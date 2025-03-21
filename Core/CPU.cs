@@ -47,7 +47,7 @@ public class CPU
         int result = HL + num;
         SetZeroFlag16(result);
         SetCarryFlag16(result);
-        HalfCarryFlag = false;
+        SetHalfCarryFlag(HL, num);
         SubtractionFlag = false;
         HL = (ushort)result;
     }
@@ -57,7 +57,7 @@ public class CPU
         int result = _a + num + (CarryFlag ? 1 : 0);
         SetZeroFlag(result);
         SetCarryFlag(result);
-        SetHalfCarryFlag(_a, num);
+        SetHalfCarryFlagC(_a, num);
         SubtractionFlag = false;
         _a = (byte)result;
     }
@@ -90,5 +90,10 @@ public class CPU
     private void SetHalfCarryFlag(ushort num1, ushort num2)
     {
         HalfCarryFlag = ((num1 & 0xFFF) + (num2 & 0xFFF)) > 0xFFF;
+    }
+
+    private void SetHalfCarryFlagC(byte num1, byte num2)
+    {
+        HalfCarryFlag = ((num1 & 0xF) + (num2 & 0xF) + (CarryFlag ? 1 : 0)) > 0xF;
     }
 }
