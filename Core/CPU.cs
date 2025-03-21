@@ -3,6 +3,8 @@ public class CPU
 {
     private byte _a, _b, _c, _d, _e, _h, _l, _f;
 
+    private ushort _pc, _sp;
+
     public byte A { get => _a; set => _a = value; }
     public byte B { get => _b; set => _b = value; }
     public byte C { get => _c; set => _c = value; }
