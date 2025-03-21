@@ -1,6 +1,8 @@
 ﻿namespace GameBoyEmulator.Core;
 public class CPU
 {
+    private MMU _mmu;
+
     private byte _a, _b, _c, _d, _e, _h, _l, _f;
 
     private ushort _pc, _sp;
@@ -24,9 +26,10 @@ public class CPU
     public bool HalfCarryFlag { get => (_f & 0x20) != 0; set => _f = (byte)(_f & 0xDF | (value ? 0x20 : 0)); }
     public bool CarryFlag { get => (_f & 0x10) != 0; set => _f = (byte)(_f & 0xEF | (value ? 0x10 : 0)); }
 
-    public CPU()
+    public CPU(MMU mmu)
     {
         _a = _b = _c = _d = _e = _h = _l = _f = 0;
+        _mmu = mmu;
     }
 
     private void ADD(byte num)
@@ -39,9 +42,24 @@ public class CPU
         _a = (byte)result;
     }
 
+    private void ADDHL(ushort num)
+    {
+        int result = HL + num;
+        SetZeroFlag16(result);
+        SetCarryFlag16(result);
+        HalfCarryFlag = false;
+        SubtractionFlag = false;
+        HL = (ushort)result;
+    }
+
     private void SetZeroFlag(int result)
     {
         ZeroFlag = (result & 0xFF) == 0;
+    }
+
+    private void SetZeroFlag16(int result)
+    {
+        ZeroFlag = (result & 0xFFFF) == 0;
     }
 
     private void SetCarryFlag(int result)
@@ -49,8 +67,18 @@ public class CPU
         CarryFlag = (result >> 8) != 0;
     }
 
+    private void SetCarryFlag16 (int result)
+    {
+        CarryFlag = (result >> 16) != 0;
+    }
+
     private void SetHalfCarryFlag(byte num1, byte num2)
     {
         HalfCarryFlag = ((num1 & 0xF) + (num2 & 0xF)) > 0xF;
+    }
+
+    private void SetHalfCarryFlag(ushort num1, ushort num2)
+    {
+        HalfCarryFlag = ((num1 & 0xFFF) + (num2 & 0xFFF)) > 0xFFF;
     }
 }

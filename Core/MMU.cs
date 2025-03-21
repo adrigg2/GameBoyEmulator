@@ -1,5 +1,5 @@
 ﻿namespace GameBoyEmulator.Core;
-internal class MMU
+public class MMU
 {
     public byte ReadByte(ushort address)
     {
