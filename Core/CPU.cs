@@ -52,6 +52,16 @@ public class CPU
         HL = (ushort)result;
     }
 
+    private void ADC (byte num)
+    {
+        int result = _a + num + (CarryFlag ? 1 : 0);
+        SetZeroFlag(result);
+        SetCarryFlag(result);
+        SetHalfCarryFlag(_a, num);
+        SubtractionFlag = false;
+        _a = (byte)result;
+    }
+
     private void SetZeroFlag(int result)
     {
         ZeroFlag = (result & 0xFF) == 0;
