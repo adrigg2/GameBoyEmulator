@@ -62,6 +62,97 @@ public class CPU
         _a = (byte)result;
     }
 
+    private void SUB(byte num)
+    {
+        int result = _a - num;
+        SetZeroFlag(result);
+        SetCarryFlag(result);
+        SetHalfCarryFlagSub(_a, num);
+        SubtractionFlag = true;
+        _a = (byte)result;
+    }
+
+    private void SBC(byte num)
+    {
+        int result = _a - num - (CarryFlag ? 1 : 0);
+        SetZeroFlag(result);
+        SetCarryFlag(result);
+        SetHalfCarryFlagSubC(_a, num);
+        SubtractionFlag = true;
+        _a = (byte)result;
+    }
+
+    private void AND(byte num)
+    {
+        int result = _a & num;
+        SetZeroFlag(result);
+        CarryFlag = false;
+        HalfCarryFlag = true;
+        SubtractionFlag = false;
+        _a = (byte)result;
+    }
+
+    private void OR(byte num)
+    {
+        int result = _a | num;
+        SetZeroFlag(result);
+        CarryFlag = false;
+        HalfCarryFlag = false;
+        SubtractionFlag = false;
+        _a = (byte)result;
+    }
+    
+    private void XOR(byte num)
+    {
+        int result = _a ^ num;
+        SetZeroFlag(result);
+        CarryFlag = false;
+        HalfCarryFlag = false;
+        SubtractionFlag = false;
+        _a = (byte)result;
+    }
+
+    private void CP(byte num)
+    {
+        int result = _a - num;
+        SetZeroFlag(result);
+        SetCarryFlag(result);
+        SetHalfCarryFlagSub(_a, num);
+        SubtractionFlag = true;
+    }
+
+    private byte INC(byte num)
+    {
+        int result = num + 1;
+        SetZeroFlag(result);
+        SetHalfCarryFlag(num, 1);
+        SubtractionFlag = false;
+        return (byte)result;
+    }
+
+    private byte DEC(byte num)
+    {
+        int result = num - 1;
+        SetZeroFlag(result);
+        SetHalfCarryFlagSub(_a, num);
+        SubtractionFlag = true;
+        return (byte)result;
+    }
+
+    private void CCF()
+    {
+        HalfCarryFlag = false;
+        SubtractionFlag = false;
+        CarryFlag = !CarryFlag;
+    }
+
+    private void SCF()
+    {
+        HalfCarryFlag = false;
+        SubtractionFlag = false;
+        CarryFlag = true;
+    }
+
     private void SetZeroFlag(int result)
     {
         ZeroFlag = (result & 0xFF) == 0;
@@ -95,5 +186,14 @@ public class CPU
     private void SetHalfCarryFlagC(byte num1, byte num2)
     {
         HalfCarryFlag = ((num1 & 0xF) + (num2 & 0xF) + (CarryFlag ? 1 : 0)) > 0xF;
+    }
+
+    private void SetHalfCarryFlagSub(byte num1, byte num2)
+    {
+        HalfCarryFlag = (num1 & 0xF) < (num2 & 0xF);
+    }
+    private void SetHalfCarryFlagSubC(byte num1, byte num2)
+    {
+        HalfCarryFlag = (num1 & 0xF) < ((num2 & 0xF) + (CarryFlag ? 1 : 0));
     }
 }
