@@ -153,6 +153,110 @@ public class CPU
         CarryFlag = true;
     }
 
+    private byte RR(byte num)
+    {
+        byte result = (byte)((num >> 1) | (CarryFlag ? 0x80 : 0));
+        SetZeroFlag(result);
+        HalfCarryFlag = false;
+        SubtractionFlag = false;
+        CarryFlag = (num & 0x1) != 0;
+        return result;
+    }
+
+    private byte RL(byte num)
+    {
+        byte result = (byte)((num << 1) | (CarryFlag ? 0x1 : 0));
+        SetZeroFlag(result);
+        HalfCarryFlag = false;
+        SubtractionFlag = false;
+        CarryFlag = (num & 0x80) != 0;
+        return result;
+    }
+
+    private byte RRC(byte num)
+    {
+        byte result = (byte)((num >> 1) | (num << 7));
+        SetZeroFlag(result);
+        HalfCarryFlag = false;
+        SubtractionFlag = false;
+        CarryFlag = (num & 0x1) != 0;
+        return result;
+    }
+
+    private byte RLC(byte num)
+    {
+        byte result = (byte)((num << 1) | (num >> 7));
+        SetZeroFlag(result);
+        HalfCarryFlag = false;
+        SubtractionFlag = false;
+        CarryFlag = (num & 0x80) != 0;
+        return result;
+    }
+
+    private byte CPL(byte num)
+    {
+        SubtractionFlag = true;
+        HalfCarryFlag = true;
+        return (byte)~num;
+    }
+
+    private void BIT(byte pos, byte num)
+    {
+        ZeroFlag = (num & pos) != 0;
+        SubtractionFlag = false;
+        HalfCarryFlag = true;
+    }
+
+    private byte RES(byte pos, byte num)
+    {
+        return (byte)(num & ~pos);
+    }
+
+    private byte SET(byte pos, byte num)
+    {
+        return (byte)(num | pos);
+    }
+
+    private byte SRL(byte num)
+    {
+        byte result = (byte)(num >> 1);
+        SetZeroFlag(result);
+        SubtractionFlag = false;
+        HalfCarryFlag = false;
+        CarryFlag = (num & 0x1) != 0;
+        return result;
+    }
+
+    private byte SRA(byte num)
+    {
+        byte result = (byte)((num >> 1) | (num & 0x80));
+        SetZeroFlag(result);
+        SubtractionFlag = false;
+        HalfCarryFlag = false;
+        CarryFlag = (num & 0x1) != 0;
+        return result;
+    }
+
+    private byte SLA(byte num)
+    {
+        byte result = (byte)(num << 1);
+        SetZeroFlag(result);
+        SubtractionFlag = false;
+        HalfCarryFlag = false;
+        CarryFlag = (num & 0x80) != 0;
+        return result;
+    }
+
+    private byte SWAP(byte num)
+    {
+        byte result = (byte)(((num & 0xF0) >> 4) | ((num & 0xF) << 4));
+        SetZeroFlag(result);
+        SubtractionFlag = false;
+        HalfCarryFlag = false;
+        CarryFlag = false;
+        return result;
+    }
+
     private void SetZeroFlag(int result)
     {
         ZeroFlag = (result & 0xFF) == 0;
