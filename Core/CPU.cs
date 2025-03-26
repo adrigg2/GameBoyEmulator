@@ -27,10 +27,37 @@ public class CPU
     public bool HalfCarryFlag { get => (_f & 0x20) != 0; set => _f = (byte)(_f & 0xDF | (value ? 0x20 : 0)); }
     public bool CarryFlag { get => (_f & 0x10) != 0; set => _f = (byte)(_f & 0xEF | (value ? 0x10 : 0)); }
 
+    private Dictionary<byte, Action<byte>> _arithmeticFunctions;
+    private Dictionary<byte, Func<byte, byte>> _rotationFunctions;
+
     public CPU(MMU mmu)
     {
         _a = _b = _c = _d = _e = _h = _l = _f = 0;
         _mmu = mmu;
+
+        _arithmeticFunctions = new Dictionary<byte, Action<byte>>()
+        {
+            { 0, ADD },
+            { 1, ADC },
+            { 2, SUB },
+            { 3, SBC },
+            { 4, AND },
+            { 5, XOR },
+            { 6, OR },
+            { 7, CP },
+        };
+
+        _rotationFunctions = new Dictionary<byte, Func<byte, byte>>()
+        {
+            { 0, RLC },
+            { 1, RRC },
+            { 2, RL },
+            { 3, RR },
+            { 4, SLA },
+            { 5, SRA },
+            { 6, SWAP },
+            { 7, SRL },
+        };
     }
 
     public void Execute()
