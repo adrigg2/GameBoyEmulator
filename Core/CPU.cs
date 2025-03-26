@@ -58,19 +58,19 @@ public class CPU
             case 0x10:          break;
             case 0x11:          break;
             case 0x12:          break;
-            case 0x13:          break;
-            case 0x14:          break;
-            case 0x15:          break;
+            case 0x13: DE++;         break;     // INC DE
+            case 0x14: D = INC(D);         break;   // INC D
+            case 0x15: D = DEC(D);         break;   // DEC D
             case 0x16:          break;
-            case 0x17:          break;
+            case 0x17: A = RL(A); ZeroFlag = false;         break;  // RLA
             case 0x18:          break;
-            case 0x19:          break;
+            case 0x19: ADDHL(DE);         break;    // ADDHL DE
             case 0x1A:          break;
-            case 0x1B:          break;
-            case 0x1C:          break;
-            case 0x1D:          break;
+            case 0x1B: DE--;         break;         // DEC DE
+            case 0x1C: E = INC(E);         break;   // INC E
+            case 0x1D: E = DEC(E);         break;   // DEC E
             case 0x1E:          break;
-            case 0x1F:          break;
+            case 0x1F: A = RR(A); ZeroFlag = false;         break;  // RRA
             case 0x20:          break;
             case 0x21:          break;
             case 0x22:          break;
