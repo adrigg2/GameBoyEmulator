@@ -1,4 +1,5 @@
-﻿// TODO: Future addition: https://gb-archive.github.io/salvage/decoding_gbz80_opcodes/Decoding%20Gamboy%20Z80%20Opcodes.html
+﻿using System.Numerics;
+
 namespace GameBoyEmulator.Core;
 public class CPU
 {
@@ -74,33 +75,33 @@ public class CPU
             case 0x20:          break;
             case 0x21:          break;
             case 0x22:          break;
-            case 0x23:          break;
-            case 0x24:          break;
-            case 0x25:          break;
+            case 0x23: HL++;         break; // INC HL
+            case 0x24: H = INC(H);         break;   // INC H
+            case 0x25: H = DEC(H);         break;   // DEC H
             case 0x26:          break;
             case 0x27:          break;
             case 0x28:          break;
-            case 0x29:          break;
+            case 0x29: ADDHL(HL);         break;    // ADDHL HL
             case 0x2A:          break;
-            case 0x2B:          break;
-            case 0x2C:          break;
-            case 0x2D:          break;
+            case 0x2B: HL--;         break; // DEC HL
+            case 0x2C: L = INC(L);         break;   // INC L
+            case 0x2D: L = DEC(L);         break;   // DEC L
             case 0x2E:          break;
             case 0x2F:          break;
             case 0x30:          break;
             case 0x31:          break;
             case 0x32:          break;
-            case 0x33:          break;
-            case 0x34:          break;
-            case 0x35:          break;
+            case 0x33: _sp++;         break;    // INC SP
+            case 0x34: _mmu.WriteByte(HL, INC(_mmu.ReadByte(HL)));         break;   // INC [HL]
+            case 0x35: _mmu.WriteByte(HL, DEC(_mmu.ReadByte(HL)));         break;   // DEC [HL]
             case 0x36:          break;
             case 0x37:          break;
             case 0x38:          break;
-            case 0x39:          break;
+            case 0x39: ADDHL(_sp);         break;   // ADDHL SP
             case 0x3A:          break;
-            case 0x3B:          break;
-            case 0x3C:          break;
-            case 0x3D:          break;
+            case 0x3B: _sp--;         break;    // DEC SP
+            case 0x3C: A = INC(A);         break;   // INC A
+            case 0x3D: A = DEC(A);         break;   // DEC A
             case 0x3E:          break;
             case 0x3F:          break;
             case 0x40:          break;
