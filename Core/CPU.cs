@@ -168,77 +168,77 @@ public class CPU
             case 0x7D:          break;
             case 0x7E:          break;
             case 0x7F:          break;
-            case 0x80:          break;
-            case 0x81:          break;
-            case 0x82:          break;
-            case 0x83:          break;
-            case 0x84:          break;
-            case 0x85:          break;
-            case 0x86:          break;
-            case 0x87:          break;
-            case 0x88:          break;
-            case 0x89:          break;
-            case 0x8A:          break;
-            case 0x8B:          break;
-            case 0x8C:          break;
-            case 0x8D:          break;
-            case 0x8E:          break;
-            case 0x8F:          break;
-            case 0x90:          break;
-            case 0x91:          break;
-            case 0x92:          break;
-            case 0x93:          break;
-            case 0x94:          break;
-            case 0x95:          break;
-            case 0x96:          break;
-            case 0x97:          break;
-            case 0x98:          break;
-            case 0x99:          break;
-            case 0x9A:          break;
-            case 0x9B:          break;
-            case 0x9C:          break;
-            case 0x9D:          break;
-            case 0x9E:          break;
-            case 0x9F:          break;
-            case 0xA0:          break;
-            case 0xA1:          break;
-            case 0xA2:          break;
-            case 0xA3:          break;
-            case 0xA4:          break;
-            case 0xA5:          break;
-            case 0xA6:          break;
-            case 0xA7:          break;
-            case 0xA8:          break;
-            case 0xA9:          break;
-            case 0xAA:          break;
-            case 0xAB:          break;
-            case 0xAC:          break;
-            case 0xAD:          break;
-            case 0xAE:          break;
-            case 0xAF:          break;
-            case 0xB0:          break;
-            case 0xB1:          break;
-            case 0xB2:          break;
-            case 0xB3:          break;
-            case 0xB4:          break;
-            case 0xB5:          break;
-            case 0xB6:          break;
-            case 0xB7:          break;
-            case 0xB8:          break;
-            case 0xB9:          break;
-            case 0xBA:          break;
-            case 0xBB:          break;
-            case 0xBC:          break;
-            case 0xBD:          break;
-            case 0xBE:          break;
-            case 0xBF:          break;
+            case 0x80: ADD(B);         break;   // ADD B
+            case 0x81: ADD(C);         break;   // ADD C
+            case 0x82: ADD(D);         break;   // ADD D
+            case 0x83: ADD(E);         break;   // ADD E
+            case 0x84: ADD(H);         break;   // ADD H
+            case 0x85: ADD(L);         break;   // ADD L
+            case 0x86: ADD(_mmu.ReadByte(HL));         break;   // ADD [HL]
+            case 0x87: ADD(A);         break;   // ADD A
+            case 0x88: ADC(B);         break;   // ADC B
+            case 0x89: ADC(C);         break;   // ADC C
+            case 0x8A: ADC(D);         break;   // ADC D
+            case 0x8B: ADC(E);         break;   // ADC E
+            case 0x8C: ADC(H);         break;   // ADC H
+            case 0x8D: ADC(L);         break;   // ADC L
+            case 0x8E: ADC(_mmu.ReadByte(HL));         break;   // ADC [HL]
+            case 0x8F: ADC(A);         break;   // ADC A
+            case 0x90: SUB(B);         break;   // SUB B
+            case 0x91: SUB(C);         break;   // SUB C
+            case 0x92: SUB(D);         break;   // SUB D
+            case 0x93: SUB(E);         break;   // SUB E
+            case 0x94: SUB(H); break;   // SUB H
+            case 0x95: SUB(L); break;   // SUB L
+            case 0x96: SUB(_mmu.ReadByte(HL)); break;   // SUB [HL]
+            case 0x97: SUB(A); break;   // SUB A
+            case 0x98: SBC(B); break;   // SBC B
+            case 0x99: SBC(C); break;   // SBC C
+            case 0x9A: SBC(D); break;   // SBC D
+            case 0x9B: SBC(E); break;   // SBC E
+            case 0x9C: SBC(H); break;   // SBC H
+            case 0x9D: SBC(L); break;   // SBC L
+            case 0x9E: SBC(_mmu.ReadByte(HL)); break;   // SBC [HL]
+            case 0x9F: SBC(A); break;   // SBC A
+            case 0xA0: AND(B);         break;   // AND B
+            case 0xA1: AND(C); break;   // AND C
+            case 0xA2: AND(D); break;   // AND D
+            case 0xA3: AND(E); break;   // AND E
+            case 0xA4: AND(H); break;   // AND H
+            case 0xA5: AND(L); break;   // AND L
+            case 0xA6: AND(_mmu.ReadByte(HL)); break;   // AND [HL]
+            case 0xA7: AND(A); break;   // AND A
+            case 0xA8: XOR(B);         break;   // XOR B
+            case 0xA9: XOR(C); break;   // XOR C
+            case 0xAA: XOR(D); break;   // XOR D
+            case 0xAB: XOR(E); break;   // XOR E
+            case 0xAC: XOR(H); break;   // XOR H
+            case 0xAD: XOR(L); break;   // XOR L
+            case 0xAE: XOR(_mmu.ReadByte(HL)); break;   // XOR [HL]
+            case 0xAF: XOR(A); break;   // XOR A
+            case 0xB0: OR(B);         break;   // OR B
+            case 0xB1: OR(C); break;   // OR C
+            case 0xB2: OR(D); break;   // OR D
+            case 0xB3: OR(E); break;   // OR E
+            case 0xB4: OR(H); break;   // OR H
+            case 0xB5: OR(L); break;   // OR L
+            case 0xB6: OR(_mmu.ReadByte(HL)); break;   // OR [HL]
+            case 0xB7: OR(A); break;   // OR A
+            case 0xB8: CP(B);         break;   // CP B
+            case 0xB9: CP(C); break;   // CP C
+            case 0xBA: CP(D); break;   // CP D
+            case 0xBB: CP(E); break;   // CP E
+            case 0xBC: CP(H); break;   // CP H
+            case 0xBD: CP(L); break;   // CP L
+            case 0xBE: CP(_mmu.ReadByte(HL)); break;   // CP [HL]
+            case 0xBF: CP(A); break;   // CP A
             case 0xC0:          break;
             case 0xC1:          break;
             case 0xC2:          break;
             case 0xC3:          break;
             case 0xC4:          break;
             case 0xC5:          break;
-            case 0xC6:          break;
+            case 0xC6: ADD(_mmu.ReadByte(instruction++));         break;   // ADD n8 // TODO: Change the instruction to the proper one
             case 0xC7:          break;
             case 0xC8:          break;
             case 0xC9:          break;
@@ -246,44 +246,44 @@ public class CPU
             case 0xCB: ExecutePrefixed(instruction++);          break; // PREFIX // TODO: Change the instruction to the proper one
             case 0xCC:          break;
             case 0xCD:          break;
-            case 0xCE:          break;
+            case 0xCE: ADC(_mmu.ReadByte(instruction++)); break;   // ADC n8 // TODO: Change the instruction to the proper one
             case 0xCF:          break;
             case 0xD0:          break;
             case 0xD1:          break;
             case 0xD2:          break;
             case 0xD4:          break;
             case 0xD5:          break;
-            case 0xD6:          break;
+            case 0xD6: SUB(_mmu.ReadByte(instruction++)); break;   // SUB n8 // TODO: Change the instruction to the proper one
             case 0xD7:          break;
             case 0xD8:          break;
             case 0xD9:          break;
             case 0xDA:          break;
             case 0xDC:          break;
-            case 0xDE:          break;
+            case 0xDE: SBC(_mmu.ReadByte(instruction++)); break;   // SBC n8 // TODO: Change the instruction to the proper one
             case 0xDF:          break;
             case 0xE0:          break;
             case 0xE1:          break;
             case 0xE2:          break;
             case 0xE5:          break;
-            case 0xE6:          break;
+            case 0xE6: AND(_mmu.ReadByte(instruction++)); break;   // AND n8 // TODO: Change the instruction to the proper one
             case 0xE7:          break;
             case 0xE8:          break;
             case 0xE9:          break;
             case 0xEA:          break;
-            case 0xEE:          break;
+            case 0xEE: XOR(_mmu.ReadByte(instruction++)); break;   // XOR n8 // TODO: Change the instruction to the proper one
             case 0xEF:          break;
             case 0xF0:          break;
             case 0xF1:          break;
             case 0xF2:          break;
             case 0xF3:          break;
             case 0xF4:          break;
-            case 0xF6:          break;
+            case 0xF6: OR(_mmu.ReadByte(instruction++)); break;   // OR n8 // TODO: Change the instruction to the proper one
             case 0xF7:          break;
             case 0xF8:          break;
             case 0xF9:          break;
             case 0xFA:          break;
             case 0xFB:          break;
-            case 0xFE:          break;
+            case 0xFE: CP(_mmu.ReadByte(instruction++)); break;   // CP n8 // TODO: Change the instruction to the proper one
             case 0xFF:          break;
             default:
                 throw new ArgumentException("The instruction given is either invalid or not implemented");
