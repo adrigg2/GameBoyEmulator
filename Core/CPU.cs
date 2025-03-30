@@ -34,7 +34,7 @@ public class CPU
 
     public void Execute()
     {
-        byte instruction = 0x00;
+        byte instruction = _mmu.ReadByte(_pc++);
 
         switch (instruction)
         {
@@ -102,70 +102,70 @@ public class CPU
             case 0x3D: A = DEC(A);         break;   // DEC A
             case 0x3E:          break;
             case 0x3F:          break;
-            case 0x40:          break;
-            case 0x41:          break;
-            case 0x42:          break;
-            case 0x43:          break;
-            case 0x44:          break;
-            case 0x45:          break;
-            case 0x46:          break;
-            case 0x47:          break;
-            case 0x48:          break;
-            case 0x49:          break;
-            case 0x4A:          break;
-            case 0x4B:          break;
-            case 0x4C:          break;
-            case 0x4D:          break;
-            case 0x4E:          break;
-            case 0x4F:          break;
-            case 0x50:          break;
-            case 0x51:          break;
-            case 0x52:          break;
-            case 0x53:          break;
-            case 0x54:          break;
-            case 0x55:          break;
-            case 0x56:          break;
-            case 0x57:          break;
-            case 0x58:          break;
-            case 0x59:          break;
-            case 0x5A:          break;
-            case 0x5B:          break;
-            case 0x5C:          break;
-            case 0x5D:          break;
-            case 0x5E:          break;
-            case 0x5F:          break;
-            case 0x60:          break;
-            case 0x61:          break;
-            case 0x62:          break;
-            case 0x63:          break;
-            case 0x64:          break;
-            case 0x65:          break;
-            case 0x66:          break;
-            case 0x67:          break;
-            case 0x68:          break;
-            case 0x69:          break;
-            case 0x6A:          break;
-            case 0x6B:          break;
-            case 0x6C:          break;
-            case 0x6D:          break;
-            case 0x6E:          break;
-            case 0x6F:          break;
-            case 0x70:          break;
-            case 0x71:          break;
-            case 0x72:          break;
-            case 0x73:          break;
-            case 0x74:          break;
-            case 0x75:          break;
-            case 0x76:          break;
-            case 0x77:          break;
-            case 0x78:          break;
-            case 0x79:          break;
-            case 0x7A:          break;
-            case 0x7B:          break;
-            case 0x7C:          break;
-            case 0x7D:          break;
-            case 0x7E:          break;
-            case 0x7F:          break;
+            case 0x40:                           break;  // LD B, B
+            case 0x41: B = C;                           break;  // LD B, C
+            case 0x42: B = D;                           break;  // LD B, D
+            case 0x43: B = E;                           break;  // LD B, E
+            case 0x44: B = H;                           break;  // LD B, H
+            case 0x45: B = L;                           break;  // LD B, L
+            case 0x46: B = _mmu.ReadByte(HL);           break;  // LD B, [HL]
+            case 0x47: B = A;                           break;  // LD B, A
+            case 0x48: C = B;                           break;  // LD C, B
+            case 0x49:                           break;  // LD C, C
+            case 0x4A: C = D;                           break;  // LD C, D
+            case 0x4B: C = E;                           break;  // LD C, E
+            case 0x4C: C = H;                           break;  // LD C, H
+            case 0x4D: C = L;                           break;  // LD C, L
+            case 0x4E: C = _mmu.ReadByte(HL);           break;  // LD C, [HL]
+            case 0x4F: C = A;                           break;  // LD C, A
+            case 0x50: D = B;                           break;  // LD D, B
+            case 0x51: D = C;                           break;  // LD D, C
+            case 0x52:                           break;  // LD D, D
+            case 0x53: D = E;                           break;  // LD D, E
+            case 0x54: D = H;                           break;  // LD D, H
+            case 0x55: D = L;                           break;  // LD D, L
+            case 0x56: D = _mmu.ReadByte(HL);           break;  // LD D, [HL]
+            case 0x57: D = A;                           break;  // LD D, A
+            case 0x58: E = B;                           break;  // LD E, B
+            case 0x59: E = C;                           break;  // LD E, C
+            case 0x5A: E = D;                           break;  // LD E, D
+            case 0x5B:                          break;  // LD E, E
+            case 0x5C: E = H;                           break;  // LD E, H
+            case 0x5D: E = L;                           break;  // LD E, L
+            case 0x5E: E = _mmu.ReadByte(HL);           break;  // LD E, [HL]
+            case 0x5F: E = A;                           break;  // LD E, A
+            case 0x60: H = B;                           break;  // LD H, B
+            case 0x61: H = C;                           break;  // LD H, C
+            case 0x62: H = D;                           break;  // LD H, D
+            case 0x63: H = E;                           break;  // LD H, E
+            case 0x64:                         break;  // LD H, H
+            case 0x65: H = L;                           break;  // LD H, L
+            case 0x66: H = _mmu.ReadByte(HL);           break;  // LD H, [HL]
+            case 0x67: H = A;                           break;  // LD H, A
+            case 0x68: L = B;                           break;  // LD L, B
+            case 0x69: L = C;                           break;  // LD L, C
+            case 0x6A: L = D;                           break;  // LD L, D
+            case 0x6B: L = E;                           break;  // LD L, E
+            case 0x6C: L = H;                           break;  // LD L, H
+            case 0x6D:                          break;  // LD L, L
+            case 0x6E: L = _mmu.ReadByte(HL);           break;  // LD L, [HL]
+            case 0x6F: L = A;                           break;  // LD L, A
+            case 0x70: _mmu.WriteByte(HL, B);           break;  // LD [HL], B
+            case 0x71: _mmu.WriteByte(HL, C);           break;  // LD [HL], C
+            case 0x72: _mmu.WriteByte(HL, D);           break;  // LD [HL], D
+            case 0x73: _mmu.WriteByte(HL, E);           break;  // LD [HL], E
+            case 0x74: _mmu.WriteByte(HL, H);           break;  // LD [HL], H
+            case 0x75: _mmu.WriteByte(HL, L);           break;  // LD [HL], L
+            case 0x76:  break;
+            case 0x77: _mmu.WriteByte(HL, A);           break;  // LD [HL], A
+            case 0x78: A = B;                           break;  // LD A, B
+            case 0x79: A = C;                           break;  // LD A, C
+            case 0x7A: A = D;                           break;  // LD A, D
+            case 0x7B: A = E;                           break;  // LD A, E
+            case 0x7C: A = H;                           break;  // LD A, H
+            case 0x7D: A = L;                           break;  // LD A, L
+            case 0x7E: A = _mmu.ReadByte(HL);           break;  // LD A, [HL]
+            case 0x7F:                           break;  // LD A, A
             case 0x80: ADD(B);         break;   // ADD B
             case 0x81: ADD(C);         break;   // ADD C
             case 0x82: ADD(D);         break;   // ADD D
@@ -236,52 +236,52 @@ public class CPU
             case 0xC3:          break;
             case 0xC4:          break;
             case 0xC5:          break;
-            case 0xC6: ADD(_mmu.ReadByte(instruction++));         break;   // ADD n8 // TODO: Change the instruction to the proper one
+            case 0xC6: ADD(_mmu.ReadByte(_mmu.ReadByte(_pc++)));         break;   // ADD n8
             case 0xC7:          break;
             case 0xC8:          break;
             case 0xC9:          break;
             case 0xCA:          break;
-            case 0xCB: ExecutePrefixed(instruction++);          break; // PREFIX // TODO: Change the instruction to the proper one
+            case 0xCB: ExecutePrefixed(_mmu.ReadByte(_pc++));          break; // PREFIX
             case 0xCC:          break;
             case 0xCD:          break;
-            case 0xCE: ADC(_mmu.ReadByte(instruction++)); break;   // ADC n8 // TODO: Change the instruction to the proper one
+            case 0xCE: ADC(_mmu.ReadByte(_mmu.ReadByte(_pc++))); break;   // ADC n8
             case 0xCF:          break;
             case 0xD0:          break;
             case 0xD1:          break;
             case 0xD2:          break;
             case 0xD4:          break;
             case 0xD5:          break;
-            case 0xD6: SUB(_mmu.ReadByte(instruction++)); break;   // SUB n8 // TODO: Change the instruction to the proper one
+            case 0xD6: SUB(_mmu.ReadByte(_mmu.ReadByte(_pc++))); break;   // SUB n8
             case 0xD7:          break;
             case 0xD8:          break;
             case 0xD9:          break;
             case 0xDA:          break;
             case 0xDC:          break;
-            case 0xDE: SBC(_mmu.ReadByte(instruction++)); break;   // SBC n8 // TODO: Change the instruction to the proper one
+            case 0xDE: SBC(_mmu.ReadByte(_mmu.ReadByte(_pc++))); break;   // SBC n8
             case 0xDF:          break;
             case 0xE0:          break;
             case 0xE1:          break;
             case 0xE2:          break;
             case 0xE5:          break;
-            case 0xE6: AND(_mmu.ReadByte(instruction++)); break;   // AND n8 // TODO: Change the instruction to the proper one
+            case 0xE6: AND(_mmu.ReadByte(_mmu.ReadByte(_pc++))); break;   // AND n8
             case 0xE7:          break;
             case 0xE8:          break;
             case 0xE9:          break;
             case 0xEA:          break;
-            case 0xEE: XOR(_mmu.ReadByte(instruction++)); break;   // XOR n8 // TODO: Change the instruction to the proper one
+            case 0xEE: XOR(_mmu.ReadByte(_mmu.ReadByte(_pc++))); break;   // XOR n8
             case 0xEF:          break;
             case 0xF0:          break;
             case 0xF1:          break;
             case 0xF2:          break;
             case 0xF3:          break;
             case 0xF4:          break;
-            case 0xF6: OR(_mmu.ReadByte(instruction++)); break;   // OR n8 // TODO: Change the instruction to the proper one
+            case 0xF6: OR(_mmu.ReadByte(_mmu.ReadByte(_pc++))); break;   // OR n8
             case 0xF7:          break;
             case 0xF8:          break;
             case 0xF9:          break;
             case 0xFA:          break;
             case 0xFB:          break;
-            case 0xFE: CP(_mmu.ReadByte(instruction++)); break;   // CP n8 // TODO: Change the instruction to the proper one
+            case 0xFE: CP(_mmu.ReadByte(_mmu.ReadByte(_pc++))); break;   // CP n8
             case 0xFF:          break;
             default:
                 throw new ArgumentException("The instruction given is either invalid or not implemented");
