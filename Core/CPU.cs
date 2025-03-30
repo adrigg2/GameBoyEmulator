@@ -292,262 +292,262 @@ public class CPU
     {
         switch (instruction)
         {
-            case 0x00: B = RLC(B);                              break;
-            case 0x01: C = RLC(C);                              break;
-            case 0x02: D = RLC(D);                              break;
-            case 0x03: E = RLC(E);                              break;
-            case 0x04: H = RLC(H);                              break;
-            case 0x05: L = RLC(L);                              break;
-            case 0x06: _mmu.WriteByte(HL, RLC(_mmu.ReadByte(HL)));   break;
-            case 0x07: A = RLC(A);                              break;
-            case 0x08: B = RRC(B); break;
-            case 0x09: C = RRC(C);                              break;
-            case 0x0A: D = RRC(D);                              break;
-            case 0x0B: E = RRC(E);                              break;
-            case 0x0C: H = RRC(H);                              break;
-            case 0x0D: L = RRC(L);                              break;
-            case 0x0E: _mmu.WriteByte(HL, RRC(_mmu.ReadByte(HL)));   break;
-            case 0x0F: A = RRC(A);                              break;
-            case 0x10: B = RL(B); break;
-            case 0x11: C = RL(C);                              break;
-            case 0x12: D = RL(D);                              break;
-            case 0x13: E = RL(E);                              break;
-            case 0x14: H = RL(H);                              break;
-            case 0x15: L = RL(L);                              break;
-            case 0x16: _mmu.WriteByte(HL, RL(_mmu.ReadByte(HL)));   break;
-            case 0x17: A = RL(A);                              break;
-            case 0x18: B = RR(B); break;
-            case 0x19: C = RR(C);                              break;
-            case 0x1A: D = RR(D);                              break;
-            case 0x1B: E = RR(E);                              break;
-            case 0x1C: H = RR(H);                              break;
-            case 0x1D: L = RR(L);                              break;
-            case 0x1E: _mmu.WriteByte(HL, RR(_mmu.ReadByte(HL)));   break;
-            case 0x1F: A = RR(A);                              break;
-            case 0x20: B = SLA(B); break;
-            case 0x21: C = SLA(C);                              break;
-            case 0x22: D = SLA(D);                              break;
-            case 0x23: E = SLA(E);                              break;
-            case 0x24: H = SLA(H);                              break;
-            case 0x25: L = SLA(L);                              break;
-            case 0x26: _mmu.WriteByte(HL, SLA(_mmu.ReadByte(HL)));   break;
-            case 0x27: A = SLA(A);                              break;
-            case 0x28: B = SRA(B); break;
-            case 0x29: C = SRA(C);                              break;
-            case 0x2A: D = SRA(D);                              break;
-            case 0x2B: E = SRA(E);                              break;
-            case 0x2C: H = SRA(H);                              break;
-            case 0x2D: L = SRA(L);                              break;
-            case 0x2E: _mmu.WriteByte(HL, SRA(_mmu.ReadByte(HL)));   break;
-            case 0x2F: A = SRA(A);                              break;
-            case 0x30: B = SWAP(B); break;
-            case 0x31: C = SWAP(C);                              break;
-            case 0x32: D = SWAP(D);                              break;
-            case 0x33: E = SWAP(E);                              break;
-            case 0x34: H = SWAP(H);                              break;
-            case 0x35: L = SWAP(L);                              break;
-            case 0x36: _mmu.WriteByte(HL, SWAP(_mmu.ReadByte(HL)));   break;
-            case 0x37: A = SWAP(A);                              break;
-            case 0x38: B = SRL(B); break;
-            case 0x39: C = SRL(C);                              break;
-            case 0x3A: D = SRL(D);                              break;
-            case 0x3B: E = SRL(E);                              break;
-            case 0x3C: H = SRL(H);                              break;
-            case 0x3D: L = SRL(L);                              break;
-            case 0x3E: _mmu.WriteByte(HL, SRL(_mmu.ReadByte(HL)));   break;
-            case 0x3F: A = SRL(A);                              break;
-            case 0x40: BIT(0x1, B); break;
-            case 0x41: BIT(0x1, C); break;
-            case 0x42: BIT(0x1, D); break;
-            case 0x43: BIT(0x1, E); break;
-            case 0x44: BIT(0x1, H); break;
-            case 0x45: BIT(0x1, L); break;
-            case 0x46: BIT(0x1, _mmu.ReadByte(HL)); break;
-            case 0x47: BIT(0x1, A); break;
-            case 0x48: BIT(0x2, B); break;
-            case 0x49: BIT(0x2, C); break;
-            case 0x4A: BIT(0x2, D); break;
-            case 0x4B: BIT(0x2, E); break;
-            case 0x4C: BIT(0x2, H); break;
-            case 0x4D: BIT(0x2, L); break;
-            case 0x4E: BIT(0x2, _mmu.ReadByte(HL)); break;
-            case 0x4F: BIT(0x2, A); break;
-            case 0x50: BIT(0x4, B); break;
-            case 0x51: BIT(0x4, C); break;
-            case 0x52: BIT(0x4, D); break;
-            case 0x53: BIT(0x4, E); break;
-            case 0x54: BIT(0x4, H); break;
-            case 0x55: BIT(0x4, L); break;
-            case 0x56: BIT(0x4, _mmu.ReadByte(HL)); break;
-            case 0x57: BIT(0x4, A); break;
-            case 0x58: BIT(0x8, B); break;
-            case 0x59: BIT(0x8, C); break;
-            case 0x5A: BIT(0x8, D); break;
-            case 0x5B: BIT(0x8, E); break;
-            case 0x5C: BIT(0x8, H); break;
-            case 0x5D: BIT(0x8, L); break;
-            case 0x5E: BIT(0x8, _mmu.ReadByte(HL)); break;
-            case 0x5F: BIT(0x8, A); break;
-            case 0x60: BIT(0x10, B); break;
-            case 0x61: BIT(0x10, C); break;
-            case 0x62: BIT(0x10, D); break;
-            case 0x63: BIT(0x10, E); break;
-            case 0x64: BIT(0x10, H); break;
-            case 0x65: BIT(0x10, L); break;
-            case 0x66: BIT(0x10, _mmu.ReadByte(HL)); break;
-            case 0x67: BIT(0x10, A); break;
-            case 0x68: BIT(0x20, B); break;
-            case 0x69: BIT(0x20, C); break;
-            case 0x6A: BIT(0x20, D); break;
-            case 0x6B: BIT(0x20, E); break;
-            case 0x6C: BIT(0x20, H); break;
-            case 0x6D: BIT(0x20, L); break;
-            case 0x6E: BIT(0x20, _mmu.ReadByte(HL)); break;
-            case 0x6F: BIT(0x20, A); break;
-            case 0x70: BIT(0x40, B); break;
-            case 0x71: BIT(0x40, C); break;
-            case 0x72: BIT(0x40, D); break;
-            case 0x73: BIT(0x40, E); break;
-            case 0x74: BIT(0x40, H); break;
-            case 0x75: BIT(0x40, L); break;
-            case 0x76: BIT(0x40, _mmu.ReadByte(HL)); break;
-            case 0x77: BIT(0x40, A); break;
-            case 0x78: BIT(0x80, B); break;
-            case 0x79: BIT(0x80, C); break;
-            case 0x7A: BIT(0x80, D); break;
-            case 0x7B: BIT(0x80, E); break;
-            case 0x7C: BIT(0x80, H); break;
-            case 0x7D: BIT(0x80, L); break;
-            case 0x7E: BIT(0x80, _mmu.ReadByte(HL)); break;
-            case 0x7F: BIT(0x80, A); break;
-            case 0x80: B = RES(0x1, B); break;
-            case 0x81: C = RES(0x1, C); break;
-            case 0x82: D = RES(0x1, D); break;
-            case 0x83: E = RES(0x1, E); break;
-            case 0x84: H = RES(0x1, H); break;
-            case 0x85: L = RES(0x1, L); break;
-            case 0x86: _mmu.WriteByte(HL, RES(0x1, _mmu.ReadByte(HL))); break;
-            case 0x87: A = RES(0x1, A); break;
-            case 0x88: B = RES(0x2, B); break;
-            case 0x89: C = RES(0x2, C); break;
-            case 0x8A: D = RES(0x2, D); break;
-            case 0x8B: E = RES(0x2, E); break;
-            case 0x8C: H = RES(0x2, H); break;
-            case 0x8D: L = RES(0x2, L); break;
-            case 0x8E: _mmu.WriteByte(HL, RES(0x2, _mmu.ReadByte(HL))); break;
-            case 0x8F: A = RES(0x2, A); break;
-            case 0x90: B = RES(0x4, B); break;
-            case 0x91: C = RES(0x4, C); break;
-            case 0x92: D = RES(0x4, D); break;
-            case 0x93: E = RES(0x4, E); break;
-            case 0x94: H = RES(0x4, H); break;
-            case 0x95: L = RES(0x4, L); break;
-            case 0x96: _mmu.WriteByte(HL, RES(0x4, _mmu.ReadByte(HL))); break;
-            case 0x97: A = RES(0x4, A); break;
-            case 0x98: B = RES(0x8, B); break;
-            case 0x99: C = RES(0x8, C); break;
-            case 0x9A: D = RES(0x8, D); break;
-            case 0x9B: E = RES(0x8, E); break;
-            case 0x9C: H = RES(0x8, H); break;
-            case 0x9D: L = RES(0x8, L); break;
-            case 0x9E: _mmu.WriteByte(HL, RES(0x8, _mmu.ReadByte(HL))); break;
-            case 0x9F: A = RES(0x8, A); break;
-            case 0xA0: B = RES(0x10, B); break;
-            case 0xA1: C = RES(0x10, C); break;
-            case 0xA2: D = RES(0x10, D); break;
-            case 0xA3: E = RES(0x10, E); break;
-            case 0xA4: H = RES(0x10, H); break;
-            case 0xA5: L = RES(0x10, L); break;
-            case 0xA6: _mmu.WriteByte(HL, RES(0x10, _mmu.ReadByte(HL))); break;
-            case 0xA7: A = RES(0x10, A); break;
-            case 0xA8: B = RES(0x20, B); break;
-            case 0xA9: C = RES(0x20, C); break;
-            case 0xAA: D = RES(0x20, D); break;
-            case 0xAB: E = RES(0x20, E); break;
-            case 0xAC: H = RES(0x20, H); break;
-            case 0xAD: L = RES(0x20, L); break;
-            case 0xAE: _mmu.WriteByte(HL, RES(0x20, _mmu.ReadByte(HL))); break;
-            case 0xAF: A = RES(0x20, A); break;
-            case 0xB0: B = RES(0x40, B); break;
-            case 0xB1: C = RES(0x40, C); break;
-            case 0xB2: D = RES(0x40, D); break;
-            case 0xB3: E = RES(0x40, E); break;
-            case 0xB4: H = RES(0x40, H); break;
-            case 0xB5: L = RES(0x40, L); break;
-            case 0xB6: _mmu.WriteByte(HL, RES(0x40, _mmu.ReadByte(HL))); break;
-            case 0xB7: A = RES(0x40, A); break;
-            case 0xB8: B = RES(0x80, B); break;
-            case 0xB9: C = RES(0x80, C); break;
-            case 0xBA: D = RES(0x80, D); break;
-            case 0xBB: E = RES(0x80, E); break;
-            case 0xBC: H = RES(0x80, H); break;
-            case 0xBD: L = RES(0x80, L); break;
-            case 0xBE: _mmu.WriteByte(HL, RES(0x80, _mmu.ReadByte(HL))); break;
-            case 0xBF: A = RES(0x80, A); break;
-            case 0xC0: B = SET(0x1, B); break;
-            case 0xC1: C = SET(0x1, C); break;
-            case 0xC2: D = SET(0x1, D); break;
-            case 0xC3: E = SET(0x1, E); break;
-            case 0xC4: H = SET(0x1, H); break;
-            case 0xC5: L = SET(0x1, L); break;
-            case 0xC6: _mmu.WriteByte(HL, SET(0x1, _mmu.ReadByte(HL))); break;
-            case 0xC7: A = SET(0x1, A); break;
-            case 0xC8: B = SET(0x2, B); break;
-            case 0xC9: C = SET(0x2, C); break;
-            case 0xCA: D = SET(0x2, D); break;
-            case 0xCB: E = SET(0x2, E); break;
-            case 0xCC: H = SET(0x2, H); break;
-            case 0xCD: L = SET(0x2, L); break;
-            case 0xCE: _mmu.WriteByte(HL, SET(0x2, _mmu.ReadByte(HL))); break;
-            case 0xCF: A = SET(0x2, A); break;
-            case 0xD0: B = SET(0x4, B); break;
-            case 0xD1: C = SET(0x4, C); break;
-            case 0xD2: D = SET(0x4, D); break;
-            case 0xD3: E = SET(0x4, E); break;
-            case 0xD4: H = SET(0x4, H); break;
-            case 0xD5: L = SET(0x4, L); break;
-            case 0xD6: _mmu.WriteByte(HL, SET(0x4, _mmu.ReadByte(HL))); break;
-            case 0xD7: A = SET(0x4, A); break;
-            case 0xD8: B = SET(0x8, B); break;
-            case 0xD9: C = SET(0x8, C); break;
-            case 0xDA: D = SET(0x8, D); break;
-            case 0xDB: E = SET(0x8, E); break;
-            case 0xDC: H = SET(0x8, H); break;
-            case 0xDD: L = SET(0x8, L); break;
-            case 0xDE: _mmu.WriteByte(HL, SET(0x8, _mmu.ReadByte(HL))); break;
-            case 0xDF: A = SET(0x8, A); break;
-            case 0xE0: B = SET(0x10, B); break;
-            case 0xE1: C = SET(0x10, C); break;
-            case 0xE2: D = SET(0x10, D); break;
-            case 0xE3: E = SET(0x10, E); break;
-            case 0xE4: H = SET(0x10, H); break;
-            case 0xE5: L = SET(0x10, L); break;
-            case 0xE6: _mmu.WriteByte(HL, SET(0x10, _mmu.ReadByte(HL))); break;
-            case 0xE7: A = SET(0x10, A); break;
-            case 0xE8: B = SET(0x20, B); break;
-            case 0xE9: C = SET(0x20, C); break;
-            case 0xEA: D = SET(0x20, D); break;
-            case 0xEB: E = SET(0x20, E); break;
-            case 0xEC: H = SET(0x20, H); break;
-            case 0xED: L = SET(0x20, L); break;
-            case 0xEE: _mmu.WriteByte(HL, SET(0x20, _mmu.ReadByte(HL))); break;
-            case 0xEF: A = SET(0x20, A); break;
-            case 0xF0: B = SET(0x40, B); break;
-            case 0xF1: C = SET(0x40, C); break;
-            case 0xF2: D = SET(0x40, D); break;
-            case 0xF3: E = SET(0x40, E); break;
-            case 0xF4: H = SET(0x40, H); break;
-            case 0xF5: L = SET(0x40, L); break;
-            case 0xF6: _mmu.WriteByte(HL, SET(0x40, _mmu.ReadByte(HL))); break;
-            case 0xF7: A = SET(0x40, A); break;
-            case 0xF8: B = SET(0x80, B); break;
-            case 0xF9: C = SET(0x80, C); break;
-            case 0xFA: D = SET(0x80, D); break;
-            case 0xFB: E = SET(0x80, E); break;
-            case 0xFC: H = SET(0x80, H); break;
-            case 0xFD: L = SET(0x80, L); break;
-            case 0xFE: _mmu.WriteByte(HL, SET(0x80, _mmu.ReadByte(HL))); break;
-            case 0xFF: A = SET(0x80, A); break;
+            case 0x00: B = RLC(B);                                          break;  // RLC B
+            case 0x01: C = RLC(C);                                          break;  // RLC C
+            case 0x02: D = RLC(D);                                          break;  // RLC D
+            case 0x03: E = RLC(E);                                          break;  // RLC E
+            case 0x04: H = RLC(H);                                          break;  // RLC H
+            case 0x05: L = RLC(L);                                          break;  // RLC L
+            case 0x06: _mmu.WriteByte(HL, RLC(_mmu.ReadByte(HL)));          break;  // RLC [HL]
+            case 0x07: A = RLC(A);                                          break;  // RLC A
+            case 0x08: B = RRC(B);                                          break;  // RRC B
+            case 0x09: C = RRC(C);                                          break;  // RRC C
+            case 0x0A: D = RRC(D);                                          break;  // RRC D
+            case 0x0B: E = RRC(E);                                          break;  // RRC E
+            case 0x0C: H = RRC(H);                                          break;  // RRC H
+            case 0x0D: L = RRC(L);                                          break;  // RRC L
+            case 0x0E: _mmu.WriteByte(HL, RRC(_mmu.ReadByte(HL)));          break;  // RRC [HL]
+            case 0x0F: A = RRC(A);                                          break;  // RRC A
+            case 0x10: B = RL(B);                                           break;  // RL B
+            case 0x11: C = RL(C);                                           break;  // RL C
+            case 0x12: D = RL(D);                                           break;  // RL D
+            case 0x13: E = RL(E);                                           break;  // RL E
+            case 0x14: H = RL(H);                                           break;  // RL H
+            case 0x15: L = RL(L);                                           break;  // RL L
+            case 0x16: _mmu.WriteByte(HL, RL(_mmu.ReadByte(HL)));           break;  // RL [HL]
+            case 0x17: A = RL(A);                                           break;  // RL A
+            case 0x18: B = RR(B);                                           break;  // RR B
+            case 0x19: C = RR(C);                                           break;  // RR C
+            case 0x1A: D = RR(D);                                           break;  // RR D
+            case 0x1B: E = RR(E);                                           break;  // RR E
+            case 0x1C: H = RR(H);                                           break;  // RR H
+            case 0x1D: L = RR(L);                                           break;  // RR L
+            case 0x1E: _mmu.WriteByte(HL, RR(_mmu.ReadByte(HL)));           break;  // RR [HL]
+            case 0x1F: A = RR(A);                                           break;  // RR A
+            case 0x20: B = SLA(B);                                          break;  // SLA B
+            case 0x21: C = SLA(C);                                          break;  // SLA C
+            case 0x22: D = SLA(D);                                          break;  // SLA D
+            case 0x23: E = SLA(E);                                          break;  // SLA E
+            case 0x24: H = SLA(H);                                          break;  // SLA H
+            case 0x25: L = SLA(L);                                          break;  // SLA L
+            case 0x26: _mmu.WriteByte(HL, SLA(_mmu.ReadByte(HL)));          break;  // SLA [HL]
+            case 0x27: A = SLA(A);                                          break;  // SLA A
+            case 0x28: B = SRA(B);                                          break;  // SRA B
+            case 0x29: C = SRA(C);                                          break;  // SRA C
+            case 0x2A: D = SRA(D);                                          break;  // SRA D
+            case 0x2B: E = SRA(E);                                          break;  // SRA E
+            case 0x2C: H = SRA(H);                                          break;  // SRA H
+            case 0x2D: L = SRA(L);                                          break;  // SRA L
+            case 0x2E: _mmu.WriteByte(HL, SRA(_mmu.ReadByte(HL)));          break;  // SRA [HL]
+            case 0x2F: A = SRA(A);                                          break;  // SRA A
+            case 0x30: B = SWAP(B);                                         break;  // SWAP B
+            case 0x31: C = SWAP(C);                                         break;  // SWAP C
+            case 0x32: D = SWAP(D);                                         break;  // SWAP D
+            case 0x33: E = SWAP(E);                                         break;  // SWAP E
+            case 0x34: H = SWAP(H);                                         break;  // SWAP H
+            case 0x35: L = SWAP(L);                                         break;  // SWAP L
+            case 0x36: _mmu.WriteByte(HL, SWAP(_mmu.ReadByte(HL)));         break;  // SWAP [HL]
+            case 0x37: A = SWAP(A);                                         break;  // SWAP A
+            case 0x38: B = SRL(B);                                          break;  // SRL B
+            case 0x39: C = SRL(C);                                          break;  // SRL C
+            case 0x3A: D = SRL(D);                                          break;  // SRL D
+            case 0x3B: E = SRL(E);                                          break;  // SRL E
+            case 0x3C: H = SRL(H);                                          break;  // SRL H
+            case 0x3D: L = SRL(L);                                          break;  // SRL L
+            case 0x3E: _mmu.WriteByte(HL, SRL(_mmu.ReadByte(HL)));          break;  // SRL [HL]
+            case 0x3F: A = SRL(A);                                          break;  // SRL A
+            case 0x40: BIT(0x1, B);                                         break;  // BIT 0, B
+            case 0x41: BIT(0x1, C);                                         break;  // BIT 0, C
+            case 0x42: BIT(0x1, D);                                         break;  // BIT 0, D
+            case 0x43: BIT(0x1, E);                                         break;  // BIT 0, E
+            case 0x44: BIT(0x1, H);                                         break;  // BIT 0, H
+            case 0x45: BIT(0x1, L);                                         break;  // BIT 0, L
+            case 0x46: BIT(0x1, _mmu.ReadByte(HL));                         break;  // BIT 0, [HL]
+            case 0x47: BIT(0x1, A);                                         break;  // BIT 0, A
+            case 0x48: BIT(0x2, B);                                         break;  // BIT 1, B
+            case 0x49: BIT(0x2, C);                                         break;  // BIT 1, C
+            case 0x4A: BIT(0x2, D);                                         break;  // BIT 1, D
+            case 0x4B: BIT(0x2, E);                                         break;  // BIT 1, E
+            case 0x4C: BIT(0x2, H);                                         break;  // BIT 1, H
+            case 0x4D: BIT(0x2, L);                                         break;  // BIT 1, L
+            case 0x4E: BIT(0x2, _mmu.ReadByte(HL));                         break;  // BIT 1, [HL]
+            case 0x4F: BIT(0x2, A);                                         break;  // BIT 1, A
+            case 0x50: BIT(0x4, B);                                         break;  // BIT 2, B
+            case 0x51: BIT(0x4, C);                                         break;  // BIT 2, C
+            case 0x52: BIT(0x4, D);                                         break;  // BIT 2, D
+            case 0x53: BIT(0x4, E);                                         break;  // BIT 2, E
+            case 0x54: BIT(0x4, H);                                         break;  // BIT 2, H
+            case 0x55: BIT(0x4, L);                                         break;  // BIT 2, L
+            case 0x56: BIT(0x4, _mmu.ReadByte(HL));                         break;  // BIT 2, [HL]
+            case 0x57: BIT(0x4, A);                                         break;  // BIT 2, A
+            case 0x58: BIT(0x8, B);                                         break;  // BIT 3, B
+            case 0x59: BIT(0x8, C);                                         break;  // BIT 3, C
+            case 0x5A: BIT(0x8, D);                                         break;  // BIT 3, D
+            case 0x5B: BIT(0x8, E);                                         break;  // BIT 3, E
+            case 0x5C: BIT(0x8, H);                                         break;  // BIT 3, H
+            case 0x5D: BIT(0x8, L);                                         break;  // BIT 3, L
+            case 0x5E: BIT(0x8, _mmu.ReadByte(HL));                         break;  // BIT 3, [HL]
+            case 0x5F: BIT(0x8, A);                                         break;  // BIT 3, A
+            case 0x60: BIT(0x10, B);                                        break;  // BIT 4, B
+            case 0x61: BIT(0x10, C);                                        break;  // BIT 4, C
+            case 0x62: BIT(0x10, D);                                        break;  // BIT 4, D
+            case 0x63: BIT(0x10, E);                                        break;  // BIT 4, E
+            case 0x64: BIT(0x10, H);                                        break;  // BIT 4, H
+            case 0x65: BIT(0x10, L);                                        break;  // BIT 4, L
+            case 0x66: BIT(0x10, _mmu.ReadByte(HL));                        break;  // BIT 4, [HL]
+            case 0x67: BIT(0x10, A);                                        break;  // BIT 4, A
+            case 0x68: BIT(0x20, B);                                        break;  // BIT 5, B
+            case 0x69: BIT(0x20, C);                                        break;  // BIT 5, C
+            case 0x6A: BIT(0x20, D);                                        break;  // BIT 5, D
+            case 0x6B: BIT(0x20, E);                                        break;  // BIT 5, E
+            case 0x6C: BIT(0x20, H);                                        break;  // BIT 5, H
+            case 0x6D: BIT(0x20, L);                                        break;  // BIT 5, L
+            case 0x6E: BIT(0x20, _mmu.ReadByte(HL));                        break;  // BIT 5, [HL]
+            case 0x6F: BIT(0x20, A);                                        break;  // BIT 5, A
+            case 0x70: BIT(0x40, B);                                        break;  // BIT 6, B
+            case 0x71: BIT(0x40, C);                                        break;  // BIT 6, C
+            case 0x72: BIT(0x40, D);                                        break;  // BIT 6, D
+            case 0x73: BIT(0x40, E);                                        break;  // BIT 6, E
+            case 0x74: BIT(0x40, H);                                        break;  // BIT 6, H
+            case 0x75: BIT(0x40, L);                                        break;  // BIT 6, L
+            case 0x76: BIT(0x40, _mmu.ReadByte(HL));                        break;  // BIT 6, [HL]
+            case 0x77: BIT(0x40, A);                                        break;  // BIT 6, A
+            case 0x78: BIT(0x80, B);                                        break;  // BIT 7, B
+            case 0x79: BIT(0x80, C);                                        break;  // BIT 7, C
+            case 0x7A: BIT(0x80, D);                                        break;  // BIT 7, D
+            case 0x7B: BIT(0x80, E);                                        break;  // BIT 7, E
+            case 0x7C: BIT(0x80, H);                                        break;  // BIT 7, H
+            case 0x7D: BIT(0x80, L);                                        break;  // BIT 7, L
+            case 0x7E: BIT(0x80, _mmu.ReadByte(HL));                        break;  // BIT 7, [HL]
+            case 0x7F: BIT(0x80, A);                                        break;  // BIT 7, A
+            case 0x80: B = RES(0x1, B);                                     break;  // RES 0, B
+            case 0x81: C = RES(0x1, C);                                     break;  // RES 0, C
+            case 0x82: D = RES(0x1, D);                                     break;  // RES 0, D
+            case 0x83: E = RES(0x1, E);                                     break;  // RES 0, E
+            case 0x84: H = RES(0x1, H);                                     break;  // RES 0, H
+            case 0x85: L = RES(0x1, L);                                     break;  // RES 0, L
+            case 0x86: _mmu.WriteByte(HL, RES(0x1, _mmu.ReadByte(HL)));     break;  // RES 0, [HL]
+            case 0x87: A = RES(0x1, A);                                     break;  // RES 0, A
+            case 0x88: B = RES(0x2, B);                                     break;  // RES 1, B
+            case 0x89: C = RES(0x2, C);                                     break;  // RES 1, C
+            case 0x8A: D = RES(0x2, D);                                     break;  // RES 1, D
+            case 0x8B: E = RES(0x2, E);                                     break;  // RES 1, E
+            case 0x8C: H = RES(0x2, H);                                     break;  // RES 1, H
+            case 0x8D: L = RES(0x2, L);                                     break;  // RES 1, L
+            case 0x8E: _mmu.WriteByte(HL, RES(0x2, _mmu.ReadByte(HL)));     break;  // RES 1, [HL]
+            case 0x8F: A = RES(0x2, A);                                     break;  // RES 1, A
+            case 0x90: B = RES(0x4, B);                                     break;  // RES 2, B
+            case 0x91: C = RES(0x4, C);                                     break;  // RES 2, C
+            case 0x92: D = RES(0x4, D);                                     break;  // RES 2, D
+            case 0x93: E = RES(0x4, E);                                     break;  // RES 2, E
+            case 0x94: H = RES(0x4, H);                                     break;  // RES 2, H
+            case 0x95: L = RES(0x4, L);                                     break;  // RES 2, L
+            case 0x96: _mmu.WriteByte(HL, RES(0x4, _mmu.ReadByte(HL)));     break;  // RES 2, [HL]
+            case 0x97: A = RES(0x4, A);                                     break;  // RES 2, A
+            case 0x98: B = RES(0x8, B);                                     break;  // RES 3, B
+            case 0x99: C = RES(0x8, C);                                     break;  // RES 3, C
+            case 0x9A: D = RES(0x8, D);                                     break;  // RES 3, D
+            case 0x9B: E = RES(0x8, E);                                     break;  // RES 3, E
+            case 0x9C: H = RES(0x8, H);                                     break;  // RES 3, H
+            case 0x9D: L = RES(0x8, L);                                     break;  // RES 3, L
+            case 0x9E: _mmu.WriteByte(HL, RES(0x8, _mmu.ReadByte(HL)));     break;  // RES 3, [HL]
+            case 0x9F: A = RES(0x8, A);                                     break;  // RES 3, A
+            case 0xA0: B = RES(0x10, B);                                    break;  // RES 4, B
+            case 0xA1: C = RES(0x10, C);                                    break;  // RES 4, C
+            case 0xA2: D = RES(0x10, D);                                    break;  // RES 4, D
+            case 0xA3: E = RES(0x10, E);                                    break;  // RES 4, E
+            case 0xA4: H = RES(0x10, H);                                    break;  // RES 4, H
+            case 0xA5: L = RES(0x10, L);                                    break;  // RES 4, L
+            case 0xA6: _mmu.WriteByte(HL, RES(0x10, _mmu.ReadByte(HL)));    break;  // RES 4, [HL]
+            case 0xA7: A = RES(0x10, A);                                    break;  // RES 4, A
+            case 0xA8: B = RES(0x20, B);                                    break;  // RES 5, B
+            case 0xA9: C = RES(0x20, C);                                    break;  // RES 5, C
+            case 0xAA: D = RES(0x20, D);                                    break;  // RES 5, D
+            case 0xAB: E = RES(0x20, E);                                    break;  // RES 5, E
+            case 0xAC: H = RES(0x20, H);                                    break;  // RES 5, H
+            case 0xAD: L = RES(0x20, L);                                    break;  // RES 5, L
+            case 0xAE: _mmu.WriteByte(HL, RES(0x20, _mmu.ReadByte(HL)));    break;  // RES 5, [HL]
+            case 0xAF: A = RES(0x20, A);                                    break;  // RES 5, A
+            case 0xB0: B = RES(0x40, B);                                    break;  // RES 6, B
+            case 0xB1: C = RES(0x40, C);                                    break;  // RES 6, C
+            case 0xB2: D = RES(0x40, D);                                    break;  // RES 6, D
+            case 0xB3: E = RES(0x40, E);                                    break;  // RES 6, E
+            case 0xB4: H = RES(0x40, H);                                    break;  // RES 6, H
+            case 0xB5: L = RES(0x40, L);                                    break;  // RES 6, L
+            case 0xB6: _mmu.WriteByte(HL, RES(0x40, _mmu.ReadByte(HL)));    break;  // RES 6, [HL]
+            case 0xB7: A = RES(0x40, A);                                    break;  // RES 6, A
+            case 0xB8: B = RES(0x80, B);                                    break;  // RES 7, B
+            case 0xB9: C = RES(0x80, C);                                    break;  // RES 7, C
+            case 0xBA: D = RES(0x80, D);                                    break;  // RES 7, D
+            case 0xBB: E = RES(0x80, E);                                    break;  // RES 7, E
+            case 0xBC: H = RES(0x80, H);                                    break;  // RES 7, H
+            case 0xBD: L = RES(0x80, L);                                    break;  // RES 7, L
+            case 0xBE: _mmu.WriteByte(HL, RES(0x80, _mmu.ReadByte(HL)));    break;  // RES 7, [HL]
+            case 0xBF: A = RES(0x80, A);                                    break;  // RES 7, A
+            case 0xC0: B = SET(0x1, B);                                     break;  // SET 0, B
+            case 0xC1: C = SET(0x1, C);                                     break;  // SET 0, C
+            case 0xC2: D = SET(0x1, D);                                     break;  // SET 0, D
+            case 0xC3: E = SET(0x1, E);                                     break;  // SET 0, E
+            case 0xC4: H = SET(0x1, H);                                     break;  // SET 0, H
+            case 0xC5: L = SET(0x1, L);                                     break;  // SET 0, L
+            case 0xC6: _mmu.WriteByte(HL, SET(0x1, _mmu.ReadByte(HL)));     break;  // SET 0, [HL]
+            case 0xC7: A = SET(0x1, A);                                     break;  // SET 0, A
+            case 0xC8: B = SET(0x2, B);                                     break;  // SET 1, B
+            case 0xC9: C = SET(0x2, C);                                     break;  // SET 1, C
+            case 0xCA: D = SET(0x2, D);                                     break;  // SET 1, D
+            case 0xCB: E = SET(0x2, E);                                     break;  // SET 1, E
+            case 0xCC: H = SET(0x2, H);                                     break;  // SET 1, H
+            case 0xCD: L = SET(0x2, L);                                     break;  // SET 1, L
+            case 0xCE: _mmu.WriteByte(HL, SET(0x2, _mmu.ReadByte(HL)));     break;  // SET 1, [HL]
+            case 0xCF: A = SET(0x2, A);                                     break;  // SET 1, A
+            case 0xD0: B = SET(0x4, B);                                     break;  // SET 2, B
+            case 0xD1: C = SET(0x4, C);                                     break;  // SET 2, C
+            case 0xD2: D = SET(0x4, D);                                     break;  // SET 2, D
+            case 0xD3: E = SET(0x4, E);                                     break;  // SET 2, E
+            case 0xD4: H = SET(0x4, H);                                     break;  // SET 2, H
+            case 0xD5: L = SET(0x4, L);                                     break;  // SET 2, L
+            case 0xD6: _mmu.WriteByte(HL, SET(0x4, _mmu.ReadByte(HL)));     break;  // SET 2, [HL]
+            case 0xD7: A = SET(0x4, A);                                     break;  // SET 2, A
+            case 0xD8: B = SET(0x8, B);                                     break;  // SET 3, B
+            case 0xD9: C = SET(0x8, C);                                     break;  // SET 3, C
+            case 0xDA: D = SET(0x8, D);                                     break;  // SET 3, D
+            case 0xDB: E = SET(0x8, E);                                     break;  // SET 3, E
+            case 0xDC: H = SET(0x8, H);                                     break;  // SET 3, H
+            case 0xDD: L = SET(0x8, L);                                     break;  // SET 3, L
+            case 0xDE: _mmu.WriteByte(HL, SET(0x8, _mmu.ReadByte(HL)));     break;  // SET 3, [HL]
+            case 0xDF: A = SET(0x8, A);                                     break;  // SET 3, A
+            case 0xE0: B = SET(0x10, B);                                    break;  // SET 4, B
+            case 0xE1: C = SET(0x10, C);                                    break;  // SET 4, C
+            case 0xE2: D = SET(0x10, D);                                    break;  // SET 4, D
+            case 0xE3: E = SET(0x10, E);                                    break;  // SET 4, E
+            case 0xE4: H = SET(0x10, H);                                    break;  // SET 4, H
+            case 0xE5: L = SET(0x10, L);                                    break;  // SET 4, L
+            case 0xE6: _mmu.WriteByte(HL, SET(0x10, _mmu.ReadByte(HL)));    break;  // SET 4, [HL]
+            case 0xE7: A = SET(0x10, A);                                    break;  // SET 4, A
+            case 0xE8: B = SET(0x20, B);                                    break;  // SET 5, B
+            case 0xE9: C = SET(0x20, C);                                    break;  // SET 5, C
+            case 0xEA: D = SET(0x20, D);                                    break;  // SET 5, D
+            case 0xEB: E = SET(0x20, E);                                    break;  // SET 5, E
+            case 0xEC: H = SET(0x20, H);                                    break;  // SET 5, H
+            case 0xED: L = SET(0x20, L);                                    break;  // SET 5, L
+            case 0xEE: _mmu.WriteByte(HL, SET(0x20, _mmu.ReadByte(HL)));    break;  // SET 5, [HL]
+            case 0xEF: A = SET(0x20, A);                                    break;  // SET 5, A
+            case 0xF0: B = SET(0x40, B);                                    break;  // SET 6, B
+            case 0xF1: C = SET(0x40, C);                                    break;  // SET 6, C
+            case 0xF2: D = SET(0x40, D);                                    break;  // SET 6, D
+            case 0xF3: E = SET(0x40, E);                                    break;  // SET 6, E
+            case 0xF4: H = SET(0x40, H);                                    break;  // SET 6, H
+            case 0xF5: L = SET(0x40, L);                                    break;  // SET 6, L
+            case 0xF6: _mmu.WriteByte(HL, SET(0x40, _mmu.ReadByte(HL)));    break;  // SET 6, [HL]
+            case 0xF7: A = SET(0x40, A);                                    break;  // SET 6, A
+            case 0xF8: B = SET(0x80, B);                                    break;  // SET 7, B
+            case 0xF9: C = SET(0x80, C);                                    break;  // SET 7, C
+            case 0xFA: D = SET(0x80, D);                                    break;  // SET 7, D
+            case 0xFB: E = SET(0x80, E);                                    break;  // SET 7, E
+            case 0xFC: H = SET(0x80, H);                                    break;  // SET 7, H
+            case 0xFD: L = SET(0x80, L);                                    break;  // SET 7, L
+            case 0xFE: _mmu.WriteByte(HL, SET(0x80, _mmu.ReadByte(HL)));    break;  // SET 7, [HL]
+            case 0xFF: A = SET(0x80, A);                                    break;  // SET 7, A
             default:
                 throw new ArgumentException("The instruction given is either invalid or not implemented");
         }
