@@ -39,69 +39,69 @@ public class CPU
         switch (instruction)
         {
             case 0x00:          break;          // NOP
-            case 0x01:          break;
-            case 0x02:          break;
+            case 0x01: BC = _mmu.ReadWord(_pc); _pc += 2; break;    // LD BC, n16
+            case 0x02: _mmu.WriteByte(BC, A);         break;    // LD [BC], A
             case 0x03: BC++;    break;          // INC BC
             case 0x04: B = INC(B);         break;   // INC B
             case 0x05: B = DEC(B);         break;   // DEC B
-            case 0x06:          break;
+            case 0x06: B = _mmu.ReadByte(_pc++);         break; // LD B, n8
             case 0x07: A = RLC(A); ZeroFlag = false;         break;   // RLCA
-            case 0x08:          break;
+            case 0x08: _mmu.WriteWord(_mmu.ReadWord(_pc), _sp); _pc += 2;         break;   // LD [a16], SP
             case 0x09: ADDHL(BC);         break; // ADDHL BC
-            case 0x0A:          break;
+            case 0x0A: A = _mmu.ReadByte(BC);         break;    // LD A, [BC]
             case 0x0B: BC--;         break; // DEC BC
             case 0x0C: C = INC(C);          break;  // INC C
             case 0x0D: C = DEC(C);         break;   // DEC C
-            case 0x0E:          break;
+            case 0x0E: C = _mmu.ReadByte(_pc++);         break; // LD C, n8
             case 0x0F: A = RRC(A); ZeroFlag = false;        break;  // RRCA
-            case 0x10:          break;
-            case 0x11:          break;
-            case 0x12:          break;
+            case 0x10:          break;  // TODO: STOP
+            case 0x11: DE = _mmu.ReadWord(_pc); _pc += 2; break;    // LD DE, n16
+            case 0x12: _mmu.WriteByte(DE, A); break;    // LD [DE], A
             case 0x13: DE++;         break;     // INC DE
             case 0x14: D = INC(D);         break;   // INC D
             case 0x15: D = DEC(D);         break;   // DEC D
-            case 0x16:          break;
+            case 0x16: D = _mmu.ReadByte(_pc++); break; // LD D, n8
             case 0x17: A = RL(A); ZeroFlag = false;         break;  // RLA
-            case 0x18:          break;
+            case 0x18:          break;  // TODO: JR e8
             case 0x19: ADDHL(DE);         break;    // ADDHL DE
-            case 0x1A:          break;
+            case 0x1A: A = _mmu.ReadByte(DE); break;    // LD A, [DE]
             case 0x1B: DE--;         break;         // DEC DE
             case 0x1C: E = INC(E);         break;   // INC E
             case 0x1D: E = DEC(E);         break;   // DEC E
-            case 0x1E:          break;
+            case 0x1E: E = _mmu.ReadByte(_pc++); break; // LD E, n8
             case 0x1F: A = RR(A); ZeroFlag = false;         break;  // RRA
-            case 0x20:          break;
-            case 0x21:          break;
-            case 0x22:          break;
+            case 0x20:          break;  // TODO: JR NZ, e8
+            case 0x21: HL = _mmu.ReadWord(_pc); _pc += 2; break;    // LD HL, n16
+            case 0x22: _mmu.WriteByte(HL++, A);         break;  // LD [HL+], A
             case 0x23: HL++;         break; // INC HL
             case 0x24: H = INC(H);         break;   // INC H
             case 0x25: H = DEC(H);         break;   // DEC H
-            case 0x26:          break;
-            case 0x27:          break;
-            case 0x28:          break;
+            case 0x26: H = _mmu.ReadByte(_pc++); break; // LD H, n8
+            case 0x27:          break; // TODO: DAA
+            case 0x28:          break; // TODO: JR Z, e8
             case 0x29: ADDHL(HL);         break;    // ADDHL HL
-            case 0x2A:          break;
+            case 0x2A: A = _mmu.ReadByte(HL++); break;    // LD A, [HL+]
             case 0x2B: HL--;         break; // DEC HL
             case 0x2C: L = INC(L);         break;   // INC L
             case 0x2D: L = DEC(L);         break;   // DEC L
-            case 0x2E:          break;
-            case 0x2F:          break;
-            case 0x30:          break;
-            case 0x31:          break;
-            case 0x32:          break;
+            case 0x2E: L = _mmu.ReadByte(_pc++); break; // LD L, n8
+            case 0x2F: CPL();         break;  // CPL
+            case 0x30:          break;  // TODO: JR NC, e8
+            case 0x31: _sp = _mmu.ReadWord(_pc); _pc += 2; break;    // LD SP, n16
+            case 0x32: _mmu.WriteByte(HL--, A); break;  // LD [HL-], A
             case 0x33: _sp++;         break;    // INC SP
             case 0x34: _mmu.WriteByte(HL, INC(_mmu.ReadByte(HL)));         break;   // INC [HL]
             case 0x35: _mmu.WriteByte(HL, DEC(_mmu.ReadByte(HL)));         break;   // DEC [HL]
-            case 0x36:          break;
-            case 0x37:          break;
-            case 0x38:          break;
+            case 0x36: _mmu.WriteByte(HL, _mmu.ReadByte(_pc++)); break; // LD H, n8
+            case 0x37: SCF();         break;  // SCF
+            case 0x38:          break;  // TODO: JR C, e8
             case 0x39: ADDHL(_sp);         break;   // ADDHL SP
-            case 0x3A:          break;
+            case 0x3A: A = _mmu.ReadByte(HL--); break;    // LD A, [HL-]
             case 0x3B: _sp--;         break;    // DEC SP
             case 0x3C: A = INC(A);         break;   // INC A
             case 0x3D: A = DEC(A);         break;   // DEC A
-            case 0x3E:          break;
-            case 0x3F:          break;
+            case 0x3E: A = _mmu.ReadByte(_pc++); break; // LD A, n8
+            case 0x3F: CCF();         break;  // CCF
             case 0x40:                           break;  // LD B, B
             case 0x41: B = C;                           break;  // LD B, C
             case 0x42: B = D;                           break;  // LD B, D
@@ -156,7 +156,7 @@ public class CPU
             case 0x73: _mmu.WriteByte(HL, E);           break;  // LD [HL], E
             case 0x74: _mmu.WriteByte(HL, H);           break;  // LD [HL], H
             case 0x75: _mmu.WriteByte(HL, L);           break;  // LD [HL], L
-            case 0x76:  break;
+            case 0x76:  break;  // TODO: HALT
             case 0x77: _mmu.WriteByte(HL, A);           break;  // LD [HL], A
             case 0x78: A = B;                           break;  // LD A, B
             case 0x79: A = C;                           break;  // LD A, C
@@ -230,59 +230,58 @@ public class CPU
             case 0xBD: CP(L); break;   // CP L
             case 0xBE: CP(_mmu.ReadByte(HL)); break;   // CP [HL]
             case 0xBF: CP(A); break;   // CP A
-            case 0xC0:          break;
-            case 0xC1:          break;
-            case 0xC2:          break;
-            case 0xC3:          break;
-            case 0xC4:          break;
-            case 0xC5:          break;
+            case 0xC0:          break;  // TODO: RET NZ
+            case 0xC1:          break;  // TODO: POP BC
+            case 0xC2:          break;  // TODO: JP NZ, a16
+            case 0xC3:          break;  // TODO: JP a16
+            case 0xC4:          break;  // TODO: CALL NZ, a16
+            case 0xC5:          break;  // TODO: PUSH BC
             case 0xC6: ADD(_mmu.ReadByte(_mmu.ReadByte(_pc++)));         break;   // ADD n8
-            case 0xC7:          break;
-            case 0xC8:          break;
-            case 0xC9:          break;
-            case 0xCA:          break;
+            case 0xC7:          break;  // TODO: RST $00
+            case 0xC8:          break;  // TODO: RET Z
+            case 0xC9:          break;  // TODO: RET
+            case 0xCA:          break;  // TODO: JP Z, a16
             case 0xCB: ExecutePrefixed(_mmu.ReadByte(_pc++));          break; // PREFIX
-            case 0xCC:          break;
-            case 0xCD:          break;
+            case 0xCC:          break;  // TODO: CALL Z, a16
+            case 0xCD:          break;  // TODO: CALL a16
             case 0xCE: ADC(_mmu.ReadByte(_mmu.ReadByte(_pc++))); break;   // ADC n8
-            case 0xCF:          break;
-            case 0xD0:          break;
-            case 0xD1:          break;
-            case 0xD2:          break;
-            case 0xD4:          break;
-            case 0xD5:          break;
+            case 0xCF:          break;  // TODO: RST $08
+            case 0xD0:          break;  // TODO: RET NC
+            case 0xD1:          break;  // TODO: POP DE
+            case 0xD2:          break;  // TODO: JP NC, a16
+            case 0xD4:          break;  // TODO: CALL NC, a16
+            case 0xD5:          break;  // TODO: PUSH DE
             case 0xD6: SUB(_mmu.ReadByte(_mmu.ReadByte(_pc++))); break;   // SUB n8
-            case 0xD7:          break;
-            case 0xD8:          break;
-            case 0xD9:          break;
-            case 0xDA:          break;
-            case 0xDC:          break;
+            case 0xD7:          break;  // TODO: RST $10
+            case 0xD8:          break;  // TODO: RET C
+            case 0xD9:          break;  // TODO: RETI
+            case 0xDA:          break;  // TODO: JP C, a16
+            case 0xDC:          break;  // TODO: CALL C, a16
             case 0xDE: SBC(_mmu.ReadByte(_mmu.ReadByte(_pc++))); break;   // SBC n8
-            case 0xDF:          break;
-            case 0xE0:          break;
-            case 0xE1:          break;
-            case 0xE2:          break;
-            case 0xE5:          break;
+            case 0xDF:          break;  // TODO: RST $18
+            case 0xE0:          break;  // TODO: LDH [a8], A
+            case 0xE1:          break;  // TODO: POP HL
+            case 0xE2:          break;  // TODO: LDH [C], A
+            case 0xE5:          break;  // TODO: PUSH HL
             case 0xE6: AND(_mmu.ReadByte(_mmu.ReadByte(_pc++))); break;   // AND n8
-            case 0xE7:          break;
-            case 0xE8:          break;
-            case 0xE9:          break;
-            case 0xEA:          break;
+            case 0xE7:          break;  // TODO: RST $20
+            case 0xE8:          break;  // TODO: ADD SP, e8
+            case 0xE9:          break;  // TODO: JP HL
+            case 0xEA:          break;  // TODO: LS [a16], A
             case 0xEE: XOR(_mmu.ReadByte(_mmu.ReadByte(_pc++))); break;   // XOR n8
-            case 0xEF:          break;
-            case 0xF0:          break;
-            case 0xF1:          break;
-            case 0xF2:          break;
-            case 0xF3:          break;
-            case 0xF4:          break;
+            case 0xEF:          break;  // TODO: RST $28
+            case 0xF0:          break;  // TODO: LDH A, [a8]
+            case 0xF1:          break;  // TODO: POP AF
+            case 0xF2:          break;  // TODO: LDH A, [C]
+            case 0xF3:          break;  // TODO: DI
+            case 0xF5:          break;  // TODO: PUSH AF
             case 0xF6: OR(_mmu.ReadByte(_mmu.ReadByte(_pc++))); break;   // OR n8
-            case 0xF7:          break;
-            case 0xF8:          break;
-            case 0xF9:          break;
-            case 0xFA:          break;
-            case 0xFB:          break;
+            case 0xF7:          break;  // TODO: RST $30
+            case 0xF8:          break;  // TODO: LD HL, SP + e8
+            case 0xF9:          break;  // TODO: LD SP, HL
+            case 0xFA:          break;  // TODO: LD A, [a16]
             case 0xFE: CP(_mmu.ReadByte(_mmu.ReadByte(_pc++))); break;   // CP n8
-            case 0xFF:          break;
+            case 0xFF:          break;  // TODO: RST $38
             default:
                 throw new ArgumentException("The instruction given is either invalid or not implemented");
         }
@@ -714,11 +713,11 @@ public class CPU
         return result;
     }
 
-    private byte CPL(byte num)
+    private void CPL()
     {
+        A = (byte)~A;
         SubtractionFlag = true;
         HalfCarryFlag = true;
-        return (byte)~num;
     }
 
     private void BIT(byte pos, byte num)
