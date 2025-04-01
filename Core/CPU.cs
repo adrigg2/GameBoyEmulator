@@ -236,7 +236,7 @@ public class CPU
             case 0xC3:          break;  // TODO: JP a16
             case 0xC4:          break;  // TODO: CALL NZ, a16
             case 0xC5:          break;  // TODO: PUSH BC
-            case 0xC6: ADD(_mmu.ReadByte(_mmu.ReadByte(_pc++)));         break;   // ADD n8
+            case 0xC6: ADD(_mmu.ReadByte(_pc++));         break;   // ADD n8
             case 0xC7:          break;  // TODO: RST $00
             case 0xC8:          break;  // TODO: RET Z
             case 0xC9:          break;  // TODO: RET
@@ -244,43 +244,43 @@ public class CPU
             case 0xCB: ExecutePrefixed(_mmu.ReadByte(_pc++));          break; // PREFIX
             case 0xCC:          break;  // TODO: CALL Z, a16
             case 0xCD:          break;  // TODO: CALL a16
-            case 0xCE: ADC(_mmu.ReadByte(_mmu.ReadByte(_pc++))); break;   // ADC n8
+            case 0xCE: ADC(_mmu.ReadByte(_pc++)); break;   // ADC n8
             case 0xCF:          break;  // TODO: RST $08
             case 0xD0:          break;  // TODO: RET NC
             case 0xD1:          break;  // TODO: POP DE
             case 0xD2:          break;  // TODO: JP NC, a16
             case 0xD4:          break;  // TODO: CALL NC, a16
             case 0xD5:          break;  // TODO: PUSH DE
-            case 0xD6: SUB(_mmu.ReadByte(_mmu.ReadByte(_pc++))); break;   // SUB n8
+            case 0xD6: SUB(_mmu.ReadByte(_pc++)); break;   // SUB n8
             case 0xD7:          break;  // TODO: RST $10
             case 0xD8:          break;  // TODO: RET C
             case 0xD9:          break;  // TODO: RETI
             case 0xDA:          break;  // TODO: JP C, a16
             case 0xDC:          break;  // TODO: CALL C, a16
-            case 0xDE: SBC(_mmu.ReadByte(_mmu.ReadByte(_pc++))); break;   // SBC n8
+            case 0xDE: SBC(_mmu.ReadByte(_pc++)); break;   // SBC n8
             case 0xDF:          break;  // TODO: RST $18
             case 0xE0:          break;  // TODO: LDH [a8], A
             case 0xE1:          break;  // TODO: POP HL
             case 0xE2:          break;  // TODO: LDH [C], A
             case 0xE5:          break;  // TODO: PUSH HL
-            case 0xE6: AND(_mmu.ReadByte(_mmu.ReadByte(_pc++))); break;   // AND n8
+            case 0xE6: AND(_mmu.ReadByte(_pc++)); break;   // AND n8
             case 0xE7:          break;  // TODO: RST $20
             case 0xE8:          break;  // TODO: ADD SP, e8
             case 0xE9:          break;  // TODO: JP HL
             case 0xEA:          break;  // TODO: LS [a16], A
-            case 0xEE: XOR(_mmu.ReadByte(_mmu.ReadByte(_pc++))); break;   // XOR n8
+            case 0xEE: XOR(_mmu.ReadByte(_pc++)); break;   // XOR n8
             case 0xEF:          break;  // TODO: RST $28
             case 0xF0:          break;  // TODO: LDH A, [a8]
             case 0xF1:          break;  // TODO: POP AF
             case 0xF2:          break;  // TODO: LDH A, [C]
             case 0xF3:          break;  // TODO: DI
             case 0xF5:          break;  // TODO: PUSH AF
-            case 0xF6: OR(_mmu.ReadByte(_mmu.ReadByte(_pc++))); break;   // OR n8
+            case 0xF6: OR(_mmu.ReadByte(_pc++)); break;   // OR n8
             case 0xF7:          break;  // TODO: RST $30
             case 0xF8:          break;  // TODO: LD HL, SP + e8
             case 0xF9:          break;  // TODO: LD SP, HL
             case 0xFA:          break;  // TODO: LD A, [a16]
-            case 0xFE: CP(_mmu.ReadByte(_mmu.ReadByte(_pc++))); break;   // CP n8
+            case 0xFE: CP(_mmu.ReadByte(_pc++)); break;   // CP n8
             case 0xFF:          break;  // TODO: RST $38
             default:
                 throw new ArgumentException("The instruction given is either invalid or not implemented");
