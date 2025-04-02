@@ -1,4 +1,6 @@
-﻿namespace GameBoyEmulator.Core;
+﻿using System;
+
+namespace GameBoyEmulator.Core;
 public class CPU
 {
     private MMU _mmu;
@@ -45,7 +47,11 @@ public class CPU
             case 0x04: B = INC(B);                                          break;  // INC B
             case 0x05: B = DEC(B);                                          break;  // DEC B
             case 0x06: B = _mmu.ReadByte(_pc++);                            break;  // LD B, n8
-            case 0x07: A = RLC(A); ZeroFlag = false;                        break;  // RLCA
+            case 0x07:                                                              // RLCA
+                F = 0;
+                CarryFlag = (A & 0x80) != 0;
+                A = (byte)((A << 1) | (A >> 7));
+                break;
             case 0x08: _mmu.WriteWord(_mmu.ReadWord(_pc), _sp); _pc += 2;   break;  // LD [a16], SP
             case 0x09: ADDHL(BC);                                           break;  // ADDHL BC
             case 0x0A: A = _mmu.ReadByte(BC);                               break;  // LD A, [BC]
@@ -53,7 +59,11 @@ public class CPU
             case 0x0C: C = INC(C);                                          break;  // INC C
             case 0x0D: C = DEC(C);                                          break;  // DEC C
             case 0x0E: C = _mmu.ReadByte(_pc++);                            break;  // LD C, n8
-            case 0x0F: A = RRC(A); ZeroFlag = false;                        break;  // RRCA
+            case 0x0F:                                                              // RRCA
+                F = 0;
+                CarryFlag = (A & 0x1) != 0;
+                A = (byte)((A >> 1) | (A << 7));
+                break;
             case 0x10:                                                      break;  // TODO: STOP
             case 0x11: DE = _mmu.ReadWord(_pc); _pc += 2;                   break;  // LD DE, n16
             case 0x12: _mmu.WriteByte(DE, A);                               break;  // LD [DE], A
@@ -61,7 +71,12 @@ public class CPU
             case 0x14: D = INC(D);                                          break;  // INC D
             case 0x15: D = DEC(D);                                          break;  // DEC D
             case 0x16: D = _mmu.ReadByte(_pc++);                            break;  // LD D, n8
-            case 0x17: A = RL(A); ZeroFlag = false;                         break;  // RLA
+            case 0x17:                                                              // RLA
+                bool carry = CarryFlag;
+                F = 0;
+                CarryFlag = (A & 0x80) != 0;
+                A = (byte)((A << 1) | (carry ? 0x1 : 0));
+                break; 
             case 0x18:                                                      break;  // TODO: JR e8
             case 0x19: ADDHL(DE);                                           break;  // ADDHL DE
             case 0x1A: A = _mmu.ReadByte(DE);                               break;  // LD A, [DE]
@@ -69,7 +84,12 @@ public class CPU
             case 0x1C: E = INC(E);                                          break;  // INC E
             case 0x1D: E = DEC(E);                                          break;  // DEC E
             case 0x1E: E = _mmu.ReadByte(_pc++);                            break;  // LD E, n8
-            case 0x1F: A = RR(A); ZeroFlag = false;                         break;  // RRA
+            case 0x1F:                                                              // RRA
+                bool cary = CarryFlag;
+                F = 0;
+                CarryFlag = (A & 0x1) != 0;
+                A = (byte)((A >> 1) | (cary ? 0x80 : 0));
+                break;
             case 0x20:                                                      break;  // TODO: JR NZ, e8
             case 0x21: HL = _mmu.ReadWord(_pc); _pc += 2;                   break;  // LD HL, n16
             case 0x22: _mmu.WriteByte(HL++, A);                             break;  // LD [HL+], A
@@ -85,7 +105,11 @@ public class CPU
             case 0x2C: L = INC(L);                                          break;  // INC L
             case 0x2D: L = DEC(L);                                          break;  // DEC L
             case 0x2E: L = _mmu.ReadByte(_pc++);                            break;  // LD L, n8
-            case 0x2F: CPL();                                               break;  // CPL
+            case 0x2F:                                                              // CPL
+                A = (byte)~A;
+                SubtractionFlag = true;
+                HalfCarryFlag = true;
+                break;
             case 0x30:                                                      break;  // TODO: JR NC, e8
             case 0x31: _sp = _mmu.ReadWord(_pc); _pc += 2;                  break;  // LD SP, n16
             case 0x32: _mmu.WriteByte(HL--, A);                             break;  // LD [HL-], A
@@ -93,7 +117,11 @@ public class CPU
             case 0x34: _mmu.WriteByte(HL, INC(_mmu.ReadByte(HL)));          break;  // INC [HL]
             case 0x35: _mmu.WriteByte(HL, DEC(_mmu.ReadByte(HL)));          break;  // DEC [HL]
             case 0x36: _mmu.WriteByte(HL, _mmu.ReadByte(_pc++));            break;  // LD H, n8
-            case 0x37: SCF();                                               break;  // SCF
+            case 0x37:                                                              // SCF
+                HalfCarryFlag = false;
+                SubtractionFlag = false; 
+                CarryFlag = true; 
+                break;
             case 0x38:                                                      break;  // TODO: JR C, e8
             case 0x39: ADDHL(_sp);                                          break;  // ADDHL SP
             case 0x3A: A = _mmu.ReadByte(HL--);                             break;  // LD A, [HL-]
@@ -101,7 +129,11 @@ public class CPU
             case 0x3C: A = INC(A);                                          break;  // INC A
             case 0x3D: A = DEC(A);                                          break;  // DEC A
             case 0x3E: A = _mmu.ReadByte(_pc++);                            break;  // LD A, n8
-            case 0x3F: CCF();                                               break;  // CCF
+            case 0x3F:                                                              // CCF
+                HalfCarryFlag = false;
+                SubtractionFlag = false;
+                CarryFlag = !CarryFlag; 
+                break;
             case 0x40:                                                      break;  // LD B, B
             case 0x41: B = C;                                               break;  // LD B, C
             case 0x42: B = D;                                               break;  // LD B, D
@@ -659,20 +691,6 @@ public class CPU
         return (byte)result;
     }
 
-    private void CCF()
-    {
-        HalfCarryFlag = false;
-        SubtractionFlag = false;
-        CarryFlag = !CarryFlag;
-    }
-
-    private void SCF()
-    {
-        HalfCarryFlag = false;
-        SubtractionFlag = false;
-        CarryFlag = true;
-    }
-
     private byte RR(byte num)
     {
         byte result = (byte)((num >> 1) | (CarryFlag ? 0x80 : 0));
@@ -711,13 +729,6 @@ public class CPU
         SubtractionFlag = false;
         CarryFlag = (num & 0x80) != 0;
         return result;
-    }
-
-    private void CPL()
-    {
-        A = (byte)~A;
-        SubtractionFlag = true;
-        HalfCarryFlag = true;
     }
 
     private void BIT(byte pos, byte num)
