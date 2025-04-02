@@ -291,27 +291,34 @@ public class CPU
             case 0xDC:                                                      break;  // TODO: CALL C, a16
             case 0xDE: SBC(_mmu.ReadByte(_pc++));                           break;  // SBC n8
             case 0xDF:                                                      break;  // TODO: RST $18
-            case 0xE0:                                                      break;  // TODO: LDH [a8], A
+            case 0xE0:                                                              // LDH [a8], A
+                _mmu.WriteByte(_mmu.ReadByte((ushort)(0xFF00 + _mmu.ReadByte(_pc++))), A);
+                break;
             case 0xE1:                                                      break;  // TODO: POP HL
-            case 0xE2:                                                      break;  // TODO: LDH [C], A
+            case 0xE2:                                                              // LDH [C], A
+                _mmu.WriteByte(_mmu.ReadByte((ushort)(0xFF00 + C)), A); 
+                break;
             case 0xE5:                                                      break;  // TODO: PUSH HL
             case 0xE6: AND(_mmu.ReadByte(_pc++));                           break;  // AND n8
             case 0xE7:                                                      break;  // TODO: RST $20
-            case 0xE8:                                                      break;  // TODO: ADD SP, e8
+            case 0xE8: _sp = ADDr16e8(_sp);                                 break;  // ADD SP, e8
             case 0xE9:                                                      break;  // TODO: JP HL
             case 0xEA:                                                      break;  // TODO: LS [a16], A
             case 0xEE: XOR(_mmu.ReadByte(_pc++));                           break;  // XOR n8
             case 0xEF:                                                      break;  // TODO: RST $28
-            case 0xF0:                                                      break;  // TODO: LDH A, [a8]
+            case 0xF0:                                                              // LDH A, [a8]
+                A = _mmu.ReadByte((ushort)(0xFF00 + _mmu.ReadByte(_pc++)));         
+                break;
             case 0xF1:                                                      break;  // TODO: POP AF
-            case 0xF2:                                                      break;  // TODO: LDH A, [C]
+            case 0xF2: A = _mmu.ReadByte((ushort)(0xFF00 + C));             break;  // LDH A, [C]
             case 0xF3:                                                      break;  // TODO: DI
             case 0xF5:                                                      break;  // TODO: PUSH AF
             case 0xF6: OR(_mmu.ReadByte(_pc++));                            break;  // OR n8
             case 0xF7:                                                      break;  // TODO: RST $30
-            case 0xF8:                                                      break;  // TODO: LD HL, SP + e8
-            case 0xF9:                                                      break;  // TODO: LD SP, HL
-            case 0xFA:                                                      break;  // TODO: LD A, [a16]
+            case 0xF8: HL = ADDr16e8(_sp);                                  break;  // LD HL, SP + e8
+            case 0xF9: _sp = HL;                                            break;  // LD SP, HL
+            case 0xFA: A = _mmu.ReadByte(_mmu.ReadWord(_pc)); _pc += 2;     break;  // LD A, [a16]
+            case 0xFB:                                                      break;  // TODO: EI
             case 0xFE: CP(_mmu.ReadByte(_pc++));                            break;  // CP n8
             case 0xFF:                                                      break;  // TODO: RST $38
             default:
@@ -786,6 +793,16 @@ public class CPU
         HalfCarryFlag = false;
         CarryFlag = false;
         return result;
+    }
+
+    private ushort ADDr16e8(ushort num)
+    {
+        byte e8 = _mmu.ReadByte(_pc++);
+        ZeroFlag = false;
+        SubtractionFlag = false;
+        SetHalfCarryFlag((byte)num, e8);
+        SetCarryFlag((byte)num + e8);
+        return (ushort)(num + (sbyte)e8);
     }
 
     private void SetZeroFlag(int result)
