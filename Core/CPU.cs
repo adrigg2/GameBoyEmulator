@@ -97,7 +97,7 @@ public class CPU
             case 0x24: H = INC(H);                                          break;  // INC H
             case 0x25: H = DEC(H);                                          break;  // DEC H
             case 0x26: H = _mmu.ReadByte(_pc++);                            break;  // LD H, n8
-            case 0x27: 
+            case 0x27:                                                              // DAA
                 int adj = 0;
                 if (SubtractionFlag)
                 {
@@ -117,7 +117,7 @@ public class CPU
                 }
                 SetZeroFlag(A);
                 HalfCarryFlag = false;
-                break;  // TODO: DAA
+                break;
             case 0x28:                                                      break;  // TODO: JR Z, e8
             case 0x29: ADDHL(HL);                                           break;  // ADDHL HL
             case 0x2A: A = _mmu.ReadByte(HL++);                             break;  // LD A, [HL+]
