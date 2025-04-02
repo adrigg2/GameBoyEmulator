@@ -97,7 +97,27 @@ public class CPU
             case 0x24: H = INC(H);                                          break;  // INC H
             case 0x25: H = DEC(H);                                          break;  // DEC H
             case 0x26: H = _mmu.ReadByte(_pc++);                            break;  // LD H, n8
-            case 0x27:                                                      break;  // TODO: DAA
+            case 0x27: 
+                int adj = 0;
+                if (SubtractionFlag)
+                {
+                    adj += HalfCarryFlag ? 0x6 : 0;
+                    adj += CarryFlag ? 0x60 : 0;
+                    A -= (byte)adj;
+                }
+                else
+                {
+                    adj += HalfCarryFlag || ((A & 0xF) > 0x9) ? 0x6 : 0;
+                    if (CarryFlag || (A > 0x99))
+                    {
+                        adj += 0x60;
+                        CarryFlag = true;
+                    }
+                    A += (byte)adj;
+                }
+                SetZeroFlag(A);
+                HalfCarryFlag = false;
+                break;  // TODO: DAA
             case 0x28:                                                      break;  // TODO: JR Z, e8
             case 0x29: ADDHL(HL);                                           break;  // ADDHL HL
             case 0x2A: A = _mmu.ReadByte(HL++);                             break;  // LD A, [HL+]
