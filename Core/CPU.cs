@@ -77,7 +77,7 @@ public class CPU
                 CarryFlag = (A & 0x80) != 0;
                 A = (byte)((A << 1) | (carry ? 0x1 : 0));
                 break; 
-            case 0x18:                                                      break;  // TODO: JR e8
+            case 0x18: JR(true, (sbyte)_mmu.ReadByte(_pc++));               break;  // JR e8
             case 0x19: ADDHL(DE);                                           break;  // ADDHL DE
             case 0x1A: A = _mmu.ReadByte(DE);                               break;  // LD A, [DE]
             case 0x1B: DE--;                                                break;  // DEC DE
@@ -90,7 +90,7 @@ public class CPU
                 CarryFlag = (A & 0x1) != 0;
                 A = (byte)((A >> 1) | (cary ? 0x80 : 0));
                 break;
-            case 0x20:                                                      break;  // TODO: JR NZ, e8
+            case 0x20: JR(!ZeroFlag, (sbyte)_mmu.ReadByte(_pc++));          break;  // JR NZ, e8
             case 0x21: HL = _mmu.ReadWord(_pc); _pc += 2;                   break;  // LD HL, n16
             case 0x22: _mmu.WriteByte(HL++, A);                             break;  // LD [HL+], A
             case 0x23: HL++;                                                break;  // INC HL
@@ -118,7 +118,7 @@ public class CPU
                 SetZeroFlag(A);
                 HalfCarryFlag = false;
                 break;
-            case 0x28:                                                      break;  // TODO: JR Z, e8
+            case 0x28: JR(ZeroFlag, (sbyte)_mmu.ReadByte(_pc++));           break;  // JR Z, e8
             case 0x29: ADDHL(HL);                                           break;  // ADDHL HL
             case 0x2A: A = _mmu.ReadByte(HL++);                             break;  // LD A, [HL+]
             case 0x2B: HL--;                                                break;  // DEC HL
@@ -130,7 +130,7 @@ public class CPU
                 SubtractionFlag = true;
                 HalfCarryFlag = true;
                 break;
-            case 0x30:                                                      break;  // TODO: JR NC, e8
+            case 0x30: JR(!CarryFlag, (sbyte)_mmu.ReadByte(_pc++));         break;  // JR NC, e8
             case 0x31: _sp = _mmu.ReadWord(_pc); _pc += 2;                  break;  // LD SP, n16
             case 0x32: _mmu.WriteByte(HL--, A);                             break;  // LD [HL-], A
             case 0x33: _sp++;                                               break;  // INC SP
@@ -142,7 +142,7 @@ public class CPU
                 SubtractionFlag = false; 
                 CarryFlag = true; 
                 break;
-            case 0x38:                                                      break;  // TODO: JR C, e8
+            case 0x38: JR(CarryFlag, (sbyte)_mmu.ReadByte(_pc++));          break;  // JR C, e8
             case 0x39: ADDHL(_sp);                                          break;  // ADDHL SP
             case 0x3A: A = _mmu.ReadByte(HL--);                             break;  // LD A, [HL-]
             case 0x3B: _sp--;                                               break;  // DEC SP
@@ -284,15 +284,15 @@ public class CPU
             case 0xBF: CP(A);                                               break;  // CP A
             case 0xC0:                                                      break;  // TODO: RET NZ
             case 0xC1:                                                      break;  // TODO: POP BC
-            case 0xC2:                                                      break;  // TODO: JP NZ, a16
-            case 0xC3:                                                      break;  // TODO: JP a16
+            case 0xC2: JP(!ZeroFlag, _mmu.ReadWord(_pc)); _pc += 2;         break;  // JP NZ, a16
+            case 0xC3: JP(true, _mmu.ReadWord(_pc)); _pc += 2;              break;  // JP a16
             case 0xC4:                                                      break;  // TODO: CALL NZ, a16
             case 0xC5:                                                      break;  // TODO: PUSH BC
             case 0xC6: ADD(_mmu.ReadByte(_pc++));                           break;  // ADD n8
             case 0xC7:                                                      break;  // TODO: RST $00
             case 0xC8:                                                      break;  // TODO: RET Z
             case 0xC9:                                                      break;  // TODO: RET
-            case 0xCA:                                                      break;  // TODO: JP Z, a16
+            case 0xCA: JP(ZeroFlag, _mmu.ReadWord(_pc)); _pc += 2;          break;  // JP Z, a16
             case 0xCB: ExecutePrefixed(_mmu.ReadByte(_pc++));               break;  // PREFIX
             case 0xCC:                                                      break;  // TODO: CALL Z, a16
             case 0xCD:                                                      break;  // TODO: CALL a16
@@ -300,14 +300,14 @@ public class CPU
             case 0xCF:                                                      break;  // TODO: RST $08
             case 0xD0:                                                      break;  // TODO: RET NC
             case 0xD1:                                                      break;  // TODO: POP DE
-            case 0xD2:                                                      break;  // TODO: JP NC, a16
+            case 0xD2: JP(!CarryFlag, _mmu.ReadWord(_pc)); _pc += 2;        break;  // JP NC, a16
             case 0xD4:                                                      break;  // TODO: CALL NC, a16
             case 0xD5:                                                      break;  // TODO: PUSH DE
             case 0xD6: SUB(_mmu.ReadByte(_pc++));                           break;  // SUB n8
             case 0xD7:                                                      break;  // TODO: RST $10
             case 0xD8:                                                      break;  // TODO: RET C
             case 0xD9:                                                      break;  // TODO: RETI
-            case 0xDA:                                                      break;  // TODO: JP C, a16
+            case 0xDA: JP(CarryFlag, _mmu.ReadWord(_pc)); _pc += 2;         break;  // JP C, a16
             case 0xDC:                                                      break;  // TODO: CALL C, a16
             case 0xDE: SBC(_mmu.ReadByte(_pc++));                           break;  // SBC n8
             case 0xDF:                                                      break;  // TODO: RST $18
@@ -322,7 +322,7 @@ public class CPU
             case 0xE6: AND(_mmu.ReadByte(_pc++));                           break;  // AND n8
             case 0xE7:                                                      break;  // TODO: RST $20
             case 0xE8: _sp = ADDr16e8(_sp);                                 break;  // ADD SP, e8
-            case 0xE9:                                                      break;  // TODO: JP HL
+            case 0xE9: JP(true, HL);                                        break;  // JP HL
             case 0xEA:                                                      break;  // TODO: LS [a16], A
             case 0xEE: XOR(_mmu.ReadByte(_pc++));                           break;  // XOR n8
             case 0xEF:                                                      break;  // TODO: RST $28
@@ -823,6 +823,22 @@ public class CPU
         SetHalfCarryFlag((byte)num, e8);
         SetCarryFlag((byte)num + e8);
         return (ushort)(num + (sbyte)e8);
+    }
+
+    private void JP(bool flag, ushort value)
+    {
+        if (flag)
+        {
+            _pc = value;
+        }
+    }
+
+    private void JR(bool flag, sbyte value)
+    {
+        if (flag)
+        {
+            _pc += (ushort)value;
+        }
     }
 
     private void SetZeroFlag(int result)
