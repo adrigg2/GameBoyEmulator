@@ -18,7 +18,7 @@ public class CPU
     public byte L { get => _l; set => _l = value; }
     public byte F { get => _f; set => _f = value; }
 
-    public ushort AF { get => (ushort)((_a << 8) | _f); set { _a = (byte)(value >> 8); _f = (byte)(value & 0xFF); } }
+    public ushort AF { get => (ushort)((_a << 8) | _f); set { _a = (byte)(value >> 8); _f = (byte)(value & 0xF0); } }
     public ushort BC { get => (ushort)((_b << 8) | _c); set { _b = (byte)(value >> 8); _c = (byte)(value & 0xFF); } }
     public ushort DE { get => (ushort)((_d << 8) | _e); set { _d = (byte)(value >> 8); _e = (byte)(value & 0xFF); } }
     public ushort HL { get => (ushort)((_h << 8) | _l); set { _h = (byte)(value >> 8); _l = (byte)(value & 0xFF); } }
@@ -283,11 +283,11 @@ public class CPU
             case 0xBE: CP(_mmu.ReadByte(HL));                               break;  // CP [HL]
             case 0xBF: CP(A);                                               break;  // CP A
             case 0xC0:                                                      break;  // TODO: RET NZ
-            case 0xC1:                                                      break;  // TODO: POP BC
+            case 0xC1: BC = _mmu.ReadWord(_sp); _sp += 2;                   break;  // POP BC
             case 0xC2: JP(!ZeroFlag, _mmu.ReadWord(_pc)); _pc += 2;         break;  // JP NZ, a16
             case 0xC3: JP(true, _mmu.ReadWord(_pc)); _pc += 2;              break;  // JP a16
             case 0xC4:                                                      break;  // TODO: CALL NZ, a16
-            case 0xC5:                                                      break;  // TODO: PUSH BC
+            case 0xC5: _sp -= 2; _mmu.WriteWord(_sp, BC);                   break;  // PUSH BC
             case 0xC6: ADD(_mmu.ReadByte(_pc++));                           break;  // ADD n8
             case 0xC7:                                                      break;  // TODO: RST $00
             case 0xC8:                                                      break;  // TODO: RET Z
@@ -299,10 +299,10 @@ public class CPU
             case 0xCE: ADC(_mmu.ReadByte(_pc++));                           break;  // ADC n8
             case 0xCF:                                                      break;  // TODO: RST $08
             case 0xD0:                                                      break;  // TODO: RET NC
-            case 0xD1:                                                      break;  // TODO: POP DE
+            case 0xD1: DE = _mmu.ReadWord(_sp); _sp += 2;                   break;  // POP DE
             case 0xD2: JP(!CarryFlag, _mmu.ReadWord(_pc)); _pc += 2;        break;  // JP NC, a16
             case 0xD4:                                                      break;  // TODO: CALL NC, a16
-            case 0xD5:                                                      break;  // TODO: PUSH DE
+            case 0xD5: _sp -= 2; _mmu.WriteWord(_sp, DE);                   break;  // PUSH DE
             case 0xD6: SUB(_mmu.ReadByte(_pc++));                           break;  // SUB n8
             case 0xD7:                                                      break;  // TODO: RST $10
             case 0xD8:                                                      break;  // TODO: RET C
@@ -314,11 +314,11 @@ public class CPU
             case 0xE0:                                                              // LDH [a8], A
                 _mmu.WriteByte(_mmu.ReadByte((ushort)(0xFF00 + _mmu.ReadByte(_pc++))), A);
                 break;
-            case 0xE1:                                                      break;  // TODO: POP HL
+            case 0xE1: HL = _mmu.ReadWord(_sp); _sp += 2;                   break;  // POP HL
             case 0xE2:                                                              // LDH [C], A
                 _mmu.WriteByte(_mmu.ReadByte((ushort)(0xFF00 + C)), A); 
                 break;
-            case 0xE5:                                                      break;  // TODO: PUSH HL
+            case 0xE5: _sp -= 2; _mmu.WriteWord(_sp, HL);                   break;  // PUSH HL
             case 0xE6: AND(_mmu.ReadByte(_pc++));                           break;  // AND n8
             case 0xE7:                                                      break;  // TODO: RST $20
             case 0xE8: _sp = ADDr16e8(_sp);                                 break;  // ADD SP, e8
@@ -329,10 +329,10 @@ public class CPU
             case 0xF0:                                                              // LDH A, [a8]
                 A = _mmu.ReadByte((ushort)(0xFF00 + _mmu.ReadByte(_pc++)));         
                 break;
-            case 0xF1:                                                      break;  // TODO: POP AF
+            case 0xF1: AF = _mmu.ReadWord(_sp); _sp += 2;                   break;  // POP AF
             case 0xF2: A = _mmu.ReadByte((ushort)(0xFF00 + C));             break;  // LDH A, [C]
             case 0xF3:                                                      break;  // TODO: DI
-            case 0xF5:                                                      break;  // TODO: PUSH AF
+            case 0xF5: _sp -= 2; _mmu.WriteWord(_sp, AF);                   break;  // PUSH AF
             case 0xF6: OR(_mmu.ReadByte(_pc++));                            break;  // OR n8
             case 0xF7:                                                      break;  // TODO: RST $30
             case 0xF8: HL = ADDr16e8(_sp);                                  break;  // LD HL, SP + e8
