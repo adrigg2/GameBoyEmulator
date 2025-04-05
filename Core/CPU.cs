@@ -323,7 +323,7 @@ public class CPU
             case 0xE7: RST(0x20);                                           break;  // RST $20
             case 0xE8: _sp = ADDr16e8(_sp);                                 break;  // ADD SP, e8
             case 0xE9: JP(true, HL);                                        break;  // JP HL
-            case 0xEA:                                                      break;  // TODO: LS [a16], A
+            case 0xEA: _mmu.WriteByte(_mmu.ReadWord(_pc), A); _pc += 2;     break;  // LD [a16], A
             case 0xEE: XOR(_mmu.ReadByte(_pc++));                           break;  // XOR n8
             case 0xEF: RST(0x28);                                           break;  // RST $28
             case 0xF0:                                                              // LDH A, [a8]
