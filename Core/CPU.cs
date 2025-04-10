@@ -9,7 +9,7 @@ public class CPU
 
     private ushort _pc, _sp;
 
-    private bool _ime, _imeEnable;
+    private bool _ime, _imeEnable, _halted, _haltBug;
 
     private int _eiCounter;
 
@@ -41,6 +41,12 @@ public class CPU
     public void Execute()
     {
         byte instruction = _mmu.ReadByte(_pc++);
+
+        if (_haltBug)
+        {
+            _pc--;
+            _haltBug = false;
+        }
 
         switch (instruction)
         {
@@ -212,7 +218,25 @@ public class CPU
             case 0x73: _mmu.WriteByte(HL, E);                               break;  // LD [HL], E
             case 0x74: _mmu.WriteByte(HL, H);                               break;  // LD [HL], H
             case 0x75: _mmu.WriteByte(HL, L);                               break;  // LD [HL], L
-            case 0x76:                                                      break;  // TODO: HALT
+            case 0x76:                                                              // HALT
+                if (_ime)
+                {
+                    _halted = true;
+                    _pc--;
+                }
+                else
+                {
+                    if ((_mmu.IE & _mmu.IF & 0x1F) == 0)
+                    {
+                        _halted = true;
+                        _pc--;
+                    }
+                    else
+                    {
+                        _haltBug = true;
+                    }
+                }
+                break;  
             case 0x77: _mmu.WriteByte(HL, A);                               break;  // LD [HL], A
             case 0x78: A = B;                                               break;  // LD A, B
             case 0x79: A = C;                                               break;  // LD A, C
@@ -354,6 +378,16 @@ public class CPU
             case 1: _eiCounter++;                   break;
             case 2: _eiCounter = 0; _ime = true;    break;
             default:                                break;
+        }
+    }
+
+    // TODO: Implement Interrupts
+    public void HandleInterrupt()
+    {
+        if (_halted)
+        {
+            _halted = false;
+            _pc++;
         }
     }
 

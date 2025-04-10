@@ -1,6 +1,9 @@
 ﻿namespace GameBoyEmulator.Core;
 public class MMU
 {
+    public byte IE { get; set; } // TODO: Implement IE
+    public byte IF { get; set; } // TODO: Implement IF
+
     public byte ReadByte(ushort address)
     {
         throw new NotImplementedException("MMU is not implemented yet");
