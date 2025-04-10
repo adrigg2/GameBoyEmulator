@@ -9,6 +9,10 @@ public class CPU
 
     private ushort _pc, _sp;
 
+    private bool _ime, _imeEnable;
+
+    private int _eiCounter;
+
     public byte A { get => _a; set => _a = value; }
     public byte B { get => _b; set => _b = value; }
     public byte C { get => _c; set => _c = value; }
@@ -306,7 +310,7 @@ public class CPU
             case 0xD6: SUB(_mmu.ReadByte(_pc++));                           break;  // SUB n8
             case 0xD7: RST(0x10);                                           break;  // RST $10
             case 0xD8: RET(CarryFlag);                                      break;  // RET C
-            case 0xD9:                                                      break;  // TODO: RETI
+            case 0xD9: RET(true); _ime = true;                              break;  // RETI
             case 0xDA: JP(CarryFlag, _mmu.ReadWord(_pc)); _pc += 2;         break;  // JP C, a16
             case 0xDC: CALL(CarryFlag, _mmu.ReadWord(_pc));                 break;  // CALL C, a16
             case 0xDE: SBC(_mmu.ReadByte(_pc++));                           break;  // SBC n8
@@ -331,18 +335,25 @@ public class CPU
                 break;
             case 0xF1: AF = _mmu.ReadWord(_sp); _sp += 2;                   break;  // POP AF
             case 0xF2: A = _mmu.ReadByte((ushort)(0xFF00 + C));             break;  // LDH A, [C]
-            case 0xF3:                                                      break;  // TODO: DI
+            case 0xF3: _ime = false;                                        break;  // DI
             case 0xF5: _sp -= 2; _mmu.WriteWord(_sp, AF);                   break;  // PUSH AF
             case 0xF6: OR(_mmu.ReadByte(_pc++));                            break;  // OR n8
             case 0xF7: RST(0x30);                                           break;  // RST $30
             case 0xF8: HL = ADDr16e8(_sp);                                  break;  // LD HL, SP + e8
             case 0xF9: _sp = HL;                                            break;  // LD SP, HL
             case 0xFA: A = _mmu.ReadByte(_mmu.ReadWord(_pc)); _pc += 2;     break;  // LD A, [a16]
-            case 0xFB:                                                      break;  // TODO: EI
+            case 0xFB: _eiCounter = 1;                                      break;  // EI
             case 0xFE: CP(_mmu.ReadByte(_pc++));                            break;  // CP n8
             case 0xFF: RST(0x38);                                           break;  // RST $38
             default:
                 throw new ArgumentException("The instruction given is either invalid or not implemented");
+        }
+
+        switch(_eiCounter)
+        {
+            case 1: _eiCounter++;                   break;
+            case 2: _eiCounter = 0; _ime = true;    break;
+            default:                                break;
         }
     }
 
