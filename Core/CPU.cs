@@ -9,7 +9,7 @@ public class CPU
 
     private ushort _pc, _sp;
 
-    private bool _ime, _imeEnable, _halted, _haltBug;
+    private bool _ime, _imeEnable, _halted, _haltBug, _stopped;
 
     private int _eiCounter;
 
@@ -40,6 +40,8 @@ public class CPU
 
     public void Execute()
     {
+        if (_stopped) return;
+
         byte instruction = _mmu.ReadByte(_pc++);
 
         if (_haltBug)
@@ -82,11 +84,13 @@ public class CPU
             case 0x15: D = DEC(D);                                          break;  // DEC D
             case 0x16: D = _mmu.ReadByte(_pc++);                            break;  // LD D, n8
             case 0x17:                                                              // RLA
+            {
                 bool carry = CarryFlag;
                 F = 0;
                 CarryFlag = (A & 0x80) != 0;
                 A = (byte)((A << 1) | (carry ? 0x1 : 0));
-                break; 
+                break;
+            } 
             case 0x18: JR(true, (sbyte)_mmu.ReadByte(_pc++));               break;  // JR e8
             case 0x19: ADDHL(DE);                                           break;  // ADDHL DE
             case 0x1A: A = _mmu.ReadByte(DE);                               break;  // LD A, [DE]
@@ -95,11 +99,13 @@ public class CPU
             case 0x1D: E = DEC(E);                                          break;  // DEC E
             case 0x1E: E = _mmu.ReadByte(_pc++);                            break;  // LD E, n8
             case 0x1F:                                                              // RRA
-                bool cary = CarryFlag;
+            {
+                bool carry = CarryFlag;
                 F = 0;
                 CarryFlag = (A & 0x1) != 0;
-                A = (byte)((A >> 1) | (cary ? 0x80 : 0));
+                A = (byte)((A >> 1) | (carry ? 0x80 : 0));
                 break;
+            }
             case 0x20: JR(!ZeroFlag, (sbyte)_mmu.ReadByte(_pc++));          break;  // JR NZ, e8
             case 0x21: HL = _mmu.ReadWord(_pc); _pc += 2;                   break;  // LD HL, n16
             case 0x22: _mmu.WriteByte(HL++, A);                             break;  // LD [HL+], A
