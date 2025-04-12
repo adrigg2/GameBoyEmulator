@@ -49,7 +49,7 @@ public class MMU
 
     public byte ReadByte(ushort address)
     {
-        switch(address)
+        switch (address)
         {
             case ushort _ when address <= 0x00FF:
                 if (_inBios)
@@ -90,11 +90,45 @@ public class MMU
 
     public void WriteByte(ushort address, byte value)
     {
-        throw new NotImplementedException("MMU is not implemented yet");
+        switch (address)
+        {
+            case ushort _ when address <= 0x7FFF:
+                _rom[address] = value;
+                break;
+            case ushort _ when address <= 0x9FFF:
+                _vram[address & 0x1FFF] = value;
+                break;
+            case ushort _ when address <= 0xBFFF:   // NOTE: Move to cartridge?
+                _eram[address & 0x1FFF] = value;
+                break;
+            case ushort _ when address <= 0xDFFF:
+                _wram[address & 0x1FFF] = value;
+                break;
+            case ushort _ when address <= 0xFDFF:   // Echo RAM
+                _wram[address & 0x1FFF] = value;
+                break;
+            case ushort _ when address <= 0xFE9F:
+                _oam[address - 0xFE00] = value;
+                break;
+            case ushort _ when address <= 0xFEFF:
+                break;
+            case ushort _ when address <= 0xFF7F:
+                _io[address & 0x7F] = value;
+                break;
+            case ushort _ when address <= 0xFFFF:
+                _hram[address & 0x7F] = value;
+                break;
+            case 0xFFFF:
+                _ie = value;
+                break;
+            default:
+                break;
+        }
     }
 
     public void WriteWord(ushort address, ushort value)
     {
-        throw new NotImplementedException("MMU is not implemented yet");
+        WriteByte(address, (byte)value);
+        WriteByte((ushort)(address + 1), (byte)(value >> 8));
     }
 }
