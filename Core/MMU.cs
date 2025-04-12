@@ -11,9 +11,9 @@ public class MMU
     private byte[] _eram;   // NOTE: Move to Cartridge?
     private byte[] _oam;    // NOTE: Move to GPU?
     private byte[] _io;
+    private byte _ie;
 
-    public byte IE { get; set; } // TODO: Implement IE
-    public byte IF { get; set; } // TODO: Implement IF
+    public byte IF { get => ReadByte(0xFF0F); set => WriteByte(0xFF0F, value); } // TODO: Implement IF
 
     public MMU()
     {
@@ -44,6 +44,7 @@ public class MMU
         _oam = new byte[0xA0];
         _io = new byte[0x80];
         _hram = new byte[0x80];
+        _ie = 0;
     }
 
     public byte ReadByte(ushort address)
@@ -57,22 +58,26 @@ public class MMU
                 }
                 return _rom[address];
             case ushort _ when address <= 0x7FFF:
-                _inBios = false;
+                _inBios = false;                    // NOTE: Move to WriteByte
                 return _rom[address];
             case ushort _ when address <= 0x9FFF:
                 return _vram[address & 0x1FFF];
+            case ushort _ when address <= 0xBFFF:   // NOTE: Move to cartridge?
+                return _eram[address & 0x1FFF];
             case ushort _ when address <= 0xDFFF:
                 return _wram[address & 0x1FFF];
-            case ushort _ when address <= 0xFDFF:
+            case ushort _ when address <= 0xFDFF:   // Echo RAM
                 return _wram[address & 0x1FFF];
             case ushort _ when address <= 0xFE9F:
-                return _oam[address & 0x9F];
+                return _oam[address - 0xFE00];
             case ushort _ when address <= 0xFEFF:
                 return 0;
             case ushort _ when address <= 0xFF7F:
                 return _io[address & 0x7F];
             case ushort _ when address <= 0xFFFF:
                 return _hram[address & 0x7F];
+            case 0xFFFF:
+                return _ie;
             default:
                 return 0;
         }
@@ -80,7 +85,7 @@ public class MMU
 
     public ushort ReadWord(ushort address)
     {
-        throw new NotImplementedException("MMU is not implemented yet");
+        return (ushort)(ReadByte(address) + (ReadByte((ushort)(address + 1)) << 8));
     }
 
     public void WriteByte(ushort address, byte value)

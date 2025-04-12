@@ -232,7 +232,7 @@ public class CPU
                 }
                 else
                 {
-                    if ((_mmu.IE & _mmu.IF & 0x1F) == 0)
+                    if ((_mmu._ie & _mmu.IF & 0x1F) == 0)
                     {
                         _halted = true;
                         _pc--;
