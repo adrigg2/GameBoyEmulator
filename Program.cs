@@ -9,7 +9,7 @@ if (args.Length < 1)
 byte[] rom = File.ReadAllBytes(args[0]);
 MMU mmu = new();
 mmu.LoadGame(rom);
-CPU cpu = new CPU(mmu);
+CPU cpu = new(mmu);
 
 while (true)
 {

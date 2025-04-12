@@ -1,7 +1,7 @@
 ﻿namespace GameBoyEmulator.Core;
 public class MMU
 {
-    private bool _inBios;
+    public bool _inBios; // DEBUG: Public
 
     private readonly byte[] _bootROM;
     private byte[] _rom;    // NOTE: Move to Cartridge?
@@ -14,7 +14,7 @@ public class MMU
     private byte _ie;
 
     public byte IE { get => _ie; set => _ie = value; }
-    public byte IF { get => ReadByte(0xFF0F); set => WriteByte(0xFF0F, value); } // TODO: Implement IF
+    public byte IF { get => ReadByte(0xFF0F); set => WriteByte(0xFF0F, value); }
 
     public MMU()
     {
@@ -59,7 +59,6 @@ public class MMU
                 }
                 return _rom[address];
             case ushort _ when address <= 0x7FFF:
-                _inBios = false;                    // NOTE: Move to WriteByte
                 return _rom[address];
             case ushort _ when address <= 0x9FFF:
                 return _vram[address & 0x1FFF];
@@ -91,6 +90,11 @@ public class MMU
 
     public void WriteByte(ushort address, byte value)
     {
+        if (address == 0xFF50)
+        {
+            _inBios = false;
+        }
+
         switch (address)
         {
             case ushort _ when address <= 0x7FFF:

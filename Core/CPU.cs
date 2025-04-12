@@ -33,7 +33,7 @@ public class CPU
     public bool HalfCarryFlag { get => (_f & 0x20) != 0; set => _f = (byte)(_f & 0xDF | (value ? 0x20 : 0)); }
     public bool CarryFlag { get => (_f & 0x10) != 0; set => _f = (byte)(_f & 0xEF | (value ? 0x10 : 0)); }
 
-    private byte _lastInstruction;  // NOTE: Debug only
+    private byte _lastInstruction;  // DEBUG: Debug only
 
     public CPU(MMU mmu)
     {
@@ -970,7 +970,7 @@ public class CPU
         HalfCarryFlag = (num1 & 0xF) < ((num2 & 0xF) + (CarryFlag ? 1 : 0));
     }
 
-    // NOTE: Debug only
+    // DEBUG: Debug only
     public override string ToString()
     {
         return $"""
@@ -991,6 +991,8 @@ public class CPU
             SP = {_sp:X2}
 
             LastInstruction = {_lastInstruction:X2}
+
+            InBIOS = {_mmu._inBios}
             """;
     }
 }
