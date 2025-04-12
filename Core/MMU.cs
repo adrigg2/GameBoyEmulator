@@ -132,4 +132,9 @@ public class MMU
         WriteByte(address, (byte)value);
         WriteByte((ushort)(address + 1), (byte)(value >> 8));
     }
+
+    public void LoadGame(byte[] rom)
+    {
+        Array.Copy(rom, _rom, Math.Min(_rom.Length, rom.Length));
+    }
 }

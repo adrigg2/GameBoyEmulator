@@ -33,7 +33,7 @@ public class CPU
     public bool HalfCarryFlag { get => (_f & 0x20) != 0; set => _f = (byte)(_f & 0xDF | (value ? 0x20 : 0)); }
     public bool CarryFlag { get => (_f & 0x10) != 0; set => _f = (byte)(_f & 0xEF | (value ? 0x10 : 0)); }
 
-    private byte _lastInstruction;
+    private byte _lastInstruction;  // NOTE: Debug only
 
     public CPU(MMU mmu)
     {
@@ -974,23 +974,23 @@ public class CPU
     public override string ToString()
     {
         return $"""
-            A = ${A}
-            B = ${B}
-            C = ${C}
-            D = ${D}
-            E = ${E}
-            H = ${H}
-            L = ${L}
+            A = {A}
+            B = {B}
+            C = {C}
+            D = {D}
+            E = {E}
+            H = {H}
+            L = {L}
 
-            Carry = ${CarryFlag}
-            HalfC = ${HalfCarryFlag}
-            Zero  = ${ZeroFlag}
-            Subtr = ${SubtractionFlag}
+            Carry = {CarryFlag}
+            HalfC = {HalfCarryFlag}
+            Zero  = {ZeroFlag}
+            Subtr = {SubtractionFlag}
 
-            PC = ${_pc}
-            SP = ${_sp}
+            PC = {_pc:X2}
+            SP = {_sp:X2}
 
-            LastInstruction = ${_lastInstruction}
+            LastInstruction = {_lastInstruction:X2}
             """;
     }
 }
