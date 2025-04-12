@@ -9,7 +9,8 @@ public class CPU
 
     private ushort _pc, _sp;
 
-    private bool _ime, _imeEnable, _halted, _haltBug, _stopped;
+    private bool _ime, _imeEnable, _halted, _haltBug;
+    // private bool _stopped;   // TODO: Stop
 
     private int _eiCounter;
 
@@ -32,6 +33,8 @@ public class CPU
     public bool HalfCarryFlag { get => (_f & 0x20) != 0; set => _f = (byte)(_f & 0xDF | (value ? 0x20 : 0)); }
     public bool CarryFlag { get => (_f & 0x10) != 0; set => _f = (byte)(_f & 0xEF | (value ? 0x10 : 0)); }
 
+    private byte _lastInstruction;
+
     public CPU(MMU mmu)
     {
         _a = _b = _c = _d = _e = _h = _l = _f = 0;
@@ -40,7 +43,7 @@ public class CPU
 
     public void Execute()
     {
-        if (_stopped) return;
+        // if (_stopped) return;    // TODO: STOP
 
         byte instruction = _mmu.ReadByte(_pc++);
 
@@ -232,7 +235,7 @@ public class CPU
                 }
                 else
                 {
-                    if ((_mmu._ie & _mmu.IF & 0x1F) == 0)
+                    if ((_mmu.IE & _mmu.IF & 0x1F) == 0)
                     {
                         _halted = true;
                         _pc--;
@@ -377,6 +380,7 @@ public class CPU
             case 0xFF: RST(0x38);                                           break;  // RST $38
             default:
                 throw new ArgumentException("The instruction given is either invalid or not implemented");
+
         }
 
         switch(_eiCounter)
@@ -385,6 +389,7 @@ public class CPU
             case 2: _eiCounter = 0; _ime = true;    break;
             default:                                break;
         }
+        _lastInstruction = instruction;
     }
 
     // TODO: Implement Interrupts
@@ -963,5 +968,29 @@ public class CPU
     private void SetHalfCarryFlagSubC(byte num1, byte num2)
     {
         HalfCarryFlag = (num1 & 0xF) < ((num2 & 0xF) + (CarryFlag ? 1 : 0));
+    }
+
+    // NOTE: Debug only
+    public override string ToString()
+    {
+        return $"""
+            A = ${A}
+            B = ${B}
+            C = ${C}
+            D = ${D}
+            E = ${E}
+            H = ${H}
+            L = ${L}
+
+            Carry = ${CarryFlag}
+            HalfC = ${HalfCarryFlag}
+            Zero  = ${ZeroFlag}
+            Subtr = ${SubtractionFlag}
+
+            PC = ${_pc}
+            SP = ${_sp}
+
+            LastInstruction = ${_lastInstruction}
+            """;
     }
 }
