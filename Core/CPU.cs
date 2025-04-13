@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace GameBoyEmulator.Core;
+﻿namespace GameBoyEmulator.Core;
 public class CPU
 {
     private MMU _mmu;
