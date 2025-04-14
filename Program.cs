@@ -10,10 +10,12 @@ byte[] rom = File.ReadAllBytes(args[0]);
 MMU mmu = new();
 mmu.LoadGame(rom);
 CPU cpu = new(mmu);
+PPU ppu = new();
 
 while (true)
 {
-    cpu.Execute();
+    int cycles = cpu.Execute();
+    ppu.Update(cycles, mmu);
     Console.WriteLine(cpu);
     Console.ReadKey();
 }
