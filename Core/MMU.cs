@@ -15,6 +15,7 @@ public class MMU
 
     public byte IE { get => _ie; set => _ie = value; }
     public byte IF { get => ReadByte(0xFF0F); set => WriteByte(0xFF0F, value); }
+    public byte LY { get => ReadByte(0xFF44); set => WriteByte(0xFF44, value); }
 
     public MMU()
     {
