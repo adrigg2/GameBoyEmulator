@@ -24,5 +24,5 @@ while (mmu._inBios)
     Console.WriteLine($"LY(CPU) = {mmu.ReadByte(0xFF44)}");
     Console.WriteLine($"Calls = {calls}");
     //if (mmu.LY == 144 || (cpu._lastInstruction != 0x20 && cpu._lastInstruction != 0xFE && cpu._lastInstruction != 0xF0) )
-    //Console.ReadKey();
+    Console.ReadKey();
 }

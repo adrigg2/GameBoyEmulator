@@ -820,7 +820,7 @@ public class CPU
 
     private void BIT(byte pos, byte num)
     {
-        ZeroFlag = (num & pos) != 0;
+        ZeroFlag = (num & pos) == 0;
         SubtractionFlag = false;
         HalfCarryFlag = true;
     }
