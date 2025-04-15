@@ -7,8 +7,10 @@ if (args.Length < 1)
 }
 
 byte[] rom = File.ReadAllBytes(args[0]);
+byte[] bootRom = File.ReadAllBytes(args[1]);
 MMU mmu = new();
 mmu.LoadGame(rom);
+mmu.LoadBootRom(bootRom);
 CPU cpu = new(mmu);
 PPU ppu = new();
 int calls = 0; // DEBUG: debug only
@@ -24,5 +26,5 @@ while (mmu._inBios)
     Console.WriteLine($"LY(CPU) = {mmu.ReadByte(0xFF44)}");
     Console.WriteLine($"Calls = {calls}");
     //if (mmu.LY == 144 || (cpu._lastInstruction != 0x20 && cpu._lastInstruction != 0xFE && cpu._lastInstruction != 0xF0) )
-    Console.ReadKey();
+    //Console.ReadKey();
 }
