@@ -1,30 +1,22 @@
-﻿using GameBoyEmulator.Core;
+﻿using System.IO;
+using System.Windows;
+using GameBoyEmulator.Core;
 
-if (args.Length < 1)
+namespace GameBoyEmulator;
+public class Program
 {
-    Console.WriteLine("A ROM filepath should be given as a parameter");
-    return;
-}
+    [STAThread]
+    public static void Main(string[] args)
+    {
+        if (args.Length < 2)
+        {
+            Console.WriteLine("A ROM and Boot ROM filepath should be given as a parameter");
+            return;
+        }
 
-byte[] rom = File.ReadAllBytes(args[0]);
-byte[] bootRom = File.ReadAllBytes(args[1]);
-MMU mmu = new();
-mmu.LoadGame(rom);
-mmu.LoadBootRom(bootRom);
-CPU cpu = new(mmu);
-PPU ppu = new();
-int calls = 0; // DEBUG: debug only
-
-while (mmu._inBios)
-{
-    calls++;
-
-    int cycles = cpu.Execute();
-    ppu.Update(cycles, mmu);
-    Console.WriteLine(cpu);
-    Console.WriteLine($"LY = {mmu.LY}");
-    Console.WriteLine($"LY(CPU) = {mmu.ReadByte(0xFF44)}");
-    Console.WriteLine($"Calls = {calls}");
-    //if (mmu.LY == 144 || (cpu._lastInstruction != 0x20 && cpu._lastInstruction != 0xFE && cpu._lastInstruction != 0xF0) )
-    //Console.ReadKey();
+        var emulator = new Emulator(args[0], args[1]);
+        var app = new Application();
+        var window = new MainWindow();
+        app.Run(window);
+    }
 }

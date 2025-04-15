@@ -21,6 +21,13 @@ public class PPU
     private int _cycleCount;
     private PPUMode _mode;
 
+    private MainWindow _window;
+
+    public PPU(MainWindow window)
+    {
+        _window = window;
+    }
+
     public void Update(int cycles, MMU mmu)
     {
         _cycleCount += cycles;
