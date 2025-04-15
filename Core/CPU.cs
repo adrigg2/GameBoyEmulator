@@ -31,7 +31,8 @@ public class CPU
     public bool HalfCarryFlag { get => (_f & 0x20) != 0; set => _f = (byte)(_f & 0xDF | (value ? 0x20 : 0)); }
     public bool CarryFlag { get => (_f & 0x10) != 0; set => _f = (byte)(_f & 0xEF | (value ? 0x10 : 0)); }
 
-    private byte _lastInstruction;  // DEBUG: Debug only
+    public byte _lastInstruction;  // DEBUG: Debug only
+    public ushort _lastInstructionPC; // DEBUG: Debug only
 
     public CPU(MMU mmu)
     {
@@ -42,6 +43,7 @@ public class CPU
     public int Execute()
     {
         // if (_stopped) return;    // TODO: STOP
+        _lastInstructionPC = _pc;
 
         byte instruction = _mmu.ReadByte(_pc++);
         int cycles = CPUCycles.Cycles[instruction];
@@ -771,7 +773,7 @@ public class CPU
     {
         int result = num - 1;
         SetZeroFlag(result);
-        SetHalfCarryFlagSub(_a, num);
+        SetHalfCarryFlagSub(num, 1);
         SubtractionFlag = true;
         return (byte)result;
     }
