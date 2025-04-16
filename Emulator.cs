@@ -1,41 +1,40 @@
 ﻿using GameBoyEmulator.Core;
 using System.IO;
+using System.Windows;
+using System.Windows.Threading;
 
 namespace GameBoyEmulator;
 public class Emulator
 {
-    private string _rom;
-    private string _bootRom;
+    private MMU _mmu;
+    private CPU _cpu;
+    private PPU _ppu;
+    int _calls;
+
+    public PPU PPU { get => _ppu; }
 
     public Emulator(string rom, string bootRom)
     {
-        _rom = rom;
-        _bootRom = bootRom;
+        byte[] romBytes = File.ReadAllBytes(rom);
+        byte[] bootRomBytes = File.ReadAllBytes(bootRom);
+        _mmu = new();
+        _mmu.LoadGame(romBytes);
+        _mmu.LoadBootRom(bootRomBytes);
+        _cpu = new(_mmu);
+        _ppu = new();
     }
 
-    public void Start(MainWindow window)
+    public void Tick()
     {
-        byte[] rom = File.ReadAllBytes(_rom);
-        byte[] bootRom = File.ReadAllBytes(_bootRom);
-        MMU mmu = new();
-        mmu.LoadGame(rom);
-        mmu.LoadBootRom(bootRom);
-        CPU cpu = new(mmu);
-        PPU ppu = new(window);
-        int calls = 0; // DEBUG: debug only
+        _calls++;
 
-        while (mmu._inBios)
-        {
-            calls++;
-
-            int cycles = cpu.Execute();
-            ppu.Update(cycles, mmu);
-            Console.WriteLine(cpu);
-            Console.WriteLine($"LY = {mmu.LY}");
-            Console.WriteLine($"LY(CPU) = {mmu.ReadByte(0xFF44)}");
-            Console.WriteLine($"Calls = {calls}");
-            //if (mmu.LY == 144 || (cpu._lastInstruction != 0x20 && cpu._lastInstruction != 0xFE && cpu._lastInstruction != 0xF0) )
-            //Console.ReadKey();
-        }
+        int cycles = _cpu.Execute();
+        _ppu.Update(cycles, _mmu);
+        Console.WriteLine(_cpu);
+        Console.WriteLine($"LY = {_mmu.LY}");
+        Console.WriteLine($"LY(CPU) = {_mmu.ReadByte(0xFF44)}");
+        Console.WriteLine($"Calls = {_calls}");
+        //if (mmu.LY == 144 || (cpu._lastInstruction != 0x20 && cpu._lastInstruction != 0xFE && cpu._lastInstruction != 0xF0) )
+        //Console.ReadKey();
     }
 }

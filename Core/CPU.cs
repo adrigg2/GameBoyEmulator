@@ -7,7 +7,7 @@ public class CPU
 
     private ushort _pc, _sp;
 
-    private bool _ime, _imeEnable, _halted, _haltBug;
+    private bool _ime, _halted, _haltBug;
     // private bool _stopped;   // TODO: Stop
 
     private int _eiCounter;

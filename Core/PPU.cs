@@ -1,4 +1,9 @@
-﻿namespace GameBoyEmulator.Core;
+﻿using System.Windows;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Threading;
+
+namespace GameBoyEmulator.Core;
 
 // NOTE: Move mode to MMU?
 public class PPU
@@ -21,11 +26,19 @@ public class PPU
     private int _cycleCount;
     private PPUMode _mode;
 
-    private MainWindow _window;
+    private WriteableBitmap _screenImage;
 
-    public PPU(MainWindow window)
+    public Dispatcher WindowDispatcher { get; set; } // NOTE: Consider transferring logic to the main window
+    private MainWindow _mainWindow; // TODO: Consider transferring logic to the main window
+
+    public PPU()
     {
-        _window = window;
+        _screenImage = new WriteableBitmap(160, 144, 96, 96, PixelFormats.Bgr32, null); // TODO: Set pixel format and palette(?) (revise the constructor parameters)
+    }
+
+    public void SetWindowSource(MainWindow window)
+    {
+        window.Screen.Source = _screenImage;
     }
 
     public void Update(int cycles, MMU mmu)
@@ -48,6 +61,7 @@ public class PPU
                     _mode = PPUMode.HBlank;
 
                     // TODO: RENDER
+                    WindowDispatcher.Invoke(GeneratePixel); // DEBUG: Test method to generate a pixel
                 }
                 break;
             case PPUMode.HBlank:
@@ -81,6 +95,40 @@ public class PPU
                     }
                 }
                 break;
+        }
+    }
+
+    // DEBUG: Test method to generate a pixel
+    // NOTE: Check if it would be better to use a safe method
+    private void GeneratePixel()
+    {
+        Random random = new Random();
+        int x = random.Next(0, 160);
+        int y = random.Next(0, 144);
+
+        try
+        {
+            _screenImage.Lock();
+
+            unsafe
+            {
+                IntPtr pBackBuffer = _screenImage.BackBuffer;
+
+                pBackBuffer += y * _screenImage.BackBufferStride;
+                pBackBuffer += x * 4;
+
+                int color_data = 255 << 16; // R
+                color_data |= 128 << 8;     // G
+                color_data |= 255 << 0;     // B
+
+                *((int*) pBackBuffer) = color_data; // Set pixel color (ARGB format, 32 bits per pixel, 4 bytes per pixel)
+            }
+
+            _screenImage.AddDirtyRect(new Int32Rect(x, y, 1, 1));
+        }
+        finally
+        {
+            _screenImage.Unlock();
         }
     }
 }

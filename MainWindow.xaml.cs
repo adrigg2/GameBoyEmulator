@@ -13,11 +13,19 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         _emulator = emulator;
-        Loaded += OnLoaded;
+        _emulator.PPU.WindowDispatcher = Dispatcher; // TODO: Consider transferring logic to the main window
+        _emulator.PPU.SetWindowSource(this); // TODO: Consider transferring logic to the main window
+        ContentRendered += OnRendered;
     }
 
-    private void OnLoaded(object sender, RoutedEventArgs e)
+    private void OnRendered(object? sender, EventArgs e)
     {
-        _emulator.Start(this);
+        Task.Run(() =>
+        {
+            while (true)
+            {
+                _emulator.Tick();
+            }
+        });
     }
 }

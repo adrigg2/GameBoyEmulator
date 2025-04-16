@@ -16,7 +16,7 @@ public class Program
 
         var emulator = new Emulator(args[0], args[1]);
         var app = new Application();
-        var window = new MainWindow();
+        var window = new MainWindow(emulator);
         app.Run(window);
     }
 }
