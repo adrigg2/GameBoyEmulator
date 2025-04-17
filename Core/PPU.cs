@@ -8,14 +8,10 @@ namespace GameBoyEmulator.Core;
 // NOTE: Move mode to MMU?
 public class PPU
 {
-    private enum PPUMode
-    {
-        OAMRead = 2,
-        VRAMRead = 3,
-        HBlank = 0,
-        VBlank = 1,
-    }
-
+    private const int OAMRead = 2;
+    private const int VRAMRead = 3;
+    private const int HBlank = 0;
+    private const int VBlank = 1;
     private const int OAMReadCycles = 80;
     private const int VRAMReadCycles = 172;
     private const int HBlankCycles = 204;
@@ -25,7 +21,6 @@ public class PPU
     private const int ScreenWidth = 160;
 
     private int _cycleCount;
-    private PPUMode _mode;
 
     private WriteableBitmap _screenImage;
 
@@ -44,27 +39,28 @@ public class PPU
     public void Update(int cycles, MMU mmu)
     {
         _cycleCount += cycles;
+        byte mode = (byte)(mmu.STAT & 0x3);
 
-        switch (_mode)
+        switch (mode)
         {
-            case PPUMode.OAMRead:
+            case OAMRead:
                 if (_cycleCount >= OAMReadCycles)
                 {
                     _cycleCount -= OAMReadCycles;
-                    _mode = PPUMode.VRAMRead;
+                    ChangeMode(VRAMRead, mmu);
                 }
                 break;
-            case PPUMode.VRAMRead:
+            case VRAMRead:
                 if (_cycleCount >= VRAMReadCycles)
                 {
                     _cycleCount -= VRAMReadCycles;
-                    _mode = PPUMode.HBlank;
+                    ChangeMode(HBlank, mmu);
 
                     // TODO: RENDER
                     WindowDispatcher.Invoke(GeneratePixel); // DEBUG: Test method to generate a pixel
                 }
                 break;
-            case PPUMode.HBlank:
+            case HBlank:
                 if (_cycleCount >= HBlankCycles)
                 {
                     _cycleCount -= HBlankCycles;
@@ -72,17 +68,17 @@ public class PPU
 
                     if (mmu.LY == ScreenHeigth)
                     {
-                        _mode = PPUMode.VBlank;
+                        ChangeMode(VBlank, mmu);
                         // TODO: RENDER
                         // TODO: VBlank Interrupt
                     }
                     else
                     {
-                        _mode = PPUMode.OAMRead;
+                        ChangeMode(OAMRead, mmu);
                     }
                 }
                 break;
-            case PPUMode.VBlank:
+            case VBlank:
                 if (_cycleCount >= ScanlineCycles)
                 {
                     _cycleCount -= ScanlineCycles;
@@ -90,12 +86,20 @@ public class PPU
 
                     if (mmu.LY > MaxLines)
                     {
-                        _mode = PPUMode.OAMRead;
+                        ChangeMode(OAMRead, mmu);
                         mmu.LY = 0;
                     }
                 }
                 break;
         }
+    }
+
+    private void ChangeMode(int mode, MMU mmu)
+    {
+        int STAT = mmu.STAT & 0xFC; // Clear the mode bits
+        mmu.STAT = (byte)(STAT | mode); // Set the new mode
+
+        // TODO: Interrupts
     }
 
     // DEBUG: Test method to generate a pixel
