@@ -15,7 +15,13 @@ public class MMU
 
     public byte IE { get => _ie; set => _ie = value; }
     public byte IF { get => ReadByte(0xFF0F); set => WriteByte(0xFF0F, value); }
+    public byte LCDC { get => ReadByte(0xFF40); set => WriteByte(0xFF40, value); }
+    public byte STAT { get => ReadByte(0xFF41); set => WriteByte(0xFF41, value); }
+    public byte SCY { get => ReadByte(0xFF42); set => WriteByte(0xFF42, value); }
+    public byte SCX { get => ReadByte(0xFF43); set => WriteByte(0xFF43, value); }
     public byte LY { get => ReadByte(0xFF44); set => WriteByte(0xFF44, value); }
+    public byte LYC { get => ReadByte(0xFF45); set => WriteByte(0xFF45, value); }
+    public byte BGP { get => ReadByte(0xFF47); set => WriteByte(0xFF47, value); }
 
     public MMU()
     {

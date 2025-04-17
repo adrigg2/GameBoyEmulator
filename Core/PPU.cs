@@ -22,6 +22,7 @@ public class PPU
     private const int ScanlineCycles = 456;
     private const int MaxLines = 153;
     private const int ScreenHeigth = 144;
+    private const int ScreenWidth = 160;
 
     private int _cycleCount;
     private PPUMode _mode;
@@ -29,11 +30,10 @@ public class PPU
     private WriteableBitmap _screenImage;
 
     public Dispatcher WindowDispatcher { get; set; } // NOTE: Consider transferring logic to the main window
-    private MainWindow _mainWindow; // TODO: Consider transferring logic to the main window
 
     public PPU()
     {
-        _screenImage = new WriteableBitmap(160, 144, 96, 96, PixelFormats.Bgr32, null); // TODO: Set pixel format and palette(?) (revise the constructor parameters)
+        _screenImage = new WriteableBitmap(ScreenWidth, ScreenHeigth, 96, 96, PixelFormats.Gray2, null); // TODO: Set pixel format and palette(?) (revise the constructor parameters)
     }
 
     public void SetWindowSource(MainWindow window)
