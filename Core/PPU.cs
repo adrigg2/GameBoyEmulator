@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
@@ -29,6 +30,10 @@ public class PPU
     public PPU()
     {
         _screenImage = new WriteableBitmap(ScreenWidth, ScreenHeigth, 96, 96, PixelFormats.Gray2, null); // TODO: Set pixel format and palette(?) (revise the constructor parameters)
+        int stride = (ScreenWidth + 3) / 4;
+        int totalBytes = ScreenHeigth * stride;
+        byte[] pixels = Enumerable.Repeat((byte)0xFF, totalBytes).ToArray();
+        _screenImage.WritePixels(new Int32Rect(0, 0, ScreenWidth, ScreenHeigth), pixels, stride, 0);
     }
 
     public void SetWindowSource(MainWindow window)
@@ -57,7 +62,7 @@ public class PPU
                     ChangeMode(HBlank, mmu);
 
                     // TODO: RENDER
-                    WindowDispatcher.Invoke(GeneratePixel); // DEBUG: Test method to generate a pixel
+                    WindowDispatcher.Invoke(() => RenderScanLine(mmu)); // DEBUG: Test method to generate a pixel
                 }
                 break;
             case HBlank:
@@ -102,14 +107,68 @@ public class PPU
         // TODO: Interrupts
     }
 
-    // DEBUG: Test method to generate a pixel
-    // NOTE: Check if it would be better to use a safe method
-    private void GeneratePixel()
+    private void RenderScanLine(MMU mmu)
     {
-        Random random = new Random();
-        int x = random.Next(0, 160);
-        int y = random.Next(0, 144);
+        byte WX = (byte)(mmu.WX - 7);
+        byte WY = mmu.WY;
+        byte LY = mmu.LY;
+        byte LCDC = mmu.LCDC;
+        byte SCY = mmu.SCY;
+        byte SCX = mmu.SCX;
+        byte BGP = mmu.BGP;
+        bool isWindow = (LCDC & 0x20) != 0 && LY >= WY;
 
+        byte y = isWindow ? (byte)(LY - WY) : (byte)(LY + SCY);
+        byte tileLine = (byte)((y & 7) * 2);
+
+        ushort tileRow = (ushort)(y / 8 * 32);
+        ushort tileMapAddress;
+        if (isWindow)
+        {
+            tileMapAddress = (LCDC & 0x40) != 0 ? (ushort)0x9C00 : (ushort)0x9800;
+        }
+        else
+        {
+            tileMapAddress = (LCDC & 0x08) != 0 ? (ushort)0x9C00 : (ushort)0x9800;
+        }
+
+        byte tileDataLow = 0;
+        byte tileDataHigh = 0;
+        for (int i = 0; i < ScreenWidth; i++)
+        {
+            byte x = isWindow && i >= WX ? (byte)(i - WX) : (byte)(i + SCX);
+            if ((i & 0x7) == 0 || ((i + SCX) & 0x7) == 0)
+            {
+                ushort tileCol = (ushort)(x / 8);
+                ushort tileIndex = (ushort)(tileMapAddress + tileRow + tileCol);
+
+                ushort tileDataAddress = (LCDC & 0x10) != 0 ? (ushort)0x8000 : (ushort)0x8800;
+                ushort tileLoc;
+                if ((LCDC & 0x8) != 0)
+                {
+                    tileLoc = (ushort)(tileDataAddress + (mmu.ReadByte((ushort)(tileIndex + 0x8000)) * 16));
+                }
+                else
+                {
+                    tileLoc = (ushort)(tileDataAddress + ((sbyte)mmu.ReadByte((ushort)(tileIndex + 0x8000)) + 128) * 16);
+                }
+
+                tileDataLow = mmu.ReadByte((ushort)(tileLoc + tileLine + 0x8000));
+                tileDataHigh = mmu.ReadByte((ushort)(tileLoc + tileLine + 0x8000 + 1));
+            }
+
+            int colorBit = 1 << (7 - (x & 7));
+            int colorId = 
+                (tileDataLow & colorBit) != 0 ? 1 : 0 +
+                (tileDataHigh & colorBit) != 0 ? 2 : 0;
+            int color = (BGP >> (colorId * 2)) & 0x3;
+            SetPixel(i, LY, color);
+        }
+    }
+
+    // NOTE: Check if it would be better to use a safe method
+    private void SetPixel(int x, int y, int color)
+    {
         try
         {
             _screenImage.Lock();
@@ -121,11 +180,7 @@ public class PPU
                 pBackBuffer += y * _screenImage.BackBufferStride;
                 pBackBuffer += x * 4;
 
-                int color_data = 255 << 16; // R
-                color_data |= 128 << 8;     // G
-                color_data |= 255 << 0;     // B
-
-                *((int*) pBackBuffer) = color_data; // Set pixel color (ARGB format, 32 bits per pixel, 4 bytes per pixel)
+                *((int*)pBackBuffer) = color;
             }
 
             _screenImage.AddDirtyRect(new Int32Rect(x, y, 1, 1));

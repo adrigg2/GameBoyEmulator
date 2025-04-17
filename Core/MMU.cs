@@ -22,6 +22,8 @@ public class MMU
     public byte LY { get => ReadByte(0xFF44); set => WriteByte(0xFF44, value); }
     public byte LYC { get => ReadByte(0xFF45); set => WriteByte(0xFF45, value); }
     public byte BGP { get => ReadByte(0xFF47); set => WriteByte(0xFF47, value); }
+    public byte WY { get => ReadByte(0xFF4A); set => WriteByte(0xFF4A, value); }
+    public byte WX { get => ReadByte(0xFF4B); set => WriteByte(0xFF4B, value); }
 
     public MMU()
     {
