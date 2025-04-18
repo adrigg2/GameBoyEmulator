@@ -24,6 +24,7 @@ public class PPU
     private int _cycleCount;
 
     private WriteableBitmap _screenImage;
+    private byte[] _screenBuffer;
 
     public Dispatcher WindowDispatcher { get; set; } // NOTE: Consider transferring logic to the main window
 
@@ -34,6 +35,7 @@ public class PPU
         int totalBytes = ScreenHeigth * stride;
         byte[] pixels = Enumerable.Repeat((byte)0xFF, totalBytes).ToArray();
         _screenImage.WritePixels(new Int32Rect(0, 0, ScreenWidth, ScreenHeigth), pixels, stride, 0);
+        _screenBuffer = new byte[ScreenWidth * ScreenHeigth / 4];
     }
 
     public void SetWindowSource(MainWindow window)
@@ -61,8 +63,7 @@ public class PPU
                     _cycleCount -= VRAMReadCycles;
                     ChangeMode(HBlank, mmu);
 
-                    // TODO: RENDER
-                    WindowDispatcher.Invoke(() => RenderScanLine(mmu)); // DEBUG: Test method to generate a pixel
+                    RenderScanLine(mmu);
                 }
                 break;
             case HBlank:
@@ -74,7 +75,7 @@ public class PPU
                     if (mmu.LY == ScreenHeigth)
                     {
                         ChangeMode(VBlank, mmu);
-                        // TODO: RENDER
+                        WindowDispatcher.Invoke(UpdateScreen); // NOTE: Consider transferring logic to the main window
                         // TODO: VBlank Interrupt
                     }
                     else
@@ -169,25 +170,12 @@ public class PPU
     // NOTE: Check if it would be better to use a safe method
     private void SetPixel(int x, int y, int color)
     {
-        try
-        {
-            _screenImage.Lock();
+        _screenBuffer[(y * ScreenWidth + x) / 4] |= (byte)(color << ((x & 3) * 2));
+    }
 
-            unsafe
-            {
-                IntPtr pBackBuffer = _screenImage.BackBuffer;
-
-                pBackBuffer += y * _screenImage.BackBufferStride;
-                pBackBuffer += x * 4;
-
-                *((int*)pBackBuffer) = color;
-            }
-
-            _screenImage.AddDirtyRect(new Int32Rect(x, y, 1, 1));
-        }
-        finally
-        {
-            _screenImage.Unlock();
-        }
+    private void UpdateScreen()
+    {
+        int stride = (ScreenWidth + 3) / 4;
+        _screenImage.WritePixels(new Int32Rect(0, 0, ScreenWidth, ScreenHeigth), _screenBuffer, stride, 0);
     }
 }
