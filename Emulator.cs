@@ -1,7 +1,5 @@
 ﻿using GameBoyEmulator.Core;
 using System.IO;
-using System.Windows;
-using System.Windows.Threading;
 
 namespace GameBoyEmulator;
 public class Emulator
@@ -9,7 +7,11 @@ public class Emulator
     private MMU _mmu;
     private CPU _cpu;
     private PPU _ppu;
-    int _calls;
+
+    private const int CPUFrequency = 4194304; // 4.194304 MHz
+    private const int CyclesPerFrame = 70224; // ~60 FPS
+    public const float FrameTime = (float)CyclesPerFrame / CPUFrequency;
+    private int _frames;
 
     public PPU PPU { get => _ppu; }
 
@@ -22,19 +24,31 @@ public class Emulator
         _mmu.LoadBootRom(bootRomBytes);
         _cpu = new(_mmu);
         _ppu = new();
+        _frames = 0;
     }
 
-    public void Tick()
+    public void ProcessFrame()
     {
-        _calls++;
+        int frameCycles = 0;
 
-        int cycles = _cpu.Execute();
-        _ppu.Update(cycles, _mmu);
-        Console.WriteLine(_cpu);
-        Console.WriteLine($"LY = {_mmu.LY}");
-        Console.WriteLine($"LY(CPU) = {_mmu.ReadByte(0xFF44)}");
-        Console.WriteLine($"Calls = {_calls}");
-        //if (mmu.LY == 144 || (cpu._lastInstruction != 0x20 && cpu._lastInstruction != 0xFE && cpu._lastInstruction != 0xF0) )
-        //Console.ReadKey();
+        while (frameCycles < CyclesPerFrame)
+        {
+            //_calls++;
+            int cycles = _cpu.Execute();
+            _ppu.Update(cycles, _mmu);
+            frameCycles += cycles;
+            //Console.WriteLine(_cpu);
+            //Console.WriteLine($"LY = {_mmu.LY}");
+            //Console.WriteLine($"LY(CPU) = {_mmu.ReadByte(0xFF44)}");
+            //Console.WriteLine($"Calls = {_calls}");
+            //if (mmu.LY == 144 || (cpu._lastInstruction != 0x20 && cpu._lastInstruction != 0xFE && cpu._lastInstruction != 0xF0) )
+            //Console.ReadKey();
+            //using (StreamWriter log = new StreamWriter(".\\logs\\log.txt", true))
+            //{
+            //    log.WriteLine($"{_cpu._lastInstruction:X2}");
+            //}
+        }
+
+        _frames++;
     }
 }

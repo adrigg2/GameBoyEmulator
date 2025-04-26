@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System.Diagnostics;
+using System.Windows;
+using System.Windows.Threading;
 
 namespace GameBoyEmulator;
 
@@ -13,18 +15,27 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         _emulator = emulator;
-        _emulator.PPU.WindowDispatcher = Dispatcher; // TODO: Consider transferring logic to the main window
-        _emulator.PPU.SetWindowSource(this); // TODO: Consider transferring logic to the main window
-        ContentRendered += OnRendered;
+        _emulator.PPU.WindowDispatcher = Dispatcher; // TODO: Consider transfering logic to the main window
+        _emulator.PPU.SetWindowSource(this); // TODO: Consider transfering logic to the main window
     }
 
-    private void OnRendered(object? sender, EventArgs e)
+    private void Tick(object? sender, EventArgs e)
     {
         Task.Run(() =>
         {
-            while (true)
+            var stopwatch = Stopwatch.StartNew();
+            _emulator.ProcessFrame();
+            var frames = 1;
+
+            while (frames <= 6960)
             {
-                _emulator.Tick();
+                if (stopwatch.ElapsedMilliseconds >= Emulator.FrameTime * 1000)
+                {
+                    //Console.WriteLine("Tick");
+                    stopwatch.Restart();
+                    _emulator.ProcessFrame();
+                    frames++;
+                }
             }
         });
     }

@@ -7,6 +7,7 @@ public class MMU
     private byte[] _rom;    // NOTE: Move to Cartridge?
     private byte[] _wram;
     private byte[] _vram;   // NOTE: Move to GPU?
+    private object[] _occupiedVram; // DEBUG: debug info
     private byte[] _hram;
     private byte[] _eram;   // NOTE: Move to Cartridge?
     private byte[] _oam;    // NOTE: Move to GPU?
@@ -36,6 +37,7 @@ public class MMU
         _oam = new byte[0xA0];
         _io = new byte[0x80];
         _hram = new byte[0x80];
+        _occupiedVram = new object[0x2000]; // DEBUG: debug info
         _ie = 0;
     }
 
@@ -93,6 +95,9 @@ public class MMU
                 break;
             case ushort _ when address <= 0x9FFF:
                 _vram[address & 0x1FFF] = value;
+                /*_occupiedVram = _vram.Select((val, index) => new { val, index })
+                    .Where(x => x.val != 0)
+                    .ToArray(); // DEBUG: debug info*/
                 break;
             case ushort _ when address <= 0xBFFF:   // NOTE: Move to cartridge?
                 _eram[address & 0x1FFF] = value;

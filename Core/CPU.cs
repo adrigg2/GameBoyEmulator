@@ -37,6 +37,9 @@ public class CPU
     public CPU(MMU mmu)
     {
         _a = _b = _c = _d = _e = _h = _l = _f = 0;
+        _pc = _sp = 0;
+        _ime = _halted = _haltBug = false;
+        _eiCounter = 0;
         _mmu = mmu;
     }
 
@@ -322,15 +325,15 @@ public class CPU
             case 0xBF: CP(A);                                               break;  // CP A
             case 0xC0: cycles += RET(!ZeroFlag);                            break;  // RET NZ
             case 0xC1: BC = _mmu.ReadWord(_sp); _sp += 2;                   break;  // POP BC
-            case 0xC2: cycles += JP(!ZeroFlag, _mmu.ReadWord(_pc));_pc += 2;break; // JP NZ, a16
-            case 0xC3: cycles += JP(true, _mmu.ReadWord(_pc)); _pc += 2;    break;  // JP a16
+            case 0xC2: cycles += JP(!ZeroFlag, _mmu.ReadWord(_pc));         break;  // JP NZ, a16
+            case 0xC3: cycles += JP(true, _mmu.ReadWord(_pc));              break;  // JP a16
             case 0xC4: cycles += CALL(!ZeroFlag, _mmu.ReadWord(_pc));       break;  // CALL NZ, a16
             case 0xC5: _sp -= 2; _mmu.WriteWord(_sp, BC);                   break;  // PUSH BC
             case 0xC6: ADD(_mmu.ReadByte(_pc++));                           break;  // ADD n8
             case 0xC7: RST(0x0);                                            break;  // RST $00
             case 0xC8: cycles += RET(ZeroFlag);                             break;  // RET Z
             case 0xC9: cycles += RET(true);                                 break;  // RET
-            case 0xCA: cycles += JP(ZeroFlag, _mmu.ReadWord(_pc)); _pc += 2;break;  // JP Z, a16
+            case 0xCA: cycles += JP(ZeroFlag, _mmu.ReadWord(_pc));          break;  // JP Z, a16
             case 0xCB: cycles += ExecutePrefixed(_mmu.ReadByte(_pc++));     break;  // PREFIX
             case 0xCC: cycles += CALL(ZeroFlag, _mmu.ReadWord(_pc));        break;  // CALL Z, a16
             case 0xCD: cycles += CALL(true, _mmu.ReadWord(_pc));            break;  // CALL a16
@@ -338,14 +341,14 @@ public class CPU
             case 0xCF: RST(0x8);                                            break;  // RST $08
             case 0xD0: cycles += RET(!CarryFlag);                           break;  // RET NC
             case 0xD1: DE = _mmu.ReadWord(_sp); _sp += 2;                   break;  // POP DE
-            case 0xD2: cycles +=JP(!CarryFlag, _mmu.ReadWord(_pc));_pc += 2;break;  // JP NC, a16
+            case 0xD2: cycles += JP(!CarryFlag, _mmu.ReadWord(_pc));        break;  // JP NC, a16
             case 0xD4: cycles += CALL(!CarryFlag, _mmu.ReadWord(_pc));      break;  // CALL NC, a16
             case 0xD5: _sp -= 2; _mmu.WriteWord(_sp, DE);                   break;  // PUSH DE
             case 0xD6: SUB(_mmu.ReadByte(_pc++));                           break;  // SUB n8
             case 0xD7: RST(0x10);                                           break;  // RST $10
             case 0xD8: cycles += RET(CarryFlag);                            break;  // RET C
             case 0xD9: cycles += RET(true); _ime = true;                    break;  // RETI
-            case 0xDA: cycles += JP(CarryFlag, _mmu.ReadWord(_pc));_pc += 2;break;  // JP C, a16
+            case 0xDA: cycles += JP(CarryFlag, _mmu.ReadWord(_pc));         break;  // JP C, a16
             case 0xDC: cycles += CALL(CarryFlag, _mmu.ReadWord(_pc));       break;  // CALL C, a16
             case 0xDE: SBC(_mmu.ReadByte(_pc++));                           break;  // SBC n8
             case 0xDF: RST(0x18);                                           break;  // RST $18
@@ -892,6 +895,7 @@ public class CPU
             _pc = value;
             return CPUCycles.JPT;
         }
+        _pc += 2;
         return CPUCycles.JPF;
     }
 

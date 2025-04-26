@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
@@ -26,7 +25,7 @@ public class PPU
     private WriteableBitmap _screenImage;
     private byte[] _screenBuffer;
 
-    public Dispatcher WindowDispatcher { get; set; } // NOTE: Consider transferring logic to the main window
+    public Dispatcher WindowDispatcher { get; set; } // NOTE: Consider transfering logic to the main window
 
     public PPU()
     {
@@ -145,29 +144,30 @@ public class PPU
 
                 ushort tileDataAddress = (LCDC & 0x10) != 0 ? (ushort)0x8000 : (ushort)0x8800;
                 ushort tileLoc;
-                if ((LCDC & 0x8) != 0)
+                if ((LCDC & 0x10) != 0)
                 {
-                    tileLoc = (ushort)(tileDataAddress + (mmu.ReadByte((ushort)(tileIndex + 0x8000)) * 16));
+                    tileLoc = (ushort)(tileDataAddress + (mmu.ReadByte(tileIndex) * 16));
                 }
                 else
                 {
-                    tileLoc = (ushort)(tileDataAddress + ((sbyte)mmu.ReadByte((ushort)(tileIndex + 0x8000)) + 128) * 16);
+                    tileLoc = (ushort)(tileDataAddress + ((sbyte)mmu.ReadByte(tileIndex) + 128) * 16);
                 }
 
-                tileDataLow = mmu.ReadByte((ushort)(tileLoc + tileLine + 0x8000));
-                tileDataHigh = mmu.ReadByte((ushort)(tileLoc + tileLine + 0x8000 + 1));
+                tileDataLow = mmu.ReadByte((ushort)(tileLoc + tileLine));
+                tileDataHigh = mmu.ReadByte((ushort)(tileLoc + tileLine + 1));
             }
 
             int colorBit = 1 << (7 - (x & 7));
-            int colorId = 
-                (tileDataLow & colorBit) != 0 ? 1 : 0 +
-                (tileDataHigh & colorBit) != 0 ? 2 : 0;
+            int colorIdLow = (tileDataLow & colorBit) != 0 ? 1 : 0;
+            int colorIdHigh = (tileDataHigh & colorBit) != 0 ? 2 : 0;
+            int colorId = colorIdLow + colorIdHigh;
             int color = (BGP >> (colorId * 2)) & 0x3;
+            color = ~color & 0x3; // Invert the color bits
+
             SetPixel(i, LY, color);
         }
     }
-
-    // NOTE: Check if it would be better to use a safe method
+    
     private void SetPixel(int x, int y, int color)
     {
         _screenBuffer[(y * ScreenWidth + x) / 4] |= (byte)(color << ((x & 3) * 2));
