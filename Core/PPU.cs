@@ -25,9 +25,9 @@ public class PPU
     private WriteableBitmap _screenImage;
     private byte[] _screenBuffer;
 
-    public Dispatcher WindowDispatcher { get; set; } // NOTE: Consider transfering logic to the main window
+    private Dispatcher _windowDispatcher; // NOTE: Consider transfering logic to the main window
 
-    public PPU()
+    public PPU(Dispatcher windowDispatcher)
     {
         _screenImage = new WriteableBitmap(ScreenWidth, ScreenHeigth, 96, 96, PixelFormats.Gray2, null); // TODO: Set pixel format and palette(?) (revise the constructor parameters)
         int stride = (ScreenWidth + 3) / 4;
@@ -35,6 +35,7 @@ public class PPU
         byte[] pixels = Enumerable.Repeat((byte)0xFF, totalBytes).ToArray();
         _screenImage.WritePixels(new Int32Rect(0, 0, ScreenWidth, ScreenHeigth), pixels, stride, 0);
         _screenBuffer = new byte[ScreenWidth * ScreenHeigth / 4];
+        _windowDispatcher = windowDispatcher;
     }
 
     public void SetWindowSource(MainWindow window)
@@ -74,7 +75,7 @@ public class PPU
                     if (mmu.LY == ScreenHeigth)
                     {
                         ChangeMode(VBlank, mmu);
-                        WindowDispatcher.Invoke(UpdateScreen); // NOTE: Consider transferring logic to the main window
+                        _windowDispatcher.Invoke(UpdateScreen); // NOTE: Consider transferring logic to the main window
                         // TODO: VBlank Interrupt
                     }
                     else
@@ -177,5 +178,6 @@ public class PPU
     {
         int stride = (ScreenWidth + 3) / 4;
         _screenImage.WritePixels(new Int32Rect(0, 0, ScreenWidth, ScreenHeigth), _screenBuffer, stride, 0);
+        Array.Clear(_screenBuffer);
     }
 }

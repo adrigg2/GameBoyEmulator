@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -11,11 +12,10 @@ public partial class MainWindow : Window
 {
     private Emulator _emulator;
 
-    public MainWindow(Emulator emulator)
+    public MainWindow(string[] args)
     {
         InitializeComponent();
-        _emulator = emulator;
-        _emulator.PPU.WindowDispatcher = Dispatcher; // TODO: Consider transfering logic to the main window
+        _emulator = new Emulator(args[0], args[1], Dispatcher);
         _emulator.PPU.SetWindowSource(this); // TODO: Consider transfering logic to the main window
     }
 
@@ -23,17 +23,21 @@ public partial class MainWindow : Window
     {
         Task.Run(() =>
         {
+            using StreamWriter logFile = new("./emulatorLog.log");
+            logFile.WriteLine("Frame 0");
+
             var stopwatch = Stopwatch.StartNew();
-            _emulator.ProcessFrame();
+            _emulator.ProcessFrame(logFile);
             var frames = 1;
 
-            while (frames <= 6960)
+            while (true)
             {
                 if (stopwatch.ElapsedMilliseconds >= Emulator.FrameTime * 1000)
                 {
+                    logFile.WriteLine($"Frame {frames}");
                     //Console.WriteLine("Tick");
                     stopwatch.Restart();
-                    _emulator.ProcessFrame();
+                    _emulator.ProcessFrame(logFile);
                     frames++;
                 }
             }

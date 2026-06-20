@@ -1,5 +1,6 @@
 ﻿using GameBoyEmulator.Core;
 using System.IO;
+using System.Windows.Threading;
 
 namespace GameBoyEmulator;
 public class Emulator
@@ -15,7 +16,7 @@ public class Emulator
 
     public PPU PPU { get => _ppu; }
 
-    public Emulator(string rom, string bootRom)
+    public Emulator(string rom, string bootRom, Dispatcher windowDispatcher)
     {
         byte[] romBytes = File.ReadAllBytes(rom);
         byte[] bootRomBytes = File.ReadAllBytes(bootRom);
@@ -23,11 +24,11 @@ public class Emulator
         _mmu.LoadGame(romBytes);
         _mmu.LoadBootRom(bootRomBytes);
         _cpu = new(_mmu);
-        _ppu = new();
+        _ppu = new(windowDispatcher);
         _frames = 0;
     }
 
-    public void ProcessFrame()
+    public void ProcessFrame(StreamWriter? logFile = null)
     {
         int frameCycles = 0;
 
@@ -37,6 +38,8 @@ public class Emulator
             int cycles = _cpu.Execute();
             _ppu.Update(cycles, _mmu);
             frameCycles += cycles;
+
+            logFile?.WriteLine($"{_cpu._lastInstructionPC:X2}: {_cpu._lastInstruction:X2}");
             //Console.WriteLine(_cpu);
             //Console.WriteLine($"LY = {_mmu.LY}");
             //Console.WriteLine($"LY(CPU) = {_mmu.ReadByte(0xFF44)}");

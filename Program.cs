@@ -13,10 +13,9 @@ public class Program
             Console.WriteLine("A ROM and Boot ROM filepath should be given as a parameter");
             return;
         }
-
-        var emulator = new Emulator(args[0], args[1]);
+        
         var app = new Application();
-        var window = new MainWindow(emulator);
+        var window = new MainWindow(args);
         app.Run(window);
     }
 }
