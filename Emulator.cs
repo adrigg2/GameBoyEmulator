@@ -39,7 +39,13 @@ public class Emulator
             _ppu.Update(cycles, _mmu);
             frameCycles += cycles;
 
-            logFile?.WriteLine($"{_cpu._lastInstructionPC:X2}: {_cpu._lastInstruction:X2}");
+            //logFile?.WriteLine($"{_cpu._lastInstructionPC:X2}: {_cpu._lastInstruction:X2}");
+
+            if (_cpu._lastInstructionPC == 0xFE)
+            {
+                logFile?.WriteLine(_cpu);
+            }
+
             //Console.WriteLine(_cpu);
             //Console.WriteLine($"LY = {_mmu.LY}");
             //Console.WriteLine($"LY(CPU) = {_mmu.ReadByte(0xFF44)}");

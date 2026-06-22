@@ -27,7 +27,7 @@ public partial class MainWindow : Window
             logFile.WriteLine("Frame 0");
 
             var stopwatch = Stopwatch.StartNew();
-            _emulator.ProcessFrame(logFile);
+            _emulator.ProcessFrame();
             var frames = 1;
 
             while (true)
@@ -39,6 +39,8 @@ public partial class MainWindow : Window
                     stopwatch.Restart();
                     _emulator.ProcessFrame(logFile);
                     frames++;
+
+                    logFile.Flush();
                 }
             }
         });

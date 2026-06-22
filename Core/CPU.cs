@@ -353,7 +353,7 @@ public class CPU
             case 0xDE: SBC(_mmu.ReadByte(_pc++));                           break;  // SBC n8
             case 0xDF: RST(0x18);                                           break;  // RST $18
             case 0xE0:                                                              // LDH [a8], A
-                _mmu.WriteByte(_mmu.ReadByte((ushort)(0xFF00 + _mmu.ReadByte(_pc++))), A);
+                _mmu.WriteByte((ushort)(0xFF00 + _mmu.ReadByte(_pc++)), A);
                 break;
             case 0xE1: HL = _mmu.ReadWord(_sp); _sp += 2;                   break;  // POP HL
             case 0xE2:                                                              // LDH [C], A
