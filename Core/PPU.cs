@@ -171,7 +171,7 @@ public class PPU
     
     private void SetPixel(int x, int y, int color)
     {
-        _screenBuffer[(y * ScreenWidth + x) / 4] |= (byte)(color << ((x & 3) * 2));
+        _screenBuffer[(y * ScreenWidth + x) / 4] |= (byte)(color << ((~x & 3) * 2));
     }
 
     private void UpdateScreen()

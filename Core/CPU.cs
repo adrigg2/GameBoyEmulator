@@ -10,7 +10,7 @@ public class CPU
     private bool _ime, _halted, _haltBug;
     // private bool _stopped;   // TODO: Stop
 
-    private int _eiCounter;
+    private bool _eiPending;
 
     public byte A { get => _a; set => _a = value; }
     public byte B { get => _b; set => _b = value; }
@@ -39,7 +39,7 @@ public class CPU
         _a = _b = _c = _d = _e = _h = _l = _f = 0;
         _pc = _sp = 0;
         _ime = _halted = _haltBug = false;
-        _eiCounter = 0;
+        _eiPending = 0;
         _mmu = mmu;
     }
 
@@ -379,7 +379,7 @@ public class CPU
             case 0xF8: HL = ADDr16e8(_sp);                                  break;  // LD HL, SP + e8
             case 0xF9: _sp = HL;                                            break;  // LD SP, HL
             case 0xFA: A = _mmu.ReadByte(_mmu.ReadWord(_pc)); _pc += 2;     break;  // LD A, [a16]
-            case 0xFB: _eiCounter = 1;                                      break;  // EI
+            case 0xFB: _eiPending = true;                                      break;  // EI
             case 0xFE: CP(_mmu.ReadByte(_pc++));                            break;  // CP n8
             case 0xFF: RST(0x38);                                           break;  // RST $38
             default:
@@ -387,12 +387,12 @@ public class CPU
 
         }
 
-        switch(_eiCounter)
+        if (_eiPending)
         {
-            case 1: _eiCounter++;                   break;
-            case 2: _eiCounter = 0; _ime = true;    break;
-            default:                                break;
+            _eiPending = false;
+            _ime = true;
         }
+
         _lastInstruction = instruction; // DEBUG: debug only
         return cycles;
     }
