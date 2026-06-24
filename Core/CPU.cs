@@ -54,13 +54,13 @@ public class CPU
         {
             if ((_mmu.IE & _mmu.IF) != 0)
             {
-                cycles += HandleInterrupt();
+             //   cycles += HandleInterrupt();
             }
         }
 
         if (_halted)
         {
-            return cycles;
+            return cycles + 4; // Cycles advance while CPU is halted
         }
 
         byte instruction = _mmu.ReadByte(_pc++);

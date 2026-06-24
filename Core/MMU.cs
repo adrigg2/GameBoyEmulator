@@ -116,7 +116,7 @@ public class MMU
             case ushort _ when address <= 0xFF7F:
                 _io[address & 0x7F] = value;
                 break;
-            case ushort _ when address <= 0xFFFF:
+            case ushort _ when address < 0xFFFF:
                 _hram[address & 0x7F] = value;
                 break;
             case 0xFFFF:
