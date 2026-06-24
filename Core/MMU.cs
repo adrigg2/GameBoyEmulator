@@ -10,7 +10,7 @@ public class MMU
     private object[] _occupiedVram; // DEBUG: debug info
     private byte[] _hram;
     private byte[] _eram;   // NOTE: Move to Cartridge?
-    private byte[] _oam;    // NOTE: Move to GPU?
+    private byte[] _oam;    // NOTE: Move to PPU?
     private byte[] _io;
     private byte _ie;
 
@@ -36,7 +36,7 @@ public class MMU
         _wram = new byte[0x2000];
         _oam = new byte[0xA0];
         _io = new byte[0x80];
-        _hram = new byte[0x80];
+        _hram = new byte[0x7F];
         _occupiedVram = new object[0x2000]; // DEBUG: debug info
         _ie = 0;
     }
@@ -67,7 +67,7 @@ public class MMU
                 return 0;
             case ushort _ when address <= 0xFF7F:
                 return _io[address & 0x7F];
-            case ushort _ when address <= 0xFFFF:
+            case ushort _ when address < 0xFFFF:
                 return _hram[address & 0x7F];
             case 0xFFFF:
                 return _ie;

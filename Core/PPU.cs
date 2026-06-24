@@ -76,7 +76,7 @@ public class PPU
                     {
                         ChangeMode(VBlank, mmu);
                         _windowDispatcher.Invoke(UpdateScreen); // NOTE: Consider transferring logic to the main window
-                        // TODO: VBlank Interrupt
+                        mmu.IF |= 0x1;
                     }
                     else
                     {

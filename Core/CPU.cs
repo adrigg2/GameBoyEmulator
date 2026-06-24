@@ -1,4 +1,6 @@
-﻿namespace GameBoyEmulator.Core;
+﻿using System.Windows.Media.Animation;
+
+namespace GameBoyEmulator.Core;
 public class CPU
 {
     private MMU _mmu;
@@ -38,8 +40,7 @@ public class CPU
     {
         _a = _b = _c = _d = _e = _h = _l = _f = 0;
         _pc = _sp = 0;
-        _ime = _halted = _haltBug = false;
-        _eiPending = 0;
+        _ime = _halted = _haltBug = _eiPending = false;
         _mmu = mmu;
     }
 
@@ -48,8 +49,22 @@ public class CPU
         // if (_stopped) return;    // TODO: STOP
         _lastInstructionPC = _pc;
 
+        int cycles = 0;
+        if (_ime || _halted)
+        {
+            if ((_mmu.IE & _mmu.IF) != 0)
+            {
+                cycles += HandleInterrupt();
+            }
+        }
+
+        if (_halted)
+        {
+            return cycles;
+        }
+
         byte instruction = _mmu.ReadByte(_pc++);
-        int cycles = CPUCycles.Cycles[instruction];
+        cycles += CPUCycles.Cycles[instruction];
 
         if (_haltBug)
         {
@@ -235,14 +250,12 @@ public class CPU
                 if (_ime)
                 {
                     _halted = true;
-                    _pc--;
                 }
                 else
                 {
                     if ((_mmu.IE & _mmu.IF & 0x1F) == 0)
                     {
                         _halted = true;
-                        _pc--;
                     }
                     else
                     {
@@ -398,13 +411,50 @@ public class CPU
     }
 
     // TODO: Implement Interrupts
-    public void HandleInterrupt()
+    public int HandleInterrupt()
     {
         if (_halted)
         {
             _halted = false;
-            _pc++;
         }
+
+        if ((_mmu.IE & _mmu.IF & 0x1) != 0)
+        {
+            _ime = false;
+            CALL(true, 0x40);
+            _mmu.IF &= 0xFE;
+            return 20;
+        }
+        else if ((_mmu.IF & _mmu.IF & 0x2) != 0)
+        {
+            _ime = false;
+            CALL(true, 0x48);
+            _mmu.IF &= 0xFD;
+            return 20;
+        }
+        else if ((_mmu.IF & _mmu.IF & 0x4) != 0)
+        {
+            _ime = false;
+            CALL(true, 0x50);
+            _mmu.IF &= 0xFB;
+            return 20;
+        }
+        else if ((_mmu.IF & _mmu.IF & 0x8) != 0)
+        {
+            _ime = false;
+            CALL(true, 0x58);
+            _mmu.IF &= 0xF7;
+            return 20;
+        }
+        else if ((_mmu.IF & _mmu.IF & 0x10) != 0)
+        {
+            _ime = false;
+            CALL(true, 0x60);
+            _mmu.IF &= 0xEF;
+            return 20;
+        }
+
+        return 0;
     }
 
     private int ExecutePrefixed(byte instruction)
