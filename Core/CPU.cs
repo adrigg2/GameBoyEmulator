@@ -418,6 +418,11 @@ public class CPU
             _halted = false;
         }
 
+        if (!_ime)
+        {
+            return 0;
+        }
+
         if ((_mmu.IE & _mmu.IF & 0x1) != 0)
         {
             _ime = false;
