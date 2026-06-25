@@ -5,7 +5,7 @@ using System.Windows.Threading;
 
 namespace GameBoyEmulator.Core;
 
-// NOTE: Move mode to MMU?
+// NOTE: Change pixel format to Bgra32, use a palette to translate the pixels and a buffer array where each value is a pixel
 public class PPU
 {
     private const int OAMRead = 2;
@@ -25,17 +25,20 @@ public class PPU
     private WriteableBitmap _screenImage;
     private byte[] _screenBuffer;
 
+    private Dictionary<ushort, int> _objectPool;
+
     private Dispatcher _windowDispatcher; // NOTE: Consider transfering logic to the main window
 
     public PPU(Dispatcher windowDispatcher)
     {
-        _screenImage = new WriteableBitmap(ScreenWidth, ScreenHeigth, 96, 96, PixelFormats.Gray2, null); // TODO: Set pixel format and palette(?) (revise the constructor parameters)
+        _screenImage = new WriteableBitmap(ScreenWidth, ScreenHeigth, 96, 96, PixelFormats.Gray2, null);
         int stride = (ScreenWidth + 3) / 4;
         int totalBytes = ScreenHeigth * stride;
         byte[] pixels = Enumerable.Repeat((byte)0xFF, totalBytes).ToArray();
         _screenImage.WritePixels(new Int32Rect(0, 0, ScreenWidth, ScreenHeigth), pixels, stride, 0);
         _screenBuffer = new byte[ScreenWidth * ScreenHeigth / 4];
         _windowDispatcher = windowDispatcher;
+        _objectPool = [];
     }
 
     public void SetWindowSource(MainWindow window)
@@ -53,6 +56,14 @@ public class PPU
             case OAMRead:
                 if (_cycleCount >= OAMReadCycles)
                 {
+                    for (ushort i = 0xFE00; i <= 0xFE9F; i += 4)
+                    {
+                        if (mmu.ReadByte(i) == mmu.LY && _objectPool.Count < 10)
+                        {
+                            _objectPool.Add(i, 0);
+                        }
+                    }
+
                     _cycleCount -= OAMReadCycles;
                     ChangeMode(VRAMRead, mmu);
                 }
