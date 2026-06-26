@@ -56,11 +56,11 @@ public class PPU
             case OAMRead:
                 if (_cycleCount >= OAMReadCycles)
                 {
-                    for (ushort i = 0xFE9C; i >= 0xFE00; i -= 4)
+                    for (ushort i = 0xFE9C; i >= 0xFE00 && _objectPool.Count < 10; i -= 4)
                     {
                         int y = mmu.ReadByte(i) - 16;
                         int size = (mmu.LCDC & 0x4) != 0 ? 16 : 8;
-                        if (y <= mmu.LY && y + size > mmu.LY && _objectPool.Count < 10)
+                        if (y <= mmu.LY && y + size > mmu.LY)
                         {
                             _objectPool.Add(i, 0);
                         }
