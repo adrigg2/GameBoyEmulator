@@ -8,6 +8,7 @@ public class Emulator
     private MMU _mmu;
     private CPU _cpu;
     private PPU _ppu;
+    private DMA _dma;
 
     private const int CPUFrequency = 4194304; // 4.194304 MHz
     private const int CyclesPerFrame = 70224; // ~60 FPS
@@ -23,6 +24,7 @@ public class Emulator
         _mmu = new();
         _mmu.LoadGame(romBytes);
         _mmu.LoadBootRom(bootRomBytes);
+        _dma = _mmu.DMA;
         _cpu = new(_mmu);
         _ppu = new(windowDispatcher);
         _frames = 0;
@@ -37,6 +39,7 @@ public class Emulator
             //_calls++;
             int cycles = _cpu.Execute();
             _ppu.Update(cycles, _mmu);
+            _dma.Tick(cycles);
             frameCycles += cycles;
 
             //logFile?.WriteLine($"{_cpu._lastInstructionPC:X2}: {_cpu._lastInstruction:X2}");

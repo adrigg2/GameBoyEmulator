@@ -1,6 +1,8 @@
 ﻿namespace GameBoyEmulator.Core;
 public class MMU
 {
+    private DMA _dma;
+
     public bool _inBios; // DEBUG: Public
 
     private readonly byte[] _bootROM;
@@ -26,6 +28,8 @@ public class MMU
     public byte WY { get => ReadByte(0xFF4A); set => WriteByte(0xFF4A, value); }
     public byte WX { get => ReadByte(0xFF4B); set => WriteByte(0xFF4B, value); }
 
+    public DMA DMA { get => _dma; }
+
     public MMU()
     {
         _inBios = true;
@@ -39,6 +43,7 @@ public class MMU
         _hram = new byte[0x7F];
         _occupiedVram = new object[0x2000]; // DEBUG: debug info
         _ie = 0;
+        _dma = new(this);
     }
 
     public byte ReadByte(ushort address)
@@ -114,6 +119,10 @@ public class MMU
             case ushort _ when address <= 0xFEFF:
                 break;
             case ushort _ when address <= 0xFF7F:
+                if (address == 0xFF46)
+                {
+                    _dma.StartTransfer(value);
+                }
                 _io[address & 0x7F] = value;
                 break;
             case ushort _ when address < 0xFFFF:
