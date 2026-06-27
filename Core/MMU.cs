@@ -119,7 +119,7 @@ public class MMU
             case ushort _ when address <= 0xFEFF:
                 break;
             case ushort _ when address <= 0xFF7F:
-                if (address == 0xFF46)
+                if (address == 0xFF46 && value <= 0xDF)
                 {
                     _dma.StartTransfer(value);
                 }

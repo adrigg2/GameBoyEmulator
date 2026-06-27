@@ -62,7 +62,7 @@ public class PPU
                         int size = (mmu.LCDC & 0x4) != 0 ? 16 : 8;
                         if (y <= mmu.LY && y + size > mmu.LY)
                         {
-                            _objectPool.Add(i, 0);
+                            _objectPool.TryAdd(i, 0);
                         }
                     }
 

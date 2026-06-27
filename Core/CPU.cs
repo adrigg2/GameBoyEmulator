@@ -54,7 +54,7 @@ public class CPU
         {
             if ((_mmu.IE & _mmu.IF) != 0)
             {
-             //   cycles += HandleInterrupt();
+                cycles += HandleInterrupt();
             }
         }
 

@@ -30,12 +30,18 @@ public class DMA(MMU mmu)
 
     public void Tick(int cycles)
     {
+        if (!_active)
+        {
+            return;
+        }
+
         _cycles += cycles;
 
-        for (int i = _cycles - _transfers * 4; i > CyclesPerTransfer; i -= 4)
+        for (int i = _cycles - _transfers * 4; i > CyclesPerTransfer && _transfers * CyclesPerTransfer < MaxCycles; i -= 4)
         {
             byte transferedByte = _mmu.ReadByte((ushort)(_address + _transfers));
             _mmu.WriteByte((ushort)(0xFE00 + _transfers), transferedByte);
+            _transfers++;
         }
         
         if (_cycles >= MaxCycles)
@@ -43,4 +49,4 @@ public class DMA(MMU mmu)
             _active = false;
         }
     }
-}}
+}
