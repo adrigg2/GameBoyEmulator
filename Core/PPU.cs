@@ -25,7 +25,7 @@ public class PPU
     private WriteableBitmap _screenImage;
     private byte[] _screenBuffer;
 
-    private Dictionary<ushort, int> _objectPool;
+    private List<ushort> _objectPool;
 
     private Dispatcher _windowDispatcher; // NOTE: Consider transfering logic to the main window
 
@@ -56,13 +56,14 @@ public class PPU
             case OAMRead:
                 if (_cycleCount >= OAMReadCycles)
                 {
+                    _objectPool.Clear();
                     for (ushort i = 0xFE9C; i >= 0xFE00 && _objectPool.Count < 10; i -= 4)
                     {
                         int y = mmu.ReadByte(i) - 16;
                         int size = (mmu.LCDC & 0x4) != 0 ? 16 : 8;
                         if (y <= mmu.LY && y + size > mmu.LY)
                         {
-                            _objectPool.TryAdd(i, 0);
+                            _objectPool.Add(i);
                         }
                     }
 
@@ -123,6 +124,20 @@ public class PPU
 
     private void RenderScanLine(MMU mmu)
     {
+        byte LCDC = mmu.LCDC;
+        if ((LCDC & 0x1) != 0)
+        {
+            RenderBG(mmu);
+        }
+
+        if ((LCDC & 0x2) != 0)
+        {
+            RenderObjects(mmu);
+        }
+    }
+
+    private void RenderBG(MMU mmu)
+    {
         byte WX = (byte)(mmu.WX - 7);
         byte WY = mmu.WY;
         byte LY = mmu.LY;
@@ -179,6 +194,41 @@ public class PPU
             color = ~color & 0x3; // Invert the color bits
 
             SetPixel(i, LY, color);
+        }
+    }
+
+    private void RenderObjects(MMU mmu)
+    {
+        byte LY = mmu.LY;
+        bool doubleSize = (mmu.LCDC & 0x4) != 0;
+        for (int i = 0; i < ScreenWidth; i++)
+        {
+            ushort objectAddress = 0;
+            foreach (ushort address in _objectPool)
+            {
+                int x = mmu.ReadByte((ushort)(address + 1)) - 8;
+                if (i >= x && i < x + 8)
+                {
+                    objectAddress = address;
+                    break;
+                }
+            }
+
+            if (objectAddress == 0)
+            {
+                continue;
+            }
+
+            int y = mmu.ReadByte(objectAddress) - 16;
+
+            byte tile = mmu.ReadByte((ushort)(objectAddress + 2));
+            if (doubleSize)
+            {
+                tile = LY >= y + 8 ? (byte)(tile & 0xFE) : (byte)(tile | 0x1);
+            }
+            byte attributes = mmu.ReadByte((ushort)(objectAddress + 3));
+
+
         }
     }
     
