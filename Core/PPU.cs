@@ -1,11 +1,12 @@
-﻿using System.Windows;
+﻿using System.Drawing;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
 namespace GameBoyEmulator.Core;
 
-// NOTE: Change pixel format to Bgra32, use a palette to translate the pixels and a buffer array where each value is a pixel
+// NOTE: Change pixel format to Bgra32, use a palette to translate the pixels and a buffer array where each value is a pixel OR use Indexed2 and a color palette
 public class PPU
 {
     private const int OAMRead = 2;
@@ -204,9 +205,10 @@ public class PPU
         for (int i = 0; i < ScreenWidth; i++)
         {
             ushort objectAddress = 0;
+            int x = 0;
             foreach (ushort address in _objectPool)
             {
-                int x = mmu.ReadByte((ushort)(address + 1)) - 8;
+                x = mmu.ReadByte((ushort)(address + 1)) - 8;
                 if (i >= x && i < x + 8)
                 {
                     objectAddress = address;
@@ -224,11 +226,36 @@ public class PPU
             byte tile = mmu.ReadByte((ushort)(objectAddress + 2));
             if (doubleSize)
             {
-                tile = LY >= y + 8 ? (byte)(tile & 0xFE) : (byte)(tile | 0x1);
+                tile = LY < y + 8 ? (byte)(tile & 0xFE) : (byte)(tile | 0x1);
             }
             byte attributes = mmu.ReadByte((ushort)(objectAddress + 3));
+            int priority = attributes & 0x80;
+            int yFlip = attributes & 0x40;
+            int xFlip = attributes & 0x20;
+            int palette = attributes & 0x10;
 
+            ushort tileAddress = (ushort)(tile + 0x8000);
 
+            int addressShift = yFlip > 0 ? (~(LY - y)) & 0x7 : (LY - y);
+            ushort tileRowAddress = (ushort)(tileAddress + addressShift * 2);
+
+            byte tileLow = mmu.ReadByte(tileRowAddress);
+            byte tileHigh = mmu.ReadByte((ushort)(tileRowAddress + 1));
+
+            int colorBit = xFlip > 0 ? 1 << (7 - (~x & 7)) : 1 << (7 - (x & 7));
+            int colorIdLow = (tileLow & colorBit) != 0 ? 1 : 0;
+            int colorIdHigh = (tileHigh & colorBit) != 0 ? 2 : 0;
+            int colorId = colorIdLow + colorIdHigh;
+
+            if (colorId != 0)
+            {
+                ushort paletteAddress = palette > 0 ? (ushort)0xFF49 : (ushort)0xFF48;
+                byte OBP = mmu.ReadByte(paletteAddress);
+                int color = (OBP >> (colorId * 2)) & 0x3;
+                color = ~color & 0x3; // Invert the color bits
+
+                SetPixel(i, LY, color);
+            }
         }
     }
     
