@@ -11,9 +11,14 @@ public class JOYPAD
 {
     private byte _pad = 0x0F;
     private byte _buttons = 0x0F;
+    private byte _oldPad = 0x0F;
+    private byte _oldButtons = 0x0F;
 
     public void Update(MMU mmu)
     {
+        if (_oldButtons != _buttons) { Console.WriteLine($"{_buttons:X2}"); }
+        if (_oldPad != _pad) { Console.WriteLine($"{_pad:X2}"); }
+
         byte JOYP = mmu.JOYP;
         if ((JOYP & 0x30) == 0x30)
         {
@@ -28,7 +33,8 @@ public class JOYPAD
             mmu.JOYP = (byte)((mmu.JOYP & 0xF0) | _pad);
         }
 
-        // TODO: Interrupt
+        _oldPad = _pad;
+        _oldButtons = _buttons;
     }
 
     public void HandleKeyDown(Key key)

@@ -430,28 +430,28 @@ public class CPU
             _mmu.IF &= 0xFE;
             return 20;
         }
-        else if ((_mmu.IF & _mmu.IF & 0x2) != 0)
+        else if ((_mmu.IE & _mmu.IF & 0x2) != 0)
         {
             _ime = false;
             CALL(true, 0x48);
             _mmu.IF &= 0xFD;
             return 20;
         }
-        else if ((_mmu.IF & _mmu.IF & 0x4) != 0)
+        else if ((_mmu.IE & _mmu.IF & 0x4) != 0)
         {
             _ime = false;
             CALL(true, 0x50);
             _mmu.IF &= 0xFB;
             return 20;
         }
-        else if ((_mmu.IF & _mmu.IF & 0x8) != 0)
+        else if ((_mmu.IE & _mmu.IF & 0x8) != 0)
         {
             _ime = false;
             CALL(true, 0x58);
             _mmu.IF &= 0xF7;
             return 20;
         }
-        else if ((_mmu.IF & _mmu.IF & 0x10) != 0)
+        else if ((_mmu.IE & _mmu.IF & 0x10) != 0)
         {
             _ime = false;
             CALL(true, 0x60);
