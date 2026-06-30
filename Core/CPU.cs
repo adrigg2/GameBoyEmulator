@@ -12,7 +12,7 @@ public class CPU
     private bool _ime, _halted, _haltBug;
     // private bool _stopped;   // TODO: Stop
 
-    private bool _eiPending;
+    private int _eiCounter;
 
     public byte A { get => _a; set => _a = value; }
     public byte B { get => _b; set => _b = value; }
@@ -40,8 +40,9 @@ public class CPU
     {
         _a = _b = _c = _d = _e = _h = _l = _f = 0;
         _pc = _sp = 0;
-        _ime = _halted = _haltBug = _eiPending = false;
+        _ime = _halted = _haltBug = false;
         _mmu = mmu;
+        _eiCounter = 0;
     }
 
     public int Execute()
@@ -370,7 +371,7 @@ public class CPU
                 break;
             case 0xE1: HL = _mmu.ReadWord(_sp); _sp += 2;                   break;  // POP HL
             case 0xE2:                                                              // LDH [C], A
-                _mmu.WriteByte(_mmu.ReadByte((ushort)(0xFF00 + C)), A); 
+                _mmu.WriteByte((ushort)(0xFF00 + C), A); 
                 break;
             case 0xE5: _sp -= 2; _mmu.WriteWord(_sp, HL);                   break;  // PUSH HL
             case 0xE6: AND(_mmu.ReadByte(_pc++));                           break;  // AND n8
@@ -392,7 +393,7 @@ public class CPU
             case 0xF8: HL = ADDr16e8(_sp);                                  break;  // LD HL, SP + e8
             case 0xF9: _sp = HL;                                            break;  // LD SP, HL
             case 0xFA: A = _mmu.ReadByte(_mmu.ReadWord(_pc)); _pc += 2;     break;  // LD A, [a16]
-            case 0xFB: _eiPending = true;                                      break;  // EI
+            case 0xFB: _eiCounter = 1;                                      break;  // EI
             case 0xFE: CP(_mmu.ReadByte(_pc++));                            break;  // CP n8
             case 0xFF: RST(0x38);                                           break;  // RST $38
             default:
@@ -400,10 +401,11 @@ public class CPU
 
         }
 
-        if (_eiPending)
+        switch (_eiCounter)
         {
-            _eiPending = false;
-            _ime = true;
+            case 1: _eiCounter++; break;
+            case 2: _eiCounter = 0; _ime = true; break;
+            default: break;
         }
 
         _lastInstruction = instruction; // DEBUG: debug only
@@ -742,7 +744,6 @@ public class CPU
     private void ADDHL(ushort num)
     {
         int result = HL + num;
-        SetZeroFlag16(result);
         SetCarryFlag16(result);
         SetHalfCarryFlag(HL, num);
         SubtractionFlag = false;
@@ -958,7 +959,7 @@ public class CPU
     {
         if (flag)
         {
-            _pc += (ushort)value;
+            _pc = (ushort)(_pc + value);
             return CPUCycles.JRT;
         }
         return CPUCycles.JRF;
@@ -1000,11 +1001,6 @@ public class CPU
     private void SetZeroFlag(int result)
     {
         ZeroFlag = (result & 0xFF) == 0;
-    }
-
-    private void SetZeroFlag16(int result)
-    {
-        ZeroFlag = (result & 0xFFFF) == 0;
     }
 
     private void SetCarryFlag(int result)
