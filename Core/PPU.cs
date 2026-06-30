@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using System.Xaml;
 
 namespace GameBoyEmulator.Core;
 
@@ -23,8 +24,12 @@ public class PPU
 
     private int _cycleCount;
 
+    private bool _STATInterruptRequest;
+    private bool _screenOff;
+
     private WriteableBitmap _screenImage;
     private byte[] _screenBuffer;
+    private byte[] _bgColorIds;
 
     private List<ushort> _objectPool;
 
@@ -38,6 +43,7 @@ public class PPU
         byte[] pixels = Enumerable.Repeat((byte)0xFF, totalBytes).ToArray();
         _screenImage.WritePixels(new Int32Rect(0, 0, ScreenWidth, ScreenHeigth), pixels, stride, 0);
         _screenBuffer = new byte[ScreenWidth * ScreenHeigth / 4];
+        _bgColorIds = new byte[ScreenWidth];
         _windowDispatcher = windowDispatcher;
         _objectPool = [];
     }
@@ -49,6 +55,23 @@ public class PPU
 
     public void Update(int cycles, MMU mmu)
     {
+        if ((mmu.LCDC & 0x80) == 0)
+        {
+            mmu.LY = 0;
+            mmu.STAT = (byte)(mmu.STAT & ~0x3);
+            _cycleCount = 0;
+            
+            if (!_screenOff)
+            {
+                _screenOff = true;
+                Array.Fill<byte>(_screenBuffer, 0xFF);
+            }
+
+            return;
+        }
+
+        _screenOff = false;
+
         _cycleCount += cycles;
         byte mode = (byte)(mmu.STAT & 0x3);
 
@@ -58,7 +81,7 @@ public class PPU
                 if (_cycleCount >= OAMReadCycles)
                 {
                     _objectPool.Clear();
-                    for (ushort i = 0xFE9C; i >= 0xFE00 && _objectPool.Count < 10; i -= 4)
+                    for (ushort i = 0xFE00; i < 0xFEA0 && _objectPool.Count < 10; i += 4)
                     {
                         int y = mmu.ReadByte(i) - 16;
                         int size = (mmu.LCDC & 0x4) != 0 ? 16 : 8;
@@ -113,6 +136,17 @@ public class PPU
                 }
                 break;
         }
+
+        if (mmu.LY == mmu.LYC)
+        {
+            mmu.STAT |= 0x4;
+        }
+        else
+        {
+            mmu.STAT = (byte)(mmu.STAT & ~0x4);
+        }
+
+        STATInterrupt(mmu);
     }
 
     private void ChangeMode(int mode, MMU mmu)
@@ -121,6 +155,43 @@ public class PPU
         mmu.STAT = (byte)(STAT | mode); // Set the new mode
 
         // TODO: Interrupts
+    }
+
+    private void STATInterrupt(MMU mmu)
+    {
+        if ((mmu.IE & 0x2) == 0)
+        {
+            return;
+        }
+
+        bool previousSTATInterruptRequest = _STATInterruptRequest;
+        byte STAT = mmu.STAT;
+
+        if ((STAT & 0x40) != 0 && (STAT & 0x4) != 0)
+        {
+            _STATInterruptRequest = true;
+        }
+        else if ((STAT & 0x20) != 0 && (STAT & 0x3) == OAMRead)
+        {
+            _STATInterruptRequest = true;
+        }
+        else if ((STAT & 0x10) != 0 && (STAT & 0x3) == VBlank)
+        {
+            _STATInterruptRequest = true;
+        }
+        else if ((STAT & 0x8) != 0 && (STAT & 0x3) == HBlank)
+        {
+            _STATInterruptRequest = true;
+        }
+        else
+        {
+            _STATInterruptRequest = false;
+        }
+
+        if (!previousSTATInterruptRequest && _STATInterruptRequest)
+        {
+            mmu.IF |= 0x2;
+        }
     }
 
     private void RenderScanLine(MMU mmu)
@@ -195,6 +266,7 @@ public class PPU
             color = ~color & 0x3; // Invert the color bits
 
             SetPixel(i, LY, color);
+            _bgColorIds[i] = (byte)colorId;
         }
     }
 
@@ -230,11 +302,16 @@ public class PPU
             }
             byte attributes = mmu.ReadByte((ushort)(objectAddress + 3));
             int priority = attributes & 0x80;
+            if (priority != 0 && _bgColorIds[i] != 0)
+            {
+                continue;
+            }
+
             int yFlip = attributes & 0x40;
             int xFlip = attributes & 0x20;
             int palette = attributes & 0x10;
 
-            ushort tileAddress = (ushort)(tile + 0x8000);
+            ushort tileAddress = (ushort)(tile * 16 + 0x8000);
 
             int addressShift = yFlip > 0 ? (~(LY - y)) & 0x7 : (LY - y);
             ushort tileRowAddress = (ushort)(tileAddress + addressShift * 2);
@@ -242,7 +319,7 @@ public class PPU
             byte tileLow = mmu.ReadByte(tileRowAddress);
             byte tileHigh = mmu.ReadByte((ushort)(tileRowAddress + 1));
 
-            int colorBit = xFlip > 0 ? 1 << (7 - (~x & 7)) : 1 << (7 - (x & 7));
+            int colorBit = xFlip > 0 ? 1 << (7 - (~(i - x) & 7)) : 1 << (7 - ((i - x) & 7));
             int colorIdLow = (tileLow & colorBit) != 0 ? 1 : 0;
             int colorIdHigh = (tileHigh & colorBit) != 0 ? 2 : 0;
             int colorId = colorIdLow + colorIdHigh;
@@ -254,7 +331,7 @@ public class PPU
                 int color = (OBP >> (colorId * 2)) & 0x3;
                 color = ~color & 0x3; // Invert the color bits
 
-                SetPixel(i, LY, color);
+                SetObjectPixel(i, LY, color);
             }
         }
     }
@@ -262,6 +339,15 @@ public class PPU
     private void SetPixel(int x, int y, int color)
     {
         _screenBuffer[(y * ScreenWidth + x) / 4] |= (byte)(color << ((~x & 3) * 2));
+    }
+
+    private void SetObjectPixel(int x, int y, int color)
+    {
+        int colorShift = (~x & 3) * 2;
+        int index = (y * ScreenWidth + x) / 4;
+
+        _screenBuffer[index] &= (byte)~(0x3 << colorShift);
+        _screenBuffer[index] |= (byte)(color << colorShift);
     }
 
     private void UpdateScreen()
