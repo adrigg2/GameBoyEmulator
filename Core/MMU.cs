@@ -17,6 +17,7 @@ public class MMU
     private byte _ie;
 
     public byte IE { get => _ie; set => _ie = value; }
+    public byte JOYP { get => ReadByte(0xFF00); set => WriteByte(0xFF00, value); }
     public byte IF { get => ReadByte(0xFF0F); set => WriteByte(0xFF0F, value); }
     public byte LCDC { get => ReadByte(0xFF40); set => WriteByte(0xFF40, value); }
     public byte STAT { get => ReadByte(0xFF41); set => WriteByte(0xFF41, value); }

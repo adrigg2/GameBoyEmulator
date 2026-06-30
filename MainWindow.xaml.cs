@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Threading;
 
 namespace GameBoyEmulator;
@@ -44,5 +45,15 @@ public partial class MainWindow : Window
                 }
             }
         });
+    }
+
+    private void Window_KeyDown(object sender, KeyEventArgs e)
+    {
+        _emulator.JOYPAD.HandleKeyDown(e.Key);
+    }
+
+    private void Window_KeyUp(object sender, KeyEventArgs e)
+    {
+        _emulator.JOYPAD.HandleKeyUp(e.Key);
     }
 }

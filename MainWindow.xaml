@@ -6,7 +6,9 @@
         xmlns:local="clr-namespace:GameBoyEmulator"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
-        ContentRendered="Tick">
+        ContentRendered="Tick"
+        KeyDown="Window_KeyDown"
+        KeyUp="Window_KeyUp">
     <Grid>
         <Image x:Name="Screen" HorizontalAlignment="Left" Height="144" Margin="314,136,0,0" VerticalAlignment="Top" Width="160"/>
 
