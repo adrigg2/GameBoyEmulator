@@ -10,6 +10,7 @@ public class Emulator
     private PPU _ppu;
     private DMA _dma;
     private JOYPAD _joypad;
+    private TIMER _timer;
 
     private const int CPUFrequency = 4194304; // 4.194304 MHz
     private const int CyclesPerFrame = 70224; // ~60 FPS
@@ -30,6 +31,7 @@ public class Emulator
         _cpu = new(_mmu);
         _ppu = new(windowDispatcher);
         _joypad = new();
+        _timer = new();
         _frames = 0;
     }
 
@@ -44,6 +46,7 @@ public class Emulator
             _ppu.Update(cycles, _mmu);
             _dma.Tick(cycles);
             _joypad.Update(_mmu);
+            _timer.Tick(cycles, _mmu);
             frameCycles += cycles;
 
             //logFile?.WriteLine($"{_cpu._lastInstructionPC:X2}: {_cpu._lastInstruction:X2}");

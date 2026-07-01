@@ -1,6 +1,7 @@
 ﻿namespace GameBoyEmulator.Core;
 public class MMU
 {
+    // TODO: Move hardware registers and periferic ram to their corresponding classes
     private DMA _dma;
 
     public bool _inBios; // DEBUG: Public
@@ -18,6 +19,10 @@ public class MMU
 
     public byte IE { get => _ie; set => _ie = value; }
     public byte JOYP { get => ReadByte(0xFF00); set => WriteByte(0xFF00, value); }
+    public byte DIV { get => _io[0x04]; set => _io[0x04] = value; }
+    public byte TIMA { get => ReadByte(0xFF05); set => WriteByte(0xFF05, value); }
+    public byte TMA { get => ReadByte(0xFF06); set => WriteByte(0xFF06, value); }
+    public byte TAC { get => ReadByte(0xFF07); set => WriteByte(0xFF07, value); }
     public byte IF { get => ReadByte(0xFF0F); set => WriteByte(0xFF0F, value); }
     public byte LCDC { get => ReadByte(0xFF40); set => WriteByte(0xFF40, value); }
     public byte STAT { get => ReadByte(0xFF41); set => WriteByte(0xFF41, value); }
@@ -124,7 +129,15 @@ public class MMU
                 {
                     _dma.StartTransfer(value);
                 }
-                _io[address & 0x7F] = value;
+
+                if (address == 0xFF04)
+                {
+                    DIV = 0;
+                }
+                else
+                {
+                    _io[address & 0x7F] = value;
+                }
                 break;
             case ushort _ when address < 0xFFFF:
                 _hram[address & 0x7F] = value;
