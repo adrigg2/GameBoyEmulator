@@ -159,11 +159,6 @@ public class PPU
 
     private void STATInterrupt(MMU mmu)
     {
-        if ((mmu.IE & 0x2) == 0)
-        {
-            return;
-        }
-
         bool previousSTATInterruptRequest = _STATInterruptRequest;
         byte STAT = mmu.STAT;
 

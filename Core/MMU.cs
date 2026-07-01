@@ -146,6 +146,9 @@ public class MMU
     public void LoadGame(byte[] rom)
     {
         Array.Copy(rom, _rom, Math.Min(_rom.Length, rom.Length));
+        Console.WriteLine($"{rom[0x0147]:x2}");
+        Console.WriteLine($"{rom[0x0148]:x2}");
+        Console.WriteLine($"{rom[0x0149]:x2}");
     }
 
     public void LoadBootRom(byte[] rom)

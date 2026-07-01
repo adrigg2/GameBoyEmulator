@@ -27,10 +27,18 @@ public class JOYPAD
         else if ((JOYP & 0x20) == 0)
         {
             mmu.JOYP = (byte)((mmu.JOYP & 0xF0) | _buttons);
+            if (_buttons != 0x0F)
+            {
+                mmu.IF |= 0x10;
+            }
         }
         else if ((JOYP & 0x10) == 0)
         {
             mmu.JOYP = (byte)((mmu.JOYP & 0xF0) | _pad);
+            if (_pad != 0x0F)
+            {
+                mmu.IF |= 0x10;
+            }
         }
 
         _oldPad = _pad;
