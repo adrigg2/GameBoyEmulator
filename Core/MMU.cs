@@ -4,7 +4,7 @@ public class MMU
     // TODO: Move hardware registers and periferic ram to their corresponding classes
     private DMA _dma;
 
-    public bool _inBios; // DEBUG: Public
+    public bool _bootRomMapped; // DEBUG: Public
 
     private readonly byte[] _bootROM;
     private byte[] _rom;    // NOTE: Move to Cartridge?
@@ -25,7 +25,7 @@ public class MMU
     public byte TAC { get => ReadByte(0xFF07); set => WriteByte(0xFF07, value); }
     public byte IF { get => ReadByte(0xFF0F); set => WriteByte(0xFF0F, value); }
     public byte LCDC { get => ReadByte(0xFF40); set => WriteByte(0xFF40, value); }
-    public byte STAT { get => ReadByte(0xFF41); set => WriteByte(0xFF41, value); }
+    public byte STAT { get => _io[0x41]; set => _io[0x41] = value; }
     public byte SCY { get => ReadByte(0xFF42); set => WriteByte(0xFF42, value); }
     public byte SCX { get => ReadByte(0xFF43); set => WriteByte(0xFF43, value); }
     public byte LY { get => ReadByte(0xFF44); set => WriteByte(0xFF44, value); }
@@ -38,7 +38,7 @@ public class MMU
 
     public MMU()
     {
-        _inBios = true;
+        _bootRomMapped = true;
         _bootROM = new byte[0x100];
         _rom = new byte[0x8000];
         _vram = new byte[0x2000];
@@ -57,7 +57,7 @@ public class MMU
         switch (address)
         {
             case ushort _ when address <= 0x00FF:
-                if (_inBios)
+                if (_bootRomMapped)
                 {
                     return _bootROM[address];
                 }
@@ -96,13 +96,13 @@ public class MMU
     {
         if (address == 0xFF50)
         {
-            _inBios = false;
+            _bootRomMapped = false;
         }
 
         switch (address)
         {
             case ushort _ when address <= 0x7FFF:
-                _rom[address] = value;
+                //_rom[address] = value;
                 break;
             case ushort _ when address <= 0x9FFF:
                 _vram[address & 0x1FFF] = value;
@@ -128,6 +128,11 @@ public class MMU
                 if (address == 0xFF46 && value <= 0xDF)
                 {
                     _dma.StartTransfer(value);
+                }
+
+                if (address == 0xFF41)
+                {
+                    value = (byte)(value & ~0x7);
                 }
 
                 if (address == 0xFF04)
@@ -162,6 +167,7 @@ public class MMU
         Console.WriteLine($"{rom[0x0147]:x2}");
         Console.WriteLine($"{rom[0x0148]:x2}");
         Console.WriteLine($"{rom[0x0149]:x2}");
+        Console.WriteLine($"{rom[0x0038]:x2}");
     }
 
     public void LoadBootRom(byte[] rom)

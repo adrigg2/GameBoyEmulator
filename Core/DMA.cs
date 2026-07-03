@@ -22,7 +22,7 @@ public class DMA(MMU mmu)
 
     public void StartTransfer(byte address)
     {
-        _address = (byte)(address << 8);
+        _address = (ushort)(address << 8);
         _active = true;
         _cycles = 0;
         _transfers = 0;

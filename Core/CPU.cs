@@ -50,6 +50,11 @@ public class CPU
         // if (_stopped) return;    // TODO: STOP
         _lastInstructionPC = _pc;
 
+        if (_pc == 0x02BB)
+        {
+
+        }
+
         int cycles = 0;
         if (_ime || _halted)
         {
@@ -114,7 +119,7 @@ public class CPU
                 A = (byte)((A << 1) | (carry ? 0x1 : 0));
                 break;
             } 
-            case 0x18: cycles += JR(true, (sbyte)_mmu.ReadByte(_pc++));     break;  // JR e8
+            case 0x18: JR(true, (sbyte)_mmu.ReadByte(_pc++));               break;  // JR e8
             case 0x19: ADDHL(DE);                                           break;  // ADDHL DE
             case 0x1A: A = _mmu.ReadByte(DE);                               break;  // LD A, [DE]
             case 0x1B: DE--;                                                break;  // DEC DE
@@ -175,7 +180,7 @@ public class CPU
             case 0x33: _sp++;                                               break;  // INC SP
             case 0x34: _mmu.WriteByte(HL, INC(_mmu.ReadByte(HL)));          break;  // INC [HL]
             case 0x35: _mmu.WriteByte(HL, DEC(_mmu.ReadByte(HL)));          break;  // DEC [HL]
-            case 0x36: _mmu.WriteByte(HL, _mmu.ReadByte(_pc++));            break;  // LD H, n8
+            case 0x36: _mmu.WriteByte(HL, _mmu.ReadByte(_pc++));            break;  // LD [HL], n8
             case 0x37:                                                              // SCF
                 HalfCarryFlag = false;
                 SubtractionFlag = false; 
@@ -340,13 +345,13 @@ public class CPU
             case 0xC0: cycles += RET(!ZeroFlag);                            break;  // RET NZ
             case 0xC1: BC = _mmu.ReadWord(_sp); _sp += 2;                   break;  // POP BC
             case 0xC2: cycles += JP(!ZeroFlag, _mmu.ReadWord(_pc));         break;  // JP NZ, a16
-            case 0xC3: cycles += JP(true, _mmu.ReadWord(_pc));              break;  // JP a16
+            case 0xC3: JP(true, _mmu.ReadWord(_pc));                        break;  // JP a16
             case 0xC4: cycles += CALL(!ZeroFlag, _mmu.ReadWord(_pc));       break;  // CALL NZ, a16
             case 0xC5: _sp -= 2; _mmu.WriteWord(_sp, BC);                   break;  // PUSH BC
             case 0xC6: ADD(_mmu.ReadByte(_pc++));                           break;  // ADD n8
             case 0xC7: RST(0x0);                                            break;  // RST $00
             case 0xC8: cycles += RET(ZeroFlag);                             break;  // RET Z
-            case 0xC9: cycles += RET(true);                                 break;  // RET
+            case 0xC9: RET(true);                                           break;  // RET
             case 0xCA: cycles += JP(ZeroFlag, _mmu.ReadWord(_pc));          break;  // JP Z, a16
             case 0xCB: cycles += ExecutePrefixed(_mmu.ReadByte(_pc++));     break;  // PREFIX
             case 0xCC: cycles += CALL(ZeroFlag, _mmu.ReadWord(_pc));        break;  // CALL Z, a16
@@ -377,7 +382,7 @@ public class CPU
             case 0xE6: AND(_mmu.ReadByte(_pc++));                           break;  // AND n8
             case 0xE7: RST(0x20);                                           break;  // RST $20
             case 0xE8: _sp = ADDr16e8(_sp);                                 break;  // ADD SP, e8
-            case 0xE9: cycles += JP(true, HL);                              break;  // JP HL
+            case 0xE9: JP(true, HL);                                        break;  // JP HL
             case 0xEA: _mmu.WriteByte(_mmu.ReadWord(_pc), A); _pc += 2;     break;  // LD [a16], A
             case 0xEE: XOR(_mmu.ReadByte(_pc++));                           break;  // XOR n8
             case 0xEF: RST(0x28);                                           break;  // RST $28
@@ -425,39 +430,44 @@ public class CPU
             return 0;
         }
 
+        ushort interruptHandler = 0;
         if ((_mmu.IE & _mmu.IF & 0x1) != 0)
         {
             _ime = false;
-            CALL(true, 0x40);
+            interruptHandler = 0x40;
             _mmu.IF &= 0xFE;
-            return 20;
         }
         else if ((_mmu.IE & _mmu.IF & 0x2) != 0)
         {
             _ime = false;
-            CALL(true, 0x48);
+            interruptHandler = 0x48;
             _mmu.IF &= 0xFD;
-            return 20;
         }
         else if ((_mmu.IE & _mmu.IF & 0x4) != 0)
         {
             _ime = false;
-            CALL(true, 0x50);
+            interruptHandler = 0x50;
             _mmu.IF &= 0xFB;
-            return 20;
         }
         else if ((_mmu.IE & _mmu.IF & 0x8) != 0)
         {
             _ime = false;
-            CALL(true, 0x58);
+            interruptHandler = 0x58;
             _mmu.IF &= 0xF7;
-            return 20;
         }
         else if ((_mmu.IE & _mmu.IF & 0x10) != 0)
         {
             _ime = false;
-            CALL(true, 0x60);
+            interruptHandler = 0x60;
             _mmu.IF &= 0xEF;
+        }
+
+        if (interruptHandler != 0)
+        {
+            _sp -= 2;
+            _mmu.WriteWord(_sp, (ushort)(_pc));
+
+            _pc = interruptHandler;
             return 20;
         }
 
@@ -1059,7 +1069,7 @@ public class CPU
 
             LastInstruction = {_lastInstruction:X2}
 
-            InBIOS = {_mmu._inBios}
+            InBIOS = {_mmu._bootRomMapped}
             """;
     }
 }

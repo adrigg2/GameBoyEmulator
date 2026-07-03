@@ -1,4 +1,5 @@
 ﻿using GameBoyEmulator.Core;
+using GameBoyEmulator.Debug;
 using System.IO;
 using System.Windows.Threading;
 
@@ -49,7 +50,10 @@ public class Emulator
             _timer.Tick(cycles, _mmu);
             frameCycles += cycles;
 
-            //logFile?.WriteLine($"{_cpu._lastInstructionPC:X2}: {_cpu._lastInstruction:X2}");
+            if (!_mmu._bootRomMapped)
+            {
+                logFile?.WriteLine($"{_cpu._lastInstructionPC:X2}: {OpcodeParser.ParseOpcode(_cpu._lastInstruction)}");
+            }
 
             if (_cpu._lastInstructionPC == 0xFE)
             {

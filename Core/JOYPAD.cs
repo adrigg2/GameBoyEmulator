@@ -16,8 +16,6 @@ public class JOYPAD
 
     public void Update(MMU mmu)
     {
-        if (_oldButtons != _buttons) { Console.WriteLine($"{_buttons:X2}"); }
-        if (_oldPad != _pad) { Console.WriteLine($"{_pad:X2}"); }
 
         byte JOYP = mmu.JOYP;
         if ((JOYP & 0x30) == 0x30)
@@ -41,6 +39,8 @@ public class JOYPAD
             }
         }
 
+        if (_oldButtons != _buttons) { Console.WriteLine($"{mmu.JOYP:X2}"); }
+        if (_oldPad != _pad) { Console.WriteLine($"{mmu.JOYP:X2}"); }
         _oldPad = _pad;
         _oldButtons = _buttons;
     }
