@@ -223,6 +223,13 @@ public class MMU
         Console.WriteLine($"{rom[0x0148]:x2}");
         Console.WriteLine($"{rom[0x0149]:x2}");
         Console.WriteLine($"{rom[0x0038]:x2}");
+
+        string s = "";
+        for (int i = 0x0134; i <= 0x0143; i++)
+        {
+            s += (char)rom[i];
+        }
+        Console.WriteLine(s);
     }
 
     public void LoadBootRom(byte[] rom)
