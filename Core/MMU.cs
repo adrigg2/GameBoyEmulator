@@ -1,8 +1,10 @@
 ﻿namespace GameBoyEmulator.Core;
 public class MMU
 {
-    // TODO: Move hardware registers and periferic ram to their corresponding classes
     private DMA _dma;
+    private JOYPAD _joypad;
+    private PPU _ppu;
+    private TIMER _timer;
 
     public bool _bootRomMapped; // DEBUG: Public
 
@@ -14,29 +16,13 @@ public class MMU
     private byte[] _hram;
     private byte[] _eram;   // NOTE: Move to Cartridge?
     private byte[] _oam;    // NOTE: Move to PPU?
-    private byte[] _io;
     private byte _ie;
+    private byte _if;
 
     public byte IE { get => _ie; set => _ie = value; }
-    public byte JOYP { get => ReadByte(0xFF00); set => WriteByte(0xFF00, value); }
-    public byte DIV { get => _io[0x04]; set => _io[0x04] = value; }
-    public byte TIMA { get => ReadByte(0xFF05); set => WriteByte(0xFF05, value); }
-    public byte TMA { get => ReadByte(0xFF06); set => WriteByte(0xFF06, value); }
-    public byte TAC { get => ReadByte(0xFF07); set => WriteByte(0xFF07, value); }
-    public byte IF { get => ReadByte(0xFF0F); set => WriteByte(0xFF0F, value); }
-    public byte LCDC { get => ReadByte(0xFF40); set => WriteByte(0xFF40, value); }
-    public byte STAT { get => _io[0x41]; set => _io[0x41] = value; }
-    public byte SCY { get => ReadByte(0xFF42); set => WriteByte(0xFF42, value); }
-    public byte SCX { get => ReadByte(0xFF43); set => WriteByte(0xFF43, value); }
-    public byte LY { get => ReadByte(0xFF44); set => WriteByte(0xFF44, value); }
-    public byte LYC { get => ReadByte(0xFF45); set => WriteByte(0xFF45, value); }
-    public byte BGP { get => ReadByte(0xFF47); set => WriteByte(0xFF47, value); }
-    public byte WY { get => ReadByte(0xFF4A); set => WriteByte(0xFF4A, value); }
-    public byte WX { get => ReadByte(0xFF4B); set => WriteByte(0xFF4B, value); }
+    public byte IF { get => _if; set => _if = value; }
 
-    public DMA DMA { get => _dma; }
-
-    public MMU()
+    public MMU(DMA dma, JOYPAD joypad, PPU ppu, TIMER timer)
     {
         _bootRomMapped = true;
         _bootROM = new byte[0x100];
@@ -45,11 +31,13 @@ public class MMU
         _eram = new byte[0x2000];
         _wram = new byte[0x2000];
         _oam = new byte[0xA0];
-        _io = new byte[0x80];
         _hram = new byte[0x7F];
         _occupiedVram = new object[0x2000]; // DEBUG: debug info
         _ie = 0;
-        _dma = new(this);
+        _dma = dma;
+        _joypad = joypad;
+        _ppu = ppu;
+        _timer = timer;
     }
 
     public byte ReadByte(ushort address)
@@ -76,8 +64,44 @@ public class MMU
                 return _oam[address - 0xFE00];
             case ushort _ when address <= 0xFEFF:
                 return 0;
+            case 0xFF00:
+                return _joypad.JOYP;
+            case 0xFF04:
+                return _timer.DIV;
+            case 0xFF05:
+                return _timer.TIMA;
+            case 0xFF06:
+                return _timer.TMA;
+            case 0xFF07:
+                return _timer.TAC;
+            case 0xFF0F:
+                return IF;
+            case 0xFF40:
+                return _ppu.LCDC;
+            case 0xFF41:
+                return _ppu.STAT;
+            case 0xFF42:
+                return _ppu.SCY;
+            case 0xFF43:
+                return _ppu.SCX;
+            case 0xFF44:
+                return _ppu.LY;
+            case 0xFF45:
+                return _ppu.LYC;
+            case 0xFF46:
+                return _dma.Address;
+            case 0xFF47:
+                return _ppu.BGP;
+            case 0xFF48:
+                return _ppu.OBP0;
+            case 0xFF49:
+                return _ppu.OBP1;
+            case 0xFF4A:
+                return _ppu.WY;
+            case 0xFF4B:
+                return _ppu.WX;
             case ushort _ when address <= 0xFF7F:
-                return _io[address & 0x7F];
+                return 0;
             case ushort _ when address < 0xFFFF:
                 return _hram[address & 0x7F];
             case 0xFFFF:
@@ -94,11 +118,6 @@ public class MMU
 
     public void WriteByte(ushort address, byte value)
     {
-        if (address == 0xFF50)
-        {
-            _bootRomMapped = false;
-        }
-
         switch (address)
         {
             case ushort _ when address <= 0x7FFF:
@@ -124,25 +143,61 @@ public class MMU
                 break;
             case ushort _ when address <= 0xFEFF:
                 break;
+            case 0xFF00:
+                _joypad.JOYP = value;
+                break;
+            case 0xFF04:
+                _timer.DIV = value;
+                break;
+            case 0xFF05:
+                _timer.TIMA = value;
+                break;
+            case 0xFF06:
+                _timer.TMA = value;
+                break;
+            case 0xFF07:
+                _timer.TAC = value;
+                break;
+            case 0xFF0F:
+                IF = value;
+                break;
+            case 0xFF40:
+                _ppu.LCDC = value;
+                break;
+            case 0xFF41:
+                _ppu.STAT = value;
+                break;
+            case 0xFF42:
+                _ppu.SCY = value;
+                break;
+            case 0xFF43:
+                _ppu.SCX = value;
+                break;
+            case 0xFF45:
+                _ppu.LYC = value;
+                break;
+            case 0xFF46:
+                _dma.Address = value;
+                break;
+            case 0xFF47:
+                _ppu.BGP = value;
+                break;
+            case 0xFF48:
+                _ppu.OBP0 = value;
+                break;
+            case 0xFF49:
+                _ppu.OBP1 = value;
+                break;
+            case 0xFF4A:
+                _ppu.WY = value;
+                break;
+            case 0xFF4B:
+                _ppu.WX = value;
+                break;
+            case 0xFF50:
+                _bootRomMapped = false;
+                break;
             case ushort _ when address <= 0xFF7F:
-                if (address == 0xFF46 && value <= 0xDF)
-                {
-                    _dma.StartTransfer(value);
-                }
-
-                if (address == 0xFF41)
-                {
-                    value = (byte)(value & ~0x7);
-                }
-
-                if (address == 0xFF04)
-                {
-                    DIV = 0;
-                }
-                else
-                {
-                    _io[address & 0x7F] = value;
-                }
                 break;
             case ushort _ when address < 0xFFFF:
                 _hram[address & 0x7F] = value;

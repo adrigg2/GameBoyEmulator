@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GameBoyEmulator.Core;
 
-public class DMA(MMU mmu)
+public class DMA
 {
     private const int MaxCycles = 640;
     private const int CyclesPerTransfer = 4;
@@ -18,17 +18,22 @@ public class DMA(MMU mmu)
 
     private bool _active = false;
 
-    private MMU _mmu = mmu;
+    public byte Address { get => (byte)(_address >> 8); set => StartTransfer(value); }
 
     public void StartTransfer(byte address)
     {
+        if (_address > 0xDF || _active)
+        {
+            return;
+        }
+
         _address = (ushort)(address << 8);
         _active = true;
         _cycles = 0;
         _transfers = 0;
     }
 
-    public void Tick(int cycles)
+    public void Tick(int cycles, MMU mmu)
     {
         if (!_active)
         {
@@ -39,8 +44,8 @@ public class DMA(MMU mmu)
 
         for (int i = _cycles - _transfers * 4; i > CyclesPerTransfer && _transfers * CyclesPerTransfer < MaxCycles; i -= 4)
         {
-            byte transferedByte = _mmu.ReadByte((ushort)(_address + _transfers));
-            _mmu.WriteByte((ushort)(0xFE00 + _transfers), transferedByte);
+            byte transferedByte = mmu.ReadByte((ushort)(_address + _transfers));
+            mmu.WriteByte((ushort)(0xFE00 + _transfers), transferedByte);
             _transfers++;
         }
         

@@ -25,14 +25,14 @@ public class Emulator
     {
         byte[] romBytes = File.ReadAllBytes(rom);
         byte[] bootRomBytes = File.ReadAllBytes(bootRom);
-        _mmu = new();
-        _mmu.LoadGame(romBytes);
-        _mmu.LoadBootRom(bootRomBytes);
-        _dma = _mmu.DMA;
-        _cpu = new(_mmu);
         _ppu = new(windowDispatcher);
         _joypad = new();
         _timer = new();
+        _dma = new();
+        _mmu = new(_dma, _joypad, _ppu, _timer);
+        _mmu.LoadGame(romBytes);
+        _mmu.LoadBootRom(bootRomBytes);
+        _cpu = new(_mmu);
         _frames = 0;
     }
 
@@ -45,7 +45,7 @@ public class Emulator
             //_calls++;
             int cycles = _cpu.Execute();
             _ppu.Update(cycles, _mmu);
-            _dma.Tick(cycles);
+            _dma.Tick(cycles, _mmu);
             _joypad.Update(_mmu);
             _timer.Tick(cycles, _mmu);
             frameCycles += cycles;

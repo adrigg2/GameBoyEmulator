@@ -13,34 +13,35 @@ public class JOYPAD
     private byte _buttons = 0x0F;
     private byte _oldPad = 0x0F;
     private byte _oldButtons = 0x0F;
+    private byte _joyp = 0x3F;
+    
+    public byte JOYP { get => _joyp; set => _joyp = (byte)((value & 0xF0) | (_joyp & 0x0F)); }
 
     public void Update(MMU mmu)
     {
-
-        byte JOYP = mmu.JOYP;
-        if ((JOYP & 0x30) == 0x30)
+        if ((_joyp & 0x30) == 0x30)
         {
-            mmu.JOYP = 0x3F;
+            _joyp = 0x3F;
         }
-        else if ((JOYP & 0x20) == 0)
+        else if ((_joyp & 0x20) == 0)
         {
-            mmu.JOYP = (byte)((mmu.JOYP & 0xF0) | _buttons);
+            _joyp = (byte)((_joyp & 0xF0) | _buttons);
             if (_buttons != 0x0F)
             {
                 mmu.IF |= 0x10;
             }
         }
-        else if ((JOYP & 0x10) == 0)
+        else if ((_joyp & 0x10) == 0)
         {
-            mmu.JOYP = (byte)((mmu.JOYP & 0xF0) | _pad);
+            _joyp = (byte)((_joyp & 0xF0) | _pad);
             if (_pad != 0x0F)
             {
                 mmu.IF |= 0x10;
             }
         }
 
-        if (_oldButtons != _buttons) { Console.WriteLine($"{mmu.JOYP:X2}"); }
-        if (_oldPad != _pad) { Console.WriteLine($"{mmu.JOYP:X2}"); }
+        if (_oldButtons != _buttons) { Console.WriteLine($"{_joyp:X2}"); }
+        if (_oldPad != _pad) { Console.WriteLine($"{_joyp:X2}"); }
         _oldPad = _pad;
         _oldButtons = _buttons;
     }

@@ -15,25 +15,31 @@ public class TIMER
 
     private int[] _timerClocks = [1024, 16, 64, 256];
 
+    private byte _div = 0;
+    
+    public byte DIV { get => _div; set => _div = 0; }
+    public byte TIMA { get; set; }
+    public byte TMA { get; set; }
+    public byte TAC { get; set; }
+
     public void Tick(int cycles, MMU mmu)
     {
-        UpdateDIV(mmu, cycles);
+        UpdateDIV(cycles);
         UpdateTimer(mmu, cycles);
     }
 
-    private void UpdateDIV(MMU mmu, int cycles)
+    private void UpdateDIV(int cycles)
     {
         _divCycles += cycles;
         if (_divCycles >= DIVCycles)
         {
-            mmu.DIV++;
+            DIV++;
             _divCycles -= DIVCycles;
         }
     }
 
     private void UpdateTimer(MMU mmu, int cycles)
     {
-        byte TAC = mmu.TAC;
         if ((TAC & 0x4) == 0)
         {
             return;
@@ -43,12 +49,12 @@ public class TIMER
         int clock = TAC & 0x3;
         while (_timerCycles >= _timerClocks[clock])
         {
-            mmu.TIMA++;
+            TIMA++;
             _timerCycles -= _timerClocks[clock];
         }
-        if (mmu.TIMA == 0)
+        if (TIMA == 0)
         {
-            mmu.TIMA = mmu.TMA;
+            TIMA = TMA;
             mmu.IF |= 0x4;
         }
     }

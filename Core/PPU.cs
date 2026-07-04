@@ -24,6 +24,18 @@ public class PPU
 
     private int _cycleCount;
 
+    private byte _lcdc;
+    private byte _stat;
+    private byte _scy;
+    private byte _scx;
+    private byte _ly;
+    private byte _lyc;
+    private byte _bgp;
+    private byte _obp0;
+    private byte _obp1;
+    private byte _wy;
+    private byte _wx;
+
     private bool _STATInterruptRequest;
     private bool _screenOff;
 
@@ -34,6 +46,18 @@ public class PPU
     private List<ushort> _objectPool;
 
     private Dispatcher _windowDispatcher; // NOTE: Consider transfering logic to the main window
+
+    public byte LCDC { get => _lcdc; set => _lcdc = value; }
+    public byte STAT { get => _stat; set => _stat = (byte)((value & 0xF8) | (_stat & 0x07)); }
+    public byte SCY { get => _scy; set => _scy = value; }
+    public byte SCX { get => _scx; set => _scx = value; }
+    public byte LY { get => _ly; }
+    public byte LYC { get => _lyc; set => _lyc = value; }
+    public byte BGP { get => _bgp; set => _bgp = value; }
+    public byte OBP0 { get => _obp0; set => _obp0 = value; }
+    public byte OBP1 { get => _obp1; set => _obp1 = value; }
+    public byte WY { get => _wy; set => _wy = value; }
+    public byte WX { get => _wx; set => _wx = value; }
 
     public PPU(Dispatcher windowDispatcher)
     {
@@ -55,10 +79,10 @@ public class PPU
 
     public void Update(int cycles, MMU mmu)
     {
-        if ((mmu.LCDC & 0x80) == 0)
+        if ((_lcdc & 0x80) == 0)
         {
-            mmu.LY = 0;
-            mmu.STAT = (byte)(mmu.STAT & ~0x3);
+            _ly = 0;
+            _stat = (byte)(_stat & ~0x3);
             _cycleCount = 0;
             
             if (!_screenOff)
@@ -73,7 +97,7 @@ public class PPU
         _screenOff = false;
 
         _cycleCount += cycles;
-        byte mode = (byte)(mmu.STAT & 0x3);
+        byte mode = (byte)(_stat & 0x3);
 
         switch (mode)
         {
@@ -84,8 +108,8 @@ public class PPU
                     for (ushort i = 0xFE00; i < 0xFEA0 && _objectPool.Count < 10; i += 4)
                     {
                         int y = mmu.ReadByte(i) - 16;
-                        int size = (mmu.LCDC & 0x4) != 0 ? 16 : 8;
-                        if (y <= mmu.LY && y + size > mmu.LY)
+                        int size = (_lcdc & 0x4) != 0 ? 16 : 8;
+                        if (y <= _ly && y + size > _ly)
                         {
                             _objectPool.Add(i);
                         }
@@ -108,9 +132,9 @@ public class PPU
                 if (_cycleCount >= HBlankCycles)
                 {
                     _cycleCount -= HBlankCycles;
-                    mmu.LY++;
+                    _ly++;
 
-                    if (mmu.LY == ScreenHeigth)
+                    if (_ly == ScreenHeigth)
                     {
                         ChangeMode(VBlank, mmu);
                         _windowDispatcher.Invoke(UpdateScreen); // NOTE: Consider transferring logic to the main window
@@ -126,24 +150,24 @@ public class PPU
                 if (_cycleCount >= ScanlineCycles)
                 {
                     _cycleCount -= ScanlineCycles;
-                    mmu.LY++;
+                    _ly++;
 
-                    if (mmu.LY > MaxLines)
+                    if (_ly > MaxLines)
                     {
                         ChangeMode(OAMRead, mmu);
-                        mmu.LY = 0;
+                        _ly = 0;
                     }
                 }
                 break;
         }
 
-        if (mmu.LY == mmu.LYC)
+        if (_ly == _lyc)
         {
-            mmu.STAT |= 0x4;
+            _stat |= 0x4;
         }
         else
         {
-            mmu.STAT = (byte)(mmu.STAT & ~0x4);
+            _stat = (byte)(_stat & ~0x4);
         }
 
         STATInterrupt(mmu);
@@ -151,30 +175,27 @@ public class PPU
 
     private void ChangeMode(int mode, MMU mmu)
     {
-        int STAT = mmu.STAT & 0xFC; // Clear the mode bits
-        mmu.STAT = (byte)(STAT | mode); // Set the new mode
-
-        // TODO: Interrupts
+        int STAT = _stat & 0xFC; // Clear the mode bits
+        _stat = (byte)(STAT | mode); // Set the new mode
     }
 
     private void STATInterrupt(MMU mmu)
     {
         bool previousSTATInterruptRequest = _STATInterruptRequest;
-        byte STAT = mmu.STAT;
 
-        if ((STAT & 0x40) != 0 && (STAT & 0x4) != 0)
+        if ((_stat & 0x40) != 0 && (_stat & 0x4) != 0)
         {
             _STATInterruptRequest = true;
         }
-        else if ((STAT & 0x20) != 0 && (STAT & 0x3) == OAMRead)
+        else if ((_stat & 0x20) != 0 && (_stat & 0x3) == OAMRead)
         {
             _STATInterruptRequest = true;
         }
-        else if ((STAT & 0x10) != 0 && (STAT & 0x3) == VBlank)
+        else if ((_stat & 0x10) != 0 && (_stat & 0x3) == VBlank)
         {
             _STATInterruptRequest = true;
         }
-        else if ((STAT & 0x8) != 0 && (STAT & 0x3) == HBlank)
+        else if ((_stat & 0x8) != 0 && (_stat & 0x3) == HBlank)
         {
             _STATInterruptRequest = true;
         }
@@ -191,13 +212,12 @@ public class PPU
 
     private void RenderScanLine(MMU mmu)
     {
-        byte LCDC = mmu.LCDC;
-        if ((LCDC & 0x1) != 0)
+        if ((_lcdc & 0x1) != 0)
         {
             RenderBG(mmu);
         }
 
-        if ((LCDC & 0x2) != 0)
+        if ((_lcdc & 0x2) != 0)
         {
             RenderObjects(mmu);
         }
@@ -205,42 +225,36 @@ public class PPU
 
     private void RenderBG(MMU mmu)
     {
-        byte WX = (byte)(mmu.WX - 7);
-        byte WY = mmu.WY;
-        byte LY = mmu.LY;
-        byte LCDC = mmu.LCDC;
-        byte SCY = mmu.SCY;
-        byte SCX = mmu.SCX;
-        byte BGP = mmu.BGP;
-        bool isWindow = (LCDC & 0x20) != 0 && LY >= WY;
+        byte WX = (byte)(_wx - 7);
+        bool isWindow = (_lcdc & 0x20) != 0 && _ly >= _wy;
 
-        byte y = isWindow ? (byte)(LY - WY) : (byte)(LY + SCY);
+        byte y = isWindow ? (byte)(_ly - _wy) : (byte)(_ly + _scy);
         byte tileLine = (byte)((y & 7) * 2);
 
         ushort tileRow = (ushort)(y / 8 * 32);
         ushort tileMapAddress;
         if (isWindow)
         {
-            tileMapAddress = (LCDC & 0x40) != 0 ? (ushort)0x9C00 : (ushort)0x9800;
+            tileMapAddress = (_lcdc & 0x40) != 0 ? (ushort)0x9C00 : (ushort)0x9800;
         }
         else
         {
-            tileMapAddress = (LCDC & 0x08) != 0 ? (ushort)0x9C00 : (ushort)0x9800;
+            tileMapAddress = (_lcdc & 0x08) != 0 ? (ushort)0x9C00 : (ushort)0x9800;
         }
 
         byte tileDataLow = 0;
         byte tileDataHigh = 0;
         for (int i = 0; i < ScreenWidth; i++)
         {
-            byte x = isWindow && i >= WX ? (byte)(i - WX) : (byte)(i + SCX);
-            if ((i & 0x7) == 0 || ((i + SCX) & 0x7) == 0)
+            byte x = isWindow && i >= WX ? (byte)(i - WX) : (byte)(i + _scx);
+            if ((i & 0x7) == 0 || ((i + _scx) & 0x7) == 0)
             {
                 ushort tileCol = (ushort)(x / 8);
                 ushort tileIndex = (ushort)(tileMapAddress + tileRow + tileCol);
 
-                ushort tileDataAddress = (LCDC & 0x10) != 0 ? (ushort)0x8000 : (ushort)0x8800;
+                ushort tileDataAddress = (_lcdc & 0x10) != 0 ? (ushort)0x8000 : (ushort)0x8800;
                 ushort tileLoc;
-                if ((LCDC & 0x10) != 0)
+                if ((_lcdc & 0x10) != 0)
                 {
                     tileLoc = (ushort)(tileDataAddress + (mmu.ReadByte(tileIndex) * 16));
                 }
@@ -257,18 +271,17 @@ public class PPU
             int colorIdLow = (tileDataLow & colorBit) != 0 ? 1 : 0;
             int colorIdHigh = (tileDataHigh & colorBit) != 0 ? 2 : 0;
             int colorId = colorIdLow + colorIdHigh;
-            int color = (BGP >> (colorId * 2)) & 0x3;
+            int color = (_bgp >> (colorId * 2)) & 0x3;
             color = ~color & 0x3; // Invert the color bits
 
-            SetPixel(i, LY, color);
+            SetPixel(i, _ly, color);
             _bgColorIds[i] = (byte)colorId;
         }
     }
 
     private void RenderObjects(MMU mmu)
     {
-        byte LY = mmu.LY;
-        bool doubleSize = (mmu.LCDC & 0x4) != 0;
+        bool doubleSize = (_lcdc & 0x4) != 0;
         for (int i = 0; i < ScreenWidth; i++)
         {
             ushort objectAddress = 0;
@@ -293,7 +306,7 @@ public class PPU
             byte tile = mmu.ReadByte((ushort)(objectAddress + 2));
             if (doubleSize)
             {
-                tile = LY < y + 8 ? (byte)(tile & 0xFE) : (byte)(tile | 0x1);
+                tile = _ly < y + 8 ? (byte)(tile & 0xFE) : (byte)(tile | 0x1);
             }
             byte attributes = mmu.ReadByte((ushort)(objectAddress + 3));
             int priority = attributes & 0x80;
@@ -308,7 +321,7 @@ public class PPU
 
             ushort tileAddress = (ushort)(tile * 16 + 0x8000);
 
-            int addressShift = yFlip > 0 ? (~(LY - y)) & 0x7 : (LY - y);
+            int addressShift = yFlip > 0 ? (~(_ly - y)) & 0x7 : (_ly - y);
             ushort tileRowAddress = (ushort)(tileAddress + addressShift * 2);
 
             byte tileLow = mmu.ReadByte(tileRowAddress);
@@ -321,12 +334,11 @@ public class PPU
 
             if (colorId != 0)
             {
-                ushort paletteAddress = palette > 0 ? (ushort)0xFF49 : (ushort)0xFF48;
-                byte OBP = mmu.ReadByte(paletteAddress);
+                byte OBP = palette > 0 ? _obp1 : _obp0;
                 int color = (OBP >> (colorId * 2)) & 0x3;
                 color = ~color & 0x3; // Invert the color bits
 
-                SetObjectPixel(i, LY, color);
+                SetObjectPixel(i, _ly, color);
             }
         }
     }
