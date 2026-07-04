@@ -35,6 +35,8 @@ public class CPU
 
     public byte _lastInstruction;  // DEBUG: Debug only
     public ushort _lastInstructionPC; // DEBUG: Debug only
+    public bool interrupt;  // DEBUG: Debug only
+    public string interruptSource;  // DEBUG: Debug only
 
     public CPU(MMU mmu)
     {
@@ -43,6 +45,8 @@ public class CPU
         _ime = _halted = _haltBug = false;
         _mmu = mmu;
         _eiCounter = 0;
+        interrupt = false;
+        interruptSource = "";
     }
 
     public int Execute()
@@ -50,12 +54,8 @@ public class CPU
         // if (_stopped) return;    // TODO: STOP
         _lastInstructionPC = _pc;
 
-        if (_pc == 0x02BB)
-        {
-
-        }
-
         int cycles = 0;
+        interrupt = false;
         if (_ime || _halted)
         {
             if ((_mmu.IE & _mmu.IF) != 0)
@@ -436,36 +436,46 @@ public class CPU
             _ime = false;
             interruptHandler = 0x40;
             _mmu.IF &= 0xFE;
+            interrupt = true;
+            interruptSource = "VBLANK";
         }
         else if ((_mmu.IE & _mmu.IF & 0x2) != 0)
         {
             _ime = false;
             interruptHandler = 0x48;
             _mmu.IF &= 0xFD;
+            interrupt = true;
+            interruptSource = "STAT";
         }
         else if ((_mmu.IE & _mmu.IF & 0x4) != 0)
         {
             _ime = false;
             interruptHandler = 0x50;
             _mmu.IF &= 0xFB;
+            interrupt = true;
+            interruptSource = "Timer";
         }
         else if ((_mmu.IE & _mmu.IF & 0x8) != 0)
         {
             _ime = false;
             interruptHandler = 0x58;
             _mmu.IF &= 0xF7;
+            interrupt = true;
+            interruptSource = "Serial";
         }
         else if ((_mmu.IE & _mmu.IF & 0x10) != 0)
         {
             _ime = false;
             interruptHandler = 0x60;
             _mmu.IF &= 0xEF;
+            interrupt = true;
+            interruptSource = "JOYPAD";
         }
 
         if (interruptHandler != 0)
         {
             _sp -= 2;
-            _mmu.WriteWord(_sp, (ushort)(_pc));
+            _mmu.WriteWord(_sp, _pc);
 
             _pc = interruptHandler;
             return 20;

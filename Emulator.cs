@@ -50,14 +50,19 @@ public class Emulator
             _timer.Tick(cycles, _mmu);
             frameCycles += cycles;
 
-            if (!_mmu._bootRomMapped)
-            {
-                logFile?.WriteLine($"{_cpu._lastInstructionPC:X2}: {OpcodeParser.ParseOpcode(_cpu._lastInstruction)}");
-            }
+            //if (!_mmu._bootRomMapped)
+            //{
+            //    logFile?.WriteLine($"{_cpu._lastInstructionPC:X2}: {OpcodeParser.ParseOpcode(_cpu._lastInstruction)}");
+            //}
 
-            if (_cpu._lastInstructionPC == 0xFE)
+            //if (_cpu._lastInstructionPC == 0xFE)
+            //{
+            //    logFile?.WriteLine(_cpu);
+            //}
+
+            if (_cpu.interrupt)
             {
-                logFile?.WriteLine(_cpu);
+                logFile?.WriteLine(_cpu.interruptSource);
             }
 
             //Console.WriteLine(_cpu);
