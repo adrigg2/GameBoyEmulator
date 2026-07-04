@@ -33,7 +33,7 @@ public class TIMER
         _divCycles += cycles;
         if (_divCycles >= DIVCycles)
         {
-            DIV++;
+            _div++;
             _divCycles -= DIVCycles;
         }
     }

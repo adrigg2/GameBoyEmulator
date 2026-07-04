@@ -116,14 +116,14 @@ public class PPU
                     }
 
                     _cycleCount -= OAMReadCycles;
-                    ChangeMode(VRAMRead, mmu);
+                    ChangeMode(VRAMRead);
                 }
                 break;
             case VRAMRead:
                 if (_cycleCount >= VRAMReadCycles)
                 {
                     _cycleCount -= VRAMReadCycles;
-                    ChangeMode(HBlank, mmu);
+                    ChangeMode(HBlank);
 
                     RenderScanLine(mmu);
                 }
@@ -136,13 +136,13 @@ public class PPU
 
                     if (_ly == ScreenHeigth)
                     {
-                        ChangeMode(VBlank, mmu);
+                        ChangeMode(VBlank);
                         _windowDispatcher.Invoke(UpdateScreen); // NOTE: Consider transferring logic to the main window
                         mmu.IF |= 0x1;
                     }
                     else
                     {
-                        ChangeMode(OAMRead, mmu);
+                        ChangeMode(OAMRead);
                     }
                 }
                 break;
@@ -154,7 +154,7 @@ public class PPU
 
                     if (_ly > MaxLines)
                     {
-                        ChangeMode(OAMRead, mmu);
+                        ChangeMode(OAMRead);
                         _ly = 0;
                     }
                 }
@@ -173,7 +173,7 @@ public class PPU
         STATInterrupt(mmu);
     }
 
-    private void ChangeMode(int mode, MMU mmu)
+    private void ChangeMode(int mode)
     {
         int STAT = _stat & 0xFC; // Clear the mode bits
         _stat = (byte)(STAT | mode); // Set the new mode

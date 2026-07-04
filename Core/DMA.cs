@@ -22,7 +22,7 @@ public class DMA
 
     public void StartTransfer(byte address)
     {
-        if (_address > 0xDF || _active)
+        if (address > 0xDF || _active)
         {
             return;
         }
