@@ -65,6 +65,11 @@ public class Emulator
                 logFile?.WriteLine(_cpu.interruptSource);
             }
 
+            if (_cpu.interruptService)
+            {
+                logFile?.WriteLine($"{_cpu._lastInstructionPC:X2}: {OpcodeParser.ParseOpcode(_cpu._lastInstruction)}");
+            }
+
             //Console.WriteLine(_cpu);
             //Console.WriteLine($"LY = {_mmu.LY}");
             //Console.WriteLine($"LY(CPU) = {_mmu.ReadByte(0xFF44)}");

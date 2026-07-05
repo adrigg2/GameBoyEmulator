@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GameBoyEmulator.Core;
+﻿namespace GameBoyEmulator.Core;
 
 public class TIMER
 {
@@ -22,8 +15,7 @@ public class TIMER
         get => (byte)(_counter >> 8);
         set
         {
-            int tacFreq = _tac & 0x3;
-            int timerIncBitDisplace = ((tacFreq - 1) & 0x3) * 2 + 4;
+            int timerIncBitDisplace = GetTimerBit();
             int oldTimerIncBit = (_counter >> timerIncBitDisplace) & 0x1;
 
             _counter = 0;
@@ -44,6 +36,7 @@ public class TIMER
             {
                 _tima = value;
             }
+            _timaResetCounter = -1;
         }
     }
     public byte TMA
@@ -54,8 +47,8 @@ public class TIMER
             if (_timaIgnoreWritesCounter > 0)
             {
                 _tima = value;
-                _tma = value;
             }
+            _tma = value;
         }
     }
     public byte TAC
@@ -63,14 +56,12 @@ public class TIMER
         get => _tac;
         set
         {
-            int tacFreq = _tac & 0x3;
-            int oldTimerIncBit = (_counter >> ((tacFreq - 1) & 0x3) * 2 + 4) & 0x1;
+            int oldTimerIncBit = (_counter >> GetTimerBit()) & 0x1;
             bool tacEnabledOld = (_tac & 0x4) > 0;
 
             _tac = value;
 
-            tacFreq = _tac & 0x3;
-            int timerIncBit = (_counter >> ((tacFreq - 1) & 0x3) * 2 + 4) & 0x1;
+            int timerIncBit = (_counter >> GetTimerBit()) & 0x1;
 
             bool timerTickByClockChange = (_tac & 0x4) > 0 && oldTimerIncBit == 1 && timerIncBit == 0;
             bool timerTickByTACDisable = tacEnabledOld && oldTimerIncBit == 1 && (_tac & 0x4) == 0;
@@ -93,17 +84,16 @@ public class TIMER
             if (_timaResetCounter > 0)
             {
                 _timaResetCounter--;
-            }
-            else if (_timaResetCounter == 0)
-            {
-                _timaResetCounter--;
-                mmu.IF |= 0x4;
-                _tima = _tma;
-                _timaIgnoreWritesCounter = 4;
+                if (_timaResetCounter == 0)
+                {
+                    _timaResetCounter--;
+                    mmu.IF |= 0x4;
+                    _tima = _tma;
+                    _timaIgnoreWritesCounter = 4;
+                }
             }
 
-            int tacFreq = _tac & 0x3;
-            int timerIncBitDisplace = ((tacFreq - 1) & 0x3) * 2 + 4;
+            int timerIncBitDisplace = GetTimerBit();
             int oldTimerIncBit = (_counter >> timerIncBitDisplace) & 0x1;
 
             _counter++;
@@ -125,5 +115,11 @@ public class TIMER
         {
             _timaResetCounter = 4;
         }
+    }
+
+    private int GetTimerBit()
+    {
+        int tacFreq = _tac & 0x3;
+        return ((tacFreq - 1) & 0x3) * 2 + 3;
     }
 }

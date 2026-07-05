@@ -37,6 +37,7 @@ public class CPU
     public ushort _lastInstructionPC; // DEBUG: Debug only
     public bool interrupt;  // DEBUG: Debug only
     public string interruptSource;  // DEBUG: Debug only
+    public bool interruptService;
 
     public CPU(MMU mmu)
     {
@@ -45,7 +46,7 @@ public class CPU
         _ime = _halted = _haltBug = false;
         _mmu = mmu;
         _eiCounter = 0;
-        interrupt = false;
+        interrupt = interruptService = false;
         interruptSource = "";
     }
 
@@ -76,6 +77,11 @@ public class CPU
         {
             _pc--;
             _haltBug = false;
+        }
+
+        if (instruction == 0xD9)
+        {
+            interruptService = false;
         }
 
         switch (instruction)
@@ -478,6 +484,7 @@ public class CPU
             _mmu.WriteWord(_sp, _pc);
 
             _pc = interruptHandler;
+            interruptService = true;
             return 20;
         }
 
