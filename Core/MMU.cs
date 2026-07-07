@@ -1,4 +1,6 @@
-﻿namespace GameBoyEmulator.Core;
+﻿using GameBoyEmulator.Core.Cartridge;
+
+namespace GameBoyEmulator.Core;
 public class MMU
 {
     private DMA _dma;
@@ -9,15 +11,13 @@ public class MMU
     public bool _bootRomMapped; // DEBUG: Public
 
     private readonly byte[] _bootROM;
-    private byte[] _rom;    // NOTE: Move to Cartridge?
     private byte[] _wram;
-    private byte[] _vram;   // NOTE: Move to GPU?
-    private object[] _occupiedVram; // DEBUG: debug info
+    private byte[] _vram;   // NOTE: Move to PPU?
     private byte[] _hram;
-    private byte[] _eram;   // NOTE: Move to Cartridge?
     private byte[] _oam;    // NOTE: Move to PPU?
     private byte _ie;
     private byte _if;
+    private ICartridge _cartridge;
 
     public byte IE { get => _ie; set => _ie = value; }
     public byte IF { get => _if; set => _if = value; }
@@ -26,18 +26,16 @@ public class MMU
     {
         _bootRomMapped = true;
         _bootROM = new byte[0x100];
-        _rom = new byte[0x8000];
         _vram = new byte[0x2000];
-        _eram = new byte[0x2000];
         _wram = new byte[0x2000];
         _oam = new byte[0xA0];
         _hram = new byte[0x7F];
-        _occupiedVram = new object[0x2000]; // DEBUG: debug info
         _ie = 0;
         _dma = dma;
         _joypad = joypad;
         _ppu = ppu;
         _timer = timer;
+        _cartridge = new NoCartridge();
     }
 
     public byte ReadByte(ushort address)
@@ -49,13 +47,13 @@ public class MMU
                 {
                     return _bootROM[address];
                 }
-                return _rom[address];
+                return _cartridge.ReadRom(address);
             case ushort _ when address <= 0x7FFF:
-                return _rom[address];
+                return _cartridge.ReadRom(address);
             case ushort _ when address <= 0x9FFF:
                 return _vram[address & 0x1FFF];
-            case ushort _ when address <= 0xBFFF:   // NOTE: Move to cartridge?
-                return _eram[address & 0x1FFF];
+            case ushort _ when address <= 0xBFFF:
+                return _cartridge.ReadRam((ushort)(address & 0x1FFF));
             case ushort _ when address <= 0xDFFF:
                 return _wram[address & 0x1FFF];
             case ushort _ when address <= 0xFDFF:   // Echo RAM
@@ -121,16 +119,13 @@ public class MMU
         switch (address)
         {
             case ushort _ when address <= 0x7FFF:
-                //_rom[address] = value;
+                _cartridge.WriteRegister(address, value);
                 break;
             case ushort _ when address <= 0x9FFF:
                 _vram[address & 0x1FFF] = value;
-                /*_occupiedVram = _vram.Select((val, index) => new { val, index })
-                    .Where(x => x.val != 0)
-                    .ToArray(); // DEBUG: debug info*/
                 break;
-            case ushort _ when address <= 0xBFFF:   // NOTE: Move to cartridge?
-                _eram[address & 0x1FFF] = value;
+            case ushort _ when address <= 0xBFFF:
+                _cartridge.WriteRam((ushort)(address & 0x1FFF), value);
                 break;
             case ushort _ when address <= 0xDFFF:
                 _wram[address & 0x1FFF] = value;
@@ -218,7 +213,6 @@ public class MMU
 
     public void LoadGame(byte[] rom)
     {
-        Array.Copy(rom, _rom, Math.Min(_rom.Length, rom.Length));
         Console.WriteLine($"{rom[0x0147]:x2}");
         Console.WriteLine($"{rom[0x0148]:x2}");
         Console.WriteLine($"{rom[0x0149]:x2}");
@@ -230,6 +224,13 @@ public class MMU
             s += (char)rom[i];
         }
         Console.WriteLine(s);
+
+        switch(rom[0x147])
+        {
+            case 0x00:
+                _cartridge = new NoMBC(rom);
+                break;
+        }
     }
 
     public void LoadBootRom(byte[] rom)
