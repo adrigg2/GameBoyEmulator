@@ -108,10 +108,7 @@ public class TIMER
 
     private void TimerTick()
     {
-        byte oldTima = _tima;
-        _tima++;
-
-        if (oldTima > 0 && _tima == 0)
+        if (_tima++ == 0xFF)
         {
             _timaResetCounter = 4;
         }

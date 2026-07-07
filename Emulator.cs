@@ -17,6 +17,7 @@ public class Emulator
     private const int CyclesPerFrame = 70224; // ~60 FPS
     public const float FrameTime = (float)CyclesPerFrame / CPUFrequency;
     private int _frames;
+    private bool _halted;
 
     public PPU PPU { get => _ppu; }
     public JOYPAD JOYPAD { get => _joypad; }
@@ -50,10 +51,19 @@ public class Emulator
             _timer.Tick(cycles, _mmu);
             frameCycles += cycles;
 
-            //if (!_mmu._bootRomMapped)
-            //{
-            //    logFile?.WriteLine($"{_cpu._lastInstructionPC:X2}: {OpcodeParser.ParseOpcode(_cpu._lastInstruction)}");
-            //}
+            if (_cpu._lastInstruction != 0x76)
+            {
+                _halted = false;
+            }
+
+            if (!_mmu._bootRomMapped && !_halted)
+            {
+                logFile?.WriteLine($"{_cpu._lastInstructionPC:X2}: {OpcodeParser.ParseOpcode(_cpu._lastInstruction)}");
+                if (_cpu._lastInstruction == 0x76)
+                {
+                    _halted = true;
+                }
+            }
 
             //if (_cpu._lastInstructionPC == 0xFE)
             //{
@@ -65,10 +75,10 @@ public class Emulator
                 logFile?.WriteLine(_cpu.interruptSource);
             }
 
-            if (_cpu.interruptService)
-            {
-                logFile?.WriteLine($"{_cpu._lastInstructionPC:X2}: {OpcodeParser.ParseOpcode(_cpu._lastInstruction)}");
-            }
+            //if (_cpu.interruptService)
+            //{
+            //    logFile?.WriteLine($"{_cpu._lastInstructionPC:X2}: {OpcodeParser.ParseOpcode(_cpu._lastInstruction)}");
+            //}
 
             //Console.WriteLine(_cpu);
             //Console.WriteLine($"LY = {_mmu.LY}");

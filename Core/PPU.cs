@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -58,6 +59,8 @@ public class PPU
     public byte OBP1 { get => _obp1; set => _obp1 = value; }
     public byte WY { get => _wy; set => _wy = value; }
     public byte WX { get => _wx; set => _wx = value; }
+
+    private int frames = 0; // DEBUG
 
     public PPU(Dispatcher windowDispatcher)
     {
@@ -362,5 +365,11 @@ public class PPU
         int stride = (ScreenWidth + 3) / 4;
         _screenImage.WritePixels(new Int32Rect(0, 0, ScreenWidth, ScreenHeigth), _screenBuffer, stride, 0);
         Array.Clear(_screenBuffer);
+
+        using FileStream stream = new($"./frames/frame{frames}.png", FileMode.Create);
+        PngBitmapEncoder encoder = new();
+        encoder.Frames.Add(BitmapFrame.Create(_screenImage));
+        encoder.Save(stream);
+        frames++;
     }
 }
