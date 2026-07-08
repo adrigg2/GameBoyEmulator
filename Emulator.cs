@@ -1,4 +1,5 @@
 ﻿using GameBoyEmulator.Core;
+using GameBoyEmulator.Core.Cartridge;
 using GameBoyEmulator.Debug;
 using System.IO;
 using System.Windows.Threading;
@@ -26,12 +27,16 @@ public class Emulator
     {
         byte[] romBytes = File.ReadAllBytes(rom);
         byte[] bootRomBytes = File.ReadAllBytes(bootRom);
+
+        string romName = rom.Split('\\').Last();
+        romName = romName.Substring(0, romName.Length - 3);
+
         _ppu = new(windowDispatcher);
         _joypad = new();
         _timer = new();
         _dma = new();
         _mmu = new(_dma, _joypad, _ppu, _timer);
-        _mmu.LoadGame(romBytes);
+        _mmu.LoadGame(romBytes, romName);
         _mmu.LoadBootRom(bootRomBytes);
         _cpu = new(_mmu);
         _frames = 0;

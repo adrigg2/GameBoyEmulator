@@ -211,7 +211,7 @@ public class MMU
         WriteByte((ushort)(address + 1), (byte)(value >> 8));
     }
 
-    public void LoadGame(byte[] rom)
+    public void LoadGame(byte[] rom, string romName)
     {
         Console.WriteLine($"{rom[0x0147]:x2}");
         Console.WriteLine($"{rom[0x0148]:x2}");
@@ -229,6 +229,15 @@ public class MMU
         {
             case 0x00:
                 _cartridge = new NoMBC(rom);
+                break;
+            case 0x01:
+            case 0x02:
+            case 0x03:
+                _cartridge = new MBC1(rom, romName);
+                break;
+            default:
+                Console.Beep();
+                Console.WriteLine($"Unsuported MBC: {rom[0x147]:X2}");
                 break;
         }
     }

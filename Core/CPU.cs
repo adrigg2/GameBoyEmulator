@@ -65,11 +65,6 @@ public class CPU
             }
         }
 
-        if (_pc >= 0x04B9 && _pc <= 0x04C0)
-        {
-
-        }
-
         if (_halted)
         {
             return cycles + 4; // Cycles advance while CPU is halted
@@ -786,8 +781,8 @@ public class CPU
     {
         int result = _a + num + (CarryFlag ? 1 : 0);
         SetZeroFlag(result);
-        SetCarryFlag(result);
         SetHalfCarryFlagC(_a, num);
+        SetCarryFlag(result);
         SubtractionFlag = false;
         _a = (byte)result;
     }
@@ -806,8 +801,8 @@ public class CPU
     {
         int result = _a - num - (CarryFlag ? 1 : 0);
         SetZeroFlag(result);
-        SetCarryFlag(result);
         SetHalfCarryFlagSubC(_a, num);
+        SetCarryFlag(result);
         SubtractionFlag = true;
         _a = (byte)result;
     }

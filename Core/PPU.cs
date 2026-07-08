@@ -219,6 +219,13 @@ public class PPU
         {
             RenderBG(mmu);
         }
+        else
+        {
+            for (int i = 0; i < ScreenWidth; i++)
+            {
+                SetPixel(i, _ly, 0xFF);
+            }
+        }
 
         if ((_lcdc & 0x2) != 0)
         {

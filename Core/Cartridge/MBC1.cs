@@ -1,0 +1,116 @@
+﻿using System.IO;
+
+namespace GameBoyEmulator.Core.Cartridge;
+
+internal class MBC1 : ICartridge
+{
+    private const int SRamOffset = 0x2000;
+    private const int RomOffset = 0x4000;
+
+    private byte[] _rom;
+    private byte[]? _sram;
+
+    private bool _battery;
+    private bool _ramEnable;
+    private bool _advancedBanking;
+
+    private string _romName;
+
+    private int _romBank;
+    private int _ramBank;
+
+    public MBC1(byte[] rom, string romName)
+    {
+        _rom = rom;
+
+        _battery = _rom[0x0147] == 0x03;
+        if (_rom[0x0147] == 0x02 || _rom[0x0147] == 0x03)
+        {
+            if (_rom[0x0149] == 0x02)
+            {
+                _sram = new byte[0x2000];
+            }
+            else if (_rom[0x0149] == 0x03)
+            {
+                _sram = new byte[0x8000];
+            }
+        }
+
+        _romName = romName;
+
+        _romBank = 1;
+    }
+
+    public byte ReadRam(ushort address)
+    {
+        if (_ramEnable)
+        {
+            int bank = _advancedBanking ? _ramBank : 0;
+            return _sram?[(bank * SRamOffset + (address & 0x1FFF)) & (_sram.Length - 1)] ?? 0xFF;
+        }
+        return 0xFF;
+    }
+
+    public byte ReadRom(ushort address)
+    {
+        if (address <= 0x3FFF)
+        {
+            if (_advancedBanking)
+            {
+                int bank = _ramBank << 5;
+                return _rom[(bank * RomOffset + address) & (_rom.Length - 1)];
+            }
+            return _rom[address];
+        }
+        else
+        {
+            int bank = (_ramBank << 5) + _romBank;
+            return _rom[(bank * RomOffset + (address & 0x3FFF)) & (_rom.Length - 1)];
+        }
+    }
+
+    public void SaveRam()
+    {
+        if (_battery && _sram != null)
+        {
+            File.WriteAllBytes($"./saves/{_romName}.save", _sram);
+        }
+    }
+
+    public void WriteRam(ushort address, byte value)
+    {
+        if (_ramEnable && _sram != null)
+        {
+            int bank = _advancedBanking ? _ramBank : 0;
+            _sram[(bank * SRamOffset + (address & 0x1FFF)) & (_sram.Length - 1)] = value;
+        }
+    }
+
+    public void WriteRegister(ushort address, byte value)
+    {
+        if (address <= 0x1FFF)
+        {
+            _ramEnable = (value & 0xA) == 0xA;
+            if (!_ramEnable)
+            {
+                SaveRam();
+            }
+        }
+        else if (address <= 0x3FFF)
+        {
+            _romBank = value & 0x1F;
+            if (_romBank == 0)
+            {
+                _romBank = 1;
+            }
+        }
+        else if (address <= 0x5FFF)
+        {
+            _ramBank = value & 0x03;
+        }
+        else if (address <= 0x7FFF)
+        {
+            _advancedBanking = (value & 0x1) == 1;
+        }
+    }
+}

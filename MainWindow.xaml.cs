@@ -16,6 +16,7 @@ public partial class MainWindow : Window
     public MainWindow(string[] args)
     {
         InitializeComponent();
+        Directory.CreateDirectory("./saves/");
         _emulator = new Emulator(args[0], args[1], Dispatcher);
         _emulator.PPU.SetWindowSource(this); // TODO: Consider transfering logic to the main window
     }
