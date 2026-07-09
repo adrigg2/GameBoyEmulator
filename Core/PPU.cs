@@ -24,6 +24,7 @@ public class PPU
     private const int ScreenWidth = 160;
 
     private int _cycleCount;
+    private int _windowY;
 
     private byte _lcdc;
     private byte _stat;
@@ -236,33 +237,35 @@ public class PPU
     private void RenderBG(MMU mmu)
     {
         byte WX = (byte)(_wx - 7);
-        bool isWindow = (_lcdc & 0x20) != 0 && _ly >= _wy;
-
-        byte y = isWindow ? (byte)(_ly - _wy) : (byte)(_ly + _scy);
-        byte tileLine = (byte)((y & 7) * 2);
-
-        ushort tileRow = (ushort)(y / 8 * 32);
-        ushort tileMapAddress;
-        if (isWindow)
-        {
-            tileMapAddress = (_lcdc & 0x40) != 0 ? (ushort)0x9C00 : (ushort)0x9800;
-        }
-        else
-        {
-            tileMapAddress = (_lcdc & 0x08) != 0 ? (ushort)0x9C00 : (ushort)0x9800;
-        }
 
         byte tileDataLow = 0;
         byte tileDataHigh = 0;
+        bool isWindow = false;
         for (int i = 0; i < ScreenWidth; i++)
         {
-            byte x = isWindow && i >= WX ? (byte)(i - WX) : (byte)(i + _scx);
+            isWindow = (_lcdc & 0x20) != 0 && _ly >= _wy && i >= WX;
+
+            byte y = isWindow ? (byte)_windowY : (byte)(_ly + _scy);
+            byte tileLine = (byte)((y & 7) * 2);
+
+            ushort tileRow = (ushort)(y / 8 * 32);
+            ushort tileMapAddress;
+            if (isWindow)
+            {
+                tileMapAddress = (_lcdc & 0x40) != 0 ? (ushort)0x9C00 : (ushort)0x9800;
+            }
+            else
+            {
+                tileMapAddress = (_lcdc & 0x08) != 0 ? (ushort)0x9C00 : (ushort)0x9800;
+            }
+
+            byte x = isWindow ? (byte)(i - WX) : (byte)(i + _scx);
             if ((i & 0x7) == 0 || ((i + _scx) & 0x7) == 0)
             {
                 ushort tileCol = (ushort)(x / 8);
                 ushort tileIndex = (ushort)(tileMapAddress + tileRow + tileCol);
 
-                ushort tileDataAddress = (_lcdc & 0x10) != 0 ? (ushort)0x8000 : (ushort)0x8800;
+                ushort tileDataAddress = (_lcdc & 0x10) != 0 ? (ushort)0x8000 : (ushort)0x9000;
                 ushort tileLoc;
                 if ((_lcdc & 0x10) != 0)
                 {
@@ -270,7 +273,7 @@ public class PPU
                 }
                 else
                 {
-                    tileLoc = (ushort)(tileDataAddress + ((sbyte)mmu.ReadByte(tileIndex) + 128) * 16);
+                    tileLoc = (ushort)(tileDataAddress + ((sbyte)mmu.ReadByte(tileIndex)) * 16);
                 }
 
                 tileDataLow = mmu.ReadByte((ushort)(tileLoc + tileLine));
@@ -287,22 +290,34 @@ public class PPU
             SetPixel(i, _ly, color);
             _bgColorIds[i] = (byte)colorId;
         }
+
+        if (isWindow)
+        {
+            _windowY++;
+        }
     }
 
     private void RenderObjects(MMU mmu)
     {
         bool doubleSize = (_lcdc & 0x4) != 0;
+        ushort objectAddress = 0;
+        int objectPixels = 0;
         for (int i = 0; i < ScreenWidth; i++)
         {
-            ushort objectAddress = 0;
             int x = 0;
-            foreach (ushort address in _objectPool)
+
+            if (objectPixels >= 8 || objectAddress == 0)
             {
-                x = mmu.ReadByte((ushort)(address + 1)) - 8;
-                if (i >= x && i < x + 8)
+                objectAddress = 0;
+                foreach (ushort address in _objectPool)
                 {
-                    objectAddress = address;
-                    break;
+                    x = mmu.ReadByte((ushort)(address + 1)) - 8;
+                    if (i >= x && i < x + 8)
+                    {
+                        objectAddress = address;
+                        objectPixels = i - x;
+                        break;
+                    }
                 }
             }
 
@@ -311,13 +326,10 @@ public class PPU
                 continue;
             }
 
+            objectPixels++;
+
             int y = mmu.ReadByte(objectAddress) - 16;
 
-            byte tile = mmu.ReadByte((ushort)(objectAddress + 2));
-            if (doubleSize)
-            {
-                tile = _ly < y + 8 ? (byte)(tile & 0xFE) : (byte)(tile | 0x1);
-            }
             byte attributes = mmu.ReadByte((ushort)(objectAddress + 3));
             int priority = attributes & 0x80;
             if (priority != 0 && _bgColorIds[i] != 0)
@@ -326,6 +338,18 @@ public class PPU
             }
 
             int yFlip = attributes & 0x40;
+
+            byte tile = mmu.ReadByte((ushort)(objectAddress + 2));
+            if (doubleSize && !(yFlip > 0))
+            {
+                tile = _ly < y + 8 ? (byte)(tile & 0xFE) : (byte)(tile | 0x01);
+            }
+            else if (doubleSize)
+            {
+                tile = _ly < y + 8 ? (byte)(tile | 0x01) : (byte)(tile & 0xFE);
+            }
+
+
             int xFlip = attributes & 0x20;
             int palette = attributes & 0x10;
 
@@ -372,6 +396,7 @@ public class PPU
         int stride = (ScreenWidth + 3) / 4;
         _screenImage.WritePixels(new Int32Rect(0, 0, ScreenWidth, ScreenHeigth), _screenBuffer, stride, 0);
         Array.Clear(_screenBuffer);
+        _windowY = 0;
 
         using FileStream stream = new($"./frames/frame{frames}.png", FileMode.Create);
         PngBitmapEncoder encoder = new();
