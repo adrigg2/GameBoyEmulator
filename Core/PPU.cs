@@ -302,70 +302,61 @@ public class PPU
         bool doubleSize = (_lcdc & 0x4) != 0;
         for (int i = 0; i < ScreenWidth; i++)
         {
-            ushort objectAddress = 0;
-            int x = 0;
             int objX = ScreenWidth;
 
             foreach (ushort address in _objectPool)
             {
-                x = mmu.ReadByte((ushort)(address + 1)) - 8;
+                int x = mmu.ReadByte((ushort)(address + 1)) - 8;
                 if (i >= x && i < x + 8 && x < objX)
                 {
-                    objectAddress = address;
-                    objX = x;
+                    int y = mmu.ReadByte(address) - 16;
+
+                    byte attributes = mmu.ReadByte((ushort)(address + 3));
+                    int priority = attributes & 0x80;
+                    if (priority != 0 && _bgColorIds[i] != 0)
+                    {
+                        continue;
+                    }
+
+                    int yFlip = attributes & 0x40;
+
+                    byte tile = mmu.ReadByte((ushort)(address + 2));
+                    if (doubleSize && !(yFlip > 0))
+                    {
+                        tile = _ly < y + 8 ? (byte)(tile & 0xFE) : (byte)(tile | 0x01);
+                    }
+                    else if (doubleSize)
+                    {
+                        tile = _ly < y + 8 ? (byte)(tile | 0x01) : (byte)(tile & 0xFE);
+                    }
+
+
+                    int xFlip = attributes & 0x20;
+                    int palette = attributes & 0x10;
+
+                    ushort tileAddress = (ushort)(tile * 16 + 0x8000);
+
+                    int addressShift = yFlip > 0 ? (~(_ly - y)) & 0x7 : (_ly - y) & 0x7;
+                    ushort tileRowAddress = (ushort)(tileAddress + addressShift * 2);
+
+                    byte tileLow = mmu.ReadByte(tileRowAddress);
+                    byte tileHigh = mmu.ReadByte((ushort)(tileRowAddress + 1));
+
+                    int colorBit = xFlip > 0 ? 1 << (7 - (~(i - x) & 7)) : 1 << (7 - ((i - x) & 7));
+                    int colorIdLow = (tileLow & colorBit) != 0 ? 1 : 0;
+                    int colorIdHigh = (tileHigh & colorBit) != 0 ? 2 : 0;
+                    int colorId = colorIdLow + colorIdHigh;
+
+                    if (colorId != 0)
+                    {
+                        objX = x;
+                        byte OBP = palette > 0 ? _obp1 : _obp0;
+                        int color = (OBP >> (colorId * 2)) & 0x3;
+                        color = ~color & 0x3; // Invert the color bits
+
+                        SetObjectPixel(i, _ly, color);
+                    }
                 }
-            }
-
-            if (objectAddress == 0)
-            {
-                continue;
-            }
-
-            int y = mmu.ReadByte(objectAddress) - 16;
-
-            byte attributes = mmu.ReadByte((ushort)(objectAddress + 3));
-            int priority = attributes & 0x80;
-            if (priority != 0 && _bgColorIds[i] != 0)
-            {
-                continue;
-            }
-
-            int yFlip = attributes & 0x40;
-
-            byte tile = mmu.ReadByte((ushort)(objectAddress + 2));
-            if (doubleSize && !(yFlip > 0))
-            {
-                tile = _ly < y + 8 ? (byte)(tile & 0xFE) : (byte)(tile | 0x01);
-            }
-            else if (doubleSize)
-            {
-                tile = _ly < y + 8 ? (byte)(tile | 0x01) : (byte)(tile & 0xFE);
-            }
-
-
-            int xFlip = attributes & 0x20;
-            int palette = attributes & 0x10;
-
-            ushort tileAddress = (ushort)(tile * 16 + 0x8000);
-
-            int addressShift = yFlip > 0 ? (~(_ly - y)) & 0x7 : (_ly - y);
-            ushort tileRowAddress = (ushort)(tileAddress + addressShift * 2);
-
-            byte tileLow = mmu.ReadByte(tileRowAddress);
-            byte tileHigh = mmu.ReadByte((ushort)(tileRowAddress + 1));
-
-            int colorBit = xFlip > 0 ? 1 << (7 - (~(i - objX) & 7)) : 1 << (7 - ((i - objX) & 7));
-            int colorIdLow = (tileLow & colorBit) != 0 ? 1 : 0;
-            int colorIdHigh = (tileHigh & colorBit) != 0 ? 2 : 0;
-            int colorId = colorIdLow + colorIdHigh;
-
-            if (colorId != 0)
-            {
-                byte OBP = palette > 0 ? _obp1 : _obp0;
-                int color = (OBP >> (colorId * 2)) & 0x3;
-                color = ~color & 0x3; // Invert the color bits
-
-                SetObjectPixel(i, _ly, color);
             }
         }
     }
