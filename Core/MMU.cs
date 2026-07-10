@@ -235,6 +235,10 @@ public class MMU
             case 0x03:
                 _cartridge = new MBC1(rom, romName);
                 break;
+            case 0x05:
+            case 0x06:
+                _cartridge = new MBC2(rom, romName);
+                break;
             default:
                 Console.Beep();
                 Console.WriteLine($"Unsuported MBC: {rom[0x147]:X2}");

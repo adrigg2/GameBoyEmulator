@@ -7,14 +7,14 @@ internal class MBC1 : ICartridge
     private const int SRamOffset = 0x2000;
     private const int RomOffset = 0x4000;
 
-    private byte[] _rom;
-    private byte[]? _sram;
+    private readonly byte[] _rom;
+    private readonly byte[]? _sram;
 
-    private bool _battery;
-    private bool _ramEnable;
+    private readonly bool _battery;
+    private bool _ramEnabled;
     private bool _advancedBanking;
 
-    private string _romName;
+    private readonly string _romName;
 
     private int _romBank;
     private int _ramBank;
@@ -48,7 +48,7 @@ internal class MBC1 : ICartridge
 
     public byte ReadRam(ushort address)
     {
-        if (_ramEnable)
+        if (_ramEnabled)
         {
             int bank = _advancedBanking ? _ramBank : 0;
             return _sram?[(bank * SRamOffset + (address & 0x1FFF)) & (_sram.Length - 1)] ?? 0xFF;
@@ -84,7 +84,7 @@ internal class MBC1 : ICartridge
 
     public void WriteRam(ushort address, byte value)
     {
-        if (_ramEnable && _sram != null)
+        if (_ramEnabled && _sram != null)
         {
             int bank = _advancedBanking ? _ramBank : 0;
             _sram[(bank * SRamOffset + (address & 0x1FFF)) & (_sram.Length - 1)] = value;
@@ -95,8 +95,8 @@ internal class MBC1 : ICartridge
     {
         if (address <= 0x1FFF)
         {
-            _ramEnable = (value & 0xF) == 0xA;
-            if (!_ramEnable)
+            _ramEnabled = (value & 0xF) == 0xA;
+            if (!_ramEnabled)
             {
                 SaveRam();
             }
