@@ -2,6 +2,7 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace GameBoyEmulator;
@@ -11,6 +12,9 @@ namespace GameBoyEmulator;
 /// </summary>
 public partial class MainWindow : Window
 {
+    const int GbWidth = 160;
+    const int GbHeight = 144;
+
     private Emulator _emulator;
 
     public MainWindow(string[] args)
@@ -19,6 +23,8 @@ public partial class MainWindow : Window
         Directory.CreateDirectory("./saves/");
         _emulator = new Emulator(args[0], args[1], Dispatcher);
         _emulator.PPU.SetWindowSource(this); // TODO: Consider transfering logic to the main window
+
+        SizeChanged += (_, _) => UpdateScale();
     }
 
     private void Tick(object? sender, EventArgs e)
@@ -56,5 +62,16 @@ public partial class MainWindow : Window
     private void Window_KeyUp(object sender, KeyEventArgs e)
     {
         _emulator.JOYPAD.HandleKeyUp(e.Key);
+    }
+
+    private void UpdateScale()
+    {
+        double scaleX = ActualWidth / GbWidth;
+        double scaleY = ActualHeight / GbHeight;
+
+        int scale = Math.Max(1, (int)Math.Floor(Math.Min(scaleX, scaleY)));
+
+        Screen.Width = GbWidth * scale;
+        Screen.Height = GbHeight * scale;
     }
 }

@@ -228,7 +228,7 @@ public class PPU
             }
         }
 
-        if ((_lcdc & 0x2) != 0)
+        if ((_lcdc & 0x2) != 0 && _objectPool.Count != 0)
         {
             RenderObjects(mmu);
         }
@@ -300,24 +300,19 @@ public class PPU
     private void RenderObjects(MMU mmu)
     {
         bool doubleSize = (_lcdc & 0x4) != 0;
-        ushort objectAddress = 0;
-        int objectPixels = 0;
         for (int i = 0; i < ScreenWidth; i++)
         {
+            ushort objectAddress = 0;
             int x = 0;
+            int objX = ScreenWidth;
 
-            if (objectPixels >= 8 || objectAddress == 0)
+            foreach (ushort address in _objectPool)
             {
-                objectAddress = 0;
-                foreach (ushort address in _objectPool)
+                x = mmu.ReadByte((ushort)(address + 1)) - 8;
+                if (i >= x && i < x + 8 && x < objX)
                 {
-                    x = mmu.ReadByte((ushort)(address + 1)) - 8;
-                    if (i >= x && i < x + 8)
-                    {
-                        objectAddress = address;
-                        objectPixels = i - x;
-                        break;
-                    }
+                    objectAddress = address;
+                    objX = x;
                 }
             }
 
@@ -325,8 +320,6 @@ public class PPU
             {
                 continue;
             }
-
-            objectPixels++;
 
             int y = mmu.ReadByte(objectAddress) - 16;
 
@@ -361,7 +354,7 @@ public class PPU
             byte tileLow = mmu.ReadByte(tileRowAddress);
             byte tileHigh = mmu.ReadByte((ushort)(tileRowAddress + 1));
 
-            int colorBit = xFlip > 0 ? 1 << (7 - (~(i - x) & 7)) : 1 << (7 - ((i - x) & 7));
+            int colorBit = xFlip > 0 ? 1 << (7 - (~(i - objX) & 7)) : 1 << (7 - ((i - objX) & 7));
             int colorIdLow = (tileLow & colorBit) != 0 ? 1 : 0;
             int colorIdHigh = (tileHigh & colorBit) != 0 ? 2 : 0;
             int colorId = colorIdLow + colorIdHigh;

@@ -9,8 +9,9 @@
         ContentRendered="Tick"
         KeyDown="Window_KeyDown"
         KeyUp="Window_KeyUp">
-    <Grid>
-        <Image x:Name="Screen" HorizontalAlignment="Left" Height="144" Margin="314,136,0,0" VerticalAlignment="Top" Width="160"/>
+    <Grid Background="Black">
+        <Image x:Name="Screen" HorizontalAlignment="Center" Height="144" Margin="0,0,0,0" VerticalAlignment="Center" Width="160" RenderTransformOrigin="0.5,0.5" RenderOptions.BitmapScalingMode="NearestNeighbor" Stretch="Uniform">
+        </Image>
 
     </Grid>
 </Window>

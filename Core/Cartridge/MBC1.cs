@@ -90,7 +90,7 @@ internal class MBC1 : ICartridge
     {
         if (address <= 0x1FFF)
         {
-            _ramEnable = (value & 0xA) == 0xA;
+            _ramEnable = (value & 0xF) == 0xA;
             if (!_ramEnable)
             {
                 SaveRam();
