@@ -39,6 +39,11 @@ internal class MBC1 : ICartridge
         _romName = romName;
 
         _romBank = 1;
+
+        if (_battery && File.Exists($"./saves/{_romName}.save"))
+        {
+            _sram = File.ReadAllBytes($"./saves/{_romName}.save");
+        }
     }
 
     public byte ReadRam(ushort address)
