@@ -1,4 +1,5 @@
 ﻿using GameBoyEmulator.Core.Cartridge;
+using System.Diagnostics.Contracts;
 
 namespace GameBoyEmulator.Core;
 public class MMU
@@ -7,6 +8,7 @@ public class MMU
     private JOYPAD _joypad;
     private PPU _ppu;
     private TIMER _timer;
+    private APU _apu;
 
     public bool _bootRomMapped; // DEBUG: Public
 
@@ -22,7 +24,7 @@ public class MMU
     public byte IE { get => _ie; set => _ie = value; }
     public byte IF { get => _if; set => _if = value; }
 
-    public MMU(DMA dma, JOYPAD joypad, PPU ppu, TIMER timer)
+    public MMU(DMA dma, JOYPAD joypad, PPU ppu, TIMER timer, APU apu)
     {
         _bootRomMapped = true;
         _bootROM = new byte[0x100];
@@ -35,6 +37,7 @@ public class MMU
         _joypad = joypad;
         _ppu = ppu;
         _timer = timer;
+        _apu = apu;
         _cartridge = new NoCartridge();
     }
 
@@ -74,6 +77,40 @@ public class MMU
                 return _timer.TAC;
             case 0xFF0F:
                 return IF;
+            case 0xFF10:
+                return _apu.NR10;
+            case 0xFF11:
+                return _apu.NR11;
+            case 0xFF12:
+                return _apu.NR12;
+            case 0xFF14:
+                return _apu.NR14;
+            case 0xFF16:
+                return _apu.NR21;
+            case 0xFF17:
+                return _apu.NR22;
+            case 0xFF19:
+                return _apu.NR24;
+            case 0xFF1A:
+                return _apu.NR30;
+            case 0xFF1C:
+                return _apu.NR32;
+            case 0xFF1E:
+                return _apu.NR34;
+            case 0xFF21:
+                return _apu.NR42;
+            case 0xFF22:
+                return _apu.NR43;
+            case 0xFF23:
+                return _apu.NR44;
+            case 0xFF24:
+                return _apu.NR50;
+            case 0xFF25:
+                return _apu.NR51;
+            case 0xFF26:
+                return _apu.NR52;
+            case ushort _ when address >= 0xFF30 && address <= 0xFF3F:
+                return _apu.ReadWaveRam(address);
             case 0xFF40:
                 return _ppu.LCDC;
             case 0xFF41:
@@ -155,6 +192,72 @@ public class MMU
                 break;
             case 0xFF0F:
                 IF = value;
+                break;
+            case 0xFF10:
+                _apu.NR10 = value;
+                break;
+            case 0xFF11:
+                _apu.NR11 = value;
+                break;
+            case 0xFF12:
+                _apu.NR12 = value;
+                break;
+            case 0xFF13:
+                _apu.NR13 = value;
+                break;
+            case 0xFF14:
+                _apu.NR14 = value;
+                break;
+            case 0xFF16:
+                _apu.NR21 = value;
+                break;
+            case 0xFF17:
+                _apu.NR22 = value;
+                break;
+            case 0xFF18:
+                _apu.NR23 = value;
+                break;
+            case 0xFF19:
+                _apu.NR24 = value;
+                break;
+            case 0xFF1A:
+                _apu.NR30 = value;
+                break;
+            case 0xFF1B:
+                _apu.NR31 = value;
+                break;
+            case 0xFF1C:
+                _apu.NR32 = value;
+                break;
+            case 0xFF1D:
+                _apu.NR33 = value;
+                break;
+            case 0xFF1E:
+                _apu.NR34 = value;
+                break;
+            case 0xFF20:
+                _apu.NR41 = value;
+                break;
+            case 0xFF21:
+                _apu.NR42 = value;
+                break;
+            case 0xFF22:
+                _apu.NR43 = value;
+                break;
+            case 0xFF23:
+                _apu.NR44 = value;
+                break;
+            case 0xFF24:
+                _apu.NR50 = value;
+                break;
+            case 0xFF25:
+                _apu.NR51 = value;
+                break;
+            case 0xFF26:
+                _apu.NR52 = value;
+                break;
+            case ushort _ when address >= 0xFF30 && address <= 0xFF3F:
+                _apu.WriteWaveRam(address, value);
                 break;
             case 0xFF40:
                 _ppu.LCDC = value;
