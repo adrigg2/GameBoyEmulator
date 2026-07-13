@@ -68,7 +68,7 @@ public class MBC2 : ICartridge
     {
         if (_ramEnabled)
         {
-            _sram[address & 0x1FF] = value;
+            _sram[address & 0x1FF] = (byte)(value | 0xF0);
         }
     }
 
