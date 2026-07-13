@@ -84,6 +84,7 @@ public class PPU
         if ((_lcdc & 0x80) == 0)
         {
             _ly = 0;
+            _windowY = 0;
             _stat = (byte)(_stat & ~0x3);
             _cycleCount = 0;
             
@@ -234,7 +235,7 @@ public class PPU
 
     private void RenderBG(MMU mmu)
     {
-        byte WX = (byte)(_wx - 7);
+        byte WX = _wx >= 7 ? (byte)(_wx - 7) : (byte)0;
 
         byte tileDataLow = 0;
         byte tileDataHigh = 0;
