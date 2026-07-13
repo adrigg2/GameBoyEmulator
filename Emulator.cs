@@ -61,24 +61,24 @@ public class Emulator
                 _halted = false;
             }
 
-            if (!_mmu._bootRomMapped && !_halted)
-            {
-                logFile?.WriteLine($"{_cpu._lastInstructionPC:X2}: {OpcodeParser.ParseOpcode(_cpu._lastInstruction)}");
-                if (_cpu._lastInstruction == 0x76)
-                {
-                    _halted = true;
-                }
-            }
-
-            //if (_cpu._lastInstructionPC == 0xFE)
+            //if (!_mmu._bootRomMapped && !_halted)
             //{
-            //    logFile?.WriteLine(_cpu);
+            //    logFile?.WriteLine($"{_cpu._lastInstructionPC:X2}: {OpcodeParser.ParseOpcode(_cpu._lastInstruction)}");
+            //    if (_cpu._lastInstruction == 0x76)
+            //    {
+            //        _halted = true;
+            //    }
             //}
 
-            if (_cpu.interrupt)
-            {
-                logFile?.WriteLine(_cpu.interruptSource);
-            }
+            ////if (_cpu._lastInstructionPC == 0xFE)
+            ////{
+            ////    logFile?.WriteLine(_cpu);
+            ////}
+
+            //if (_cpu.interrupt)
+            //{
+            //    logFile?.WriteLine(_cpu.interruptSource);
+            //}
 
             //if (_cpu.interruptService)
             //{

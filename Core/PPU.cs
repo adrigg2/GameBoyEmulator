@@ -61,8 +61,6 @@ public class PPU
     public byte WY { get => _wy; set => _wy = value; }
     public byte WX { get => _wx; set => _wx = value; }
 
-    private int frames = 0; // DEBUG
-
     public PPU(Dispatcher windowDispatcher)
     {
         _screenImage = new WriteableBitmap(ScreenWidth, ScreenHeigth, 96, 96, PixelFormats.Gray2, null);
@@ -381,11 +379,5 @@ public class PPU
         _screenImage.WritePixels(new Int32Rect(0, 0, ScreenWidth, ScreenHeigth), _screenBuffer, stride, 0);
         Array.Clear(_screenBuffer);
         _windowY = 0;
-
-        using FileStream stream = new($"./frames/frame{frames}.png", FileMode.Create);
-        PngBitmapEncoder encoder = new();
-        encoder.Frames.Add(BitmapFrame.Create(_screenImage));
-        encoder.Save(stream);
-        frames++;
     }
 }

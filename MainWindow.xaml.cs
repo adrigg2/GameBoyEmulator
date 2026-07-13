@@ -45,7 +45,7 @@ public partial class MainWindow : Window
                     logFile.WriteLine($"Frame {frames}");
                     //Console.WriteLine("Tick");
                     stopwatch.Restart();
-                    _emulator.ProcessFrame(logFile);
+                    _emulator.ProcessFrame();
                     frames++;
 
                     logFile.Flush();
