@@ -1,4 +1,5 @@
-﻿using GameBoyEmulator.Core.Cartridge;
+﻿using GameBoyEmulator.Core.Audio;
+using GameBoyEmulator.Core.Cartridge;
 using System.Diagnostics.Contracts;
 
 namespace GameBoyEmulator.Core;
@@ -78,31 +79,31 @@ public class MMU
             case 0xFF0F:
                 return IF;
             case 0xFF10:
-                return _apu.NR10;
+                return _apu.Channel1.NR10;
             case 0xFF11:
-                return _apu.NR11;
+                return _apu.Channel1.NR11;
             case 0xFF12:
-                return _apu.NR12;
+                return _apu.Channel1.NR12;
             case 0xFF14:
-                return _apu.NR14;
+                return _apu.Channel1.NR14;
             case 0xFF16:
-                return _apu.NR21;
+                return _apu.Channel2.NR21;
             case 0xFF17:
-                return _apu.NR22;
+                return _apu.Channel2.NR22;
             case 0xFF19:
-                return _apu.NR24;
+                return _apu.Channel2.NR24;
             case 0xFF1A:
-                return _apu.NR30;
+                return _apu.Channel3.NR30;
             case 0xFF1C:
-                return _apu.NR32;
+                return _apu.Channel3.NR32;
             case 0xFF1E:
-                return _apu.NR34;
+                return _apu.Channel3.NR34;
             case 0xFF21:
-                return _apu.NR42;
+                return _apu.Channel4.NR42;
             case 0xFF22:
-                return _apu.NR43;
+                return _apu.Channel4.NR43;
             case 0xFF23:
-                return _apu.NR44;
+                return _apu.Channel4.NR44;
             case 0xFF24:
                 return _apu.NR50;
             case 0xFF25:
@@ -110,7 +111,7 @@ public class MMU
             case 0xFF26:
                 return _apu.NR52;
             case ushort _ when address >= 0xFF30 && address <= 0xFF3F:
-                return _apu.ReadWaveRam(address);
+                return _apu.Channel3.ReadWaveRam(address);
             case 0xFF40:
                 return _ppu.LCDC;
             case 0xFF41:
@@ -194,58 +195,58 @@ public class MMU
                 IF = value;
                 break;
             case 0xFF10:
-                _apu.NR10 = value;
+                _apu.Channel1.NR10 = value;
                 break;
             case 0xFF11:
-                _apu.NR11 = value;
+                _apu.Channel1.NR11 = value;
                 break;
             case 0xFF12:
-                _apu.NR12 = value;
+                _apu.Channel1.NR12 = value;
                 break;
             case 0xFF13:
-                _apu.NR13 = value;
+                _apu.Channel1.NR13 = value;
                 break;
             case 0xFF14:
-                _apu.NR14 = value;
+                _apu.Channel1.NR14 = value;
                 break;
             case 0xFF16:
-                _apu.NR21 = value;
+                _apu.Channel2.NR21 = value;
                 break;
             case 0xFF17:
-                _apu.NR22 = value;
+                _apu.Channel2.NR22 = value;
                 break;
             case 0xFF18:
-                _apu.NR23 = value;
+                _apu.Channel2.NR23 = value;
                 break;
             case 0xFF19:
-                _apu.NR24 = value;
+                _apu.Channel2.NR24 = value;
                 break;
             case 0xFF1A:
-                _apu.NR30 = value;
+                _apu.Channel3.NR30 = value;
                 break;
             case 0xFF1B:
-                _apu.NR31 = value;
+                _apu.Channel3.NR31 = value;
                 break;
             case 0xFF1C:
-                _apu.NR32 = value;
+                _apu.Channel3.NR32 = value;
                 break;
             case 0xFF1D:
-                _apu.NR33 = value;
+                _apu.Channel3.NR33 = value;
                 break;
             case 0xFF1E:
-                _apu.NR34 = value;
+                _apu.Channel3.NR34 = value;
                 break;
             case 0xFF20:
-                _apu.NR41 = value;
+                _apu.Channel4.NR41 = value;
                 break;
             case 0xFF21:
-                _apu.NR42 = value;
+                _apu.Channel4.NR42 = value;
                 break;
             case 0xFF22:
-                _apu.NR43 = value;
+                _apu.Channel4.NR43 = value;
                 break;
             case 0xFF23:
-                _apu.NR44 = value;
+                _apu.Channel4.NR44 = value;
                 break;
             case 0xFF24:
                 _apu.NR50 = value;
@@ -257,7 +258,7 @@ public class MMU
                 _apu.NR52 = value;
                 break;
             case ushort _ when address >= 0xFF30 && address <= 0xFF3F:
-                _apu.WriteWaveRam(address, value);
+                _apu.Channel3.WriteWaveRam(address, value);
                 break;
             case 0xFF40:
                 _ppu.LCDC = value;
