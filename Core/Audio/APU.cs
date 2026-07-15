@@ -13,7 +13,48 @@ public class APU
     
     public byte NR50 { get => _nr50; set => _nr50 = value; }
     public byte NR51 { get => _nr51; set => _nr51 = value; }
-    public byte NR52 { get => _nr52; set => _nr52 = (byte)(value & 0x80); }
+    public byte NR52 
+    {
+        get
+        {
+            byte nr52 = _nr52;
+            if (_channel1.Active)
+            {
+                nr52 |= 0x1;
+            }
+
+            if (_channel2.Active)
+            {
+                nr52 |= 0x2;
+            }
+
+            if (_channel3.Active)
+            {
+                nr52 |= 0x4;
+            }
+
+            if (_channel4.Active)
+            {
+                nr52 |= 0x8;
+            }
+
+            return nr52;
+        }
+        set 
+        {
+            _nr52 = (byte)(value & 0x80);
+            if ((_nr52 & 0x80) == 0)
+            {
+                _nr50 = 0;
+                _nr51 = 0;
+
+                _channel1.ClearRegisters();
+                _channel2.ClearRegisters();
+                _channel3.ClearRegisters();
+                _channel4.ClearRegisters();
+            }
+        }
+    }
 
     public Channel1 Channel1 { get => _channel1; }
     public Channel2 Channel2 { get => _channel2; }
