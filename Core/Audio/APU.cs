@@ -73,6 +73,7 @@ public class APU
     {
         if (divApuCounter % 2 == 0)
         {
+            _channel1.LengthTimer();
             // sound length
         }
 
