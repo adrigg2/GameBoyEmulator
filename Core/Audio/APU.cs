@@ -78,7 +78,7 @@ public class APU
 
         if (divApuCounter % 4 == 0)
         {
-            // ch1 freq sweep
+            _channel1.FrequencySweep();
         }
 
         if (divApuCounter % 8 == 0)

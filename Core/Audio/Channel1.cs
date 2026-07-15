@@ -8,6 +8,9 @@ public class Channel1
     private byte _nr13;
     private byte _nr14;
 
+    private int _sweepCounter;
+    private int _currentPace;
+
     private bool _active;
 
     public byte NR10 { get => _nr10; set => _nr10 = value; }
@@ -25,5 +28,54 @@ public class Channel1
         _nr12 = 0;
         _nr13 = 0;
         _nr14 = 0;
+    }
+
+    public void FrequencySweep()
+    {
+        if (!_active)
+        {
+            return;
+        }
+
+        if (_currentPace == 0)
+        {
+            _sweepCounter = 0;
+            _currentPace = (_nr10 & 0x70) >> 4;
+        }
+
+        _sweepCounter++;
+        if (_sweepCounter == _currentPace)
+        {
+            _sweepCounter = 0;
+            _currentPace = (_nr10 & 0x70) >> 4;
+
+            int period = _nr13 | ((_nr14 & 0x07) << 8);
+            int direction = _nr10 & 0x08;
+            int step = _nr10 & 0x07;
+
+            int periodStep = (int)(period / Math.Pow(2, step));
+            if (direction == 0)
+            {
+                period += periodStep;
+            }
+            else
+            {
+                period -= periodStep;
+            }
+
+            if (period > 0x7FF)
+            {
+                _active = false;
+            }
+
+            if (period < 0)
+            {
+                period = 0;
+            }
+
+            _nr13 = (byte)(period & 0xFF);
+            _nr14 = (byte)(_nr14 & ~(0x7));
+            _nr14 = (byte)(_nr14 | ((period >> 8) & 0x7));
+        }
     }
 }
