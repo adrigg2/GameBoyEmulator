@@ -9,6 +9,7 @@ public class TIMER
 
     private int _timaResetCounter = -1;
     private int _timaIgnoreWritesCounter = 0;
+    private int _divApu = 0;
     
     public byte DIV 
     {
@@ -17,13 +18,20 @@ public class TIMER
         {
             int timerIncBitDisplace = GetTimerBit();
             int oldTimerIncBit = (_counter >> timerIncBitDisplace) & 0x1;
+            int oldTimerApuBit = (_counter >> 12) & 0x1;
 
             _counter = 0;
 
             int timerIncBit = (_counter >> timerIncBitDisplace) & 0x1;
+            int timerApuBit = (_counter >> 12) & 0x1;
             if ((_tac & 0x4) > 0 && oldTimerIncBit == 1 && timerIncBit == 0)
             {
                 TimerTick();
+            }
+
+            if (oldTimerApuBit == 1 && timerApuBit == 0)
+            {
+                _divApu++;
             }
         }
     }
@@ -72,7 +80,7 @@ public class TIMER
         }
     }
 
-    public void Tick(int cycles, MMU mmu)
+    public int Tick(int cycles, MMU mmu)
     {
         for (int i = 0; i < cycles; i++)
         {
@@ -95,15 +103,24 @@ public class TIMER
 
             int timerIncBitDisplace = GetTimerBit();
             int oldTimerIncBit = (_counter >> timerIncBitDisplace) & 0x1;
+            int oldTimerApuBit = (_counter >> 12) & 0x1;
 
             _counter++;
 
             int timerIncBit = (_counter >> timerIncBitDisplace) & 0x1;
+            int timerApuBit = (_counter >> 12) & 0x1;
             if ((_tac & 0x4) > 0 && oldTimerIncBit == 1 && timerIncBit == 0)
             {
                 TimerTick();
             }
+
+            if (oldTimerApuBit == 1 && timerApuBit == 0)
+            {
+                _divApu++;
+            }
         }
+
+        return _divApu;
     }
 
     private void TimerTick()

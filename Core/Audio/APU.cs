@@ -68,4 +68,22 @@ public class APU
         _channel3 = new();
         _channel4 = new();
     }
+
+    public void Tick(int divApuCounter)
+    {
+        if (divApuCounter % 2 == 0)
+        {
+            // sound length
+        }
+
+        if (divApuCounter % 4 == 0)
+        {
+            // ch1 freq sweep
+        }
+
+        if (divApuCounter % 8 == 0)
+        {
+            // envelope sweep
+        }
+    }
 }
