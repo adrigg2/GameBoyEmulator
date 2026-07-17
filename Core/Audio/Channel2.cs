@@ -22,6 +22,7 @@ public class Channel2
     private int _envSweepCounter;
 
     private bool _active;
+    private bool _dacActive;
     private bool _envDir;
 
     public byte NR21 { get => (byte)(_nr21 & 0xC0); set => _nr21 = value; }
@@ -34,6 +35,11 @@ public class Channel2
             if ((_nr22 & 0xF8) == 0)
             {
                 _active = false;
+                _dacActive = false;
+            }
+            else
+            {
+                _dacActive = true;
             }
         }
     }
@@ -44,9 +50,9 @@ public class Channel2
         set
         {
             _nr24 = value;
-            if ((_nr24 & 0x80) != 0 && !_active)
+            if ((_nr24 & 0x80) != 0 && !Active)
             {
-                _active = true;
+                Active = true;
                 _lengthTimer = _nr21 & 0x3F;
                 _periodDiv = _nr23 | ((_nr24 & 0x07) << 8);
                 _volume = (_nr22 & 0xF0) >> 4;
@@ -56,13 +62,18 @@ public class Channel2
         }
     }
 
-    public bool Active { get => _active; }
+    public bool Active { get => _active; private set => _active = value && _dacActive; }
 
-    public int Tick()
+    public float Tick()
     {
-        if (!_active)
+        if (!_dacActive)
         {
             return 0;
+        }
+
+        if (!Active)
+        {
+            return 1;
         }
 
         if (++_periodDiv > 0x7FF)
@@ -72,12 +83,13 @@ public class Channel2
         }
 
         int dutyCycle = (_nr21 & 0xC0) >> 6;
-        return ((_dutyCycles[dutyCycle] >> _sampleIndex) & 0x1) * _volume;
+        int digitalSignal = ((_dutyCycles[dutyCycle] >> _sampleIndex) & 0x1) * _volume;
+        return (-2.0f * digitalSignal / 15.0f) + 1.0f;
     }
 
     public void ClearRegisters()
     {
-        _active = false;
+        Active = false;
         _nr21 &= 0x3F;
         _nr22 = 0;
         _nr23 = 0;
@@ -86,7 +98,7 @@ public class Channel2
 
     public void LengthTimer()
     {
-        if (!_active)
+        if (!Active)
         {
             return;
         }
@@ -97,14 +109,14 @@ public class Channel2
             _lengthTimer++;
             if (_lengthTimer >= 64)
             {
-                _active = false;
+                Active = false;
             }
         }
     }
 
     public void EnvelopeSweep()
     {
-        if (!_active || _envSweepPace == 0)
+        if (!Active || _envSweepPace == 0)
         {
             return;
         }

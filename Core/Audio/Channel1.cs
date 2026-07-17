@@ -26,6 +26,7 @@ public class Channel1
     private int _envSweepCounter;
 
     private bool _active;
+    private bool _dacActive;
     private bool _envDir;
 
     public byte NR10 { get => _nr10; set => _nr10 = value; }
@@ -39,6 +40,11 @@ public class Channel1
             if ((_nr12 & 0xF8) == 0)
             {
                 _active = false;
+                _dacActive = false;
+            }
+            else
+            {
+                _dacActive = true;
             }
         }
     }
@@ -50,7 +56,7 @@ public class Channel1
             _nr14 = value;
             if ((_nr14 & 0x80) != 0 && !_active)
             {
-                _active = true;
+                Active = true;
                 _lengthTimer = _nr11 & 0x3F;
                 _periodDiv = _nr13 | ((_nr14 & 0x07) << 8);
                 _sweepCounter = 0;
@@ -68,13 +74,18 @@ public class Channel1
         }
     }
 
-    public bool Active { get => _active; }
+    public bool Active { get => _active; private set => _active = value && _dacActive; }
 
-    public int Tick()
+    public float Tick()
     {
-        if (!_active)
+        if (!_dacActive)
         {
             return 0;
+        }
+
+        if (!Active)
+        {
+            return 1;
         }
 
         if (++_periodDiv > 0x7FF)
@@ -84,22 +95,24 @@ public class Channel1
         }
 
         int dutyCycle = (_nr11 & 0xC0) >> 6;
-        return ((_dutyCycles[dutyCycle] >> _sampleIndex) & 0x1) * _volume;
+        int digitalSignal = ((_dutyCycles[dutyCycle] >> _sampleIndex) & 0x1) * _volume;
+        return (-2.0f * digitalSignal / 15.0f) + 1.0f;
     }
 
     public void ClearRegisters()
     {
-        _active = false;
+        Active = false;
         _nr10 = 0;
         _nr11 &= 0x3F;
         _nr12 = 0;
         _nr13 = 0;
         _nr14 = 0;
+        _sampleIndex = 0;
     }
 
     public void FrequencySweep()
     {
-        if (!_active)
+        if (!Active)
         {
             return;
         }
@@ -129,7 +142,7 @@ public class Channel1
 
     public void LengthTimer()
     {
-        if (!_active)
+        if (!Active)
         {
             return;
         }
@@ -140,14 +153,14 @@ public class Channel1
             _lengthTimer++;
             if (_lengthTimer >= 64)
             {
-                _active = false;
+                Active = false;
             }
         }
     }
 
     public void EnvelopeSweep()
     {
-        if (!_active || _envSweepPace == 0)
+        if (!Active || _envSweepPace == 0)
         {
             return;
         }
@@ -186,7 +199,7 @@ public class Channel1
 
         if (period > 0x7FF)
         {
-            _active = false;
+            Active = false;
         }
 
         return period;
