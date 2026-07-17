@@ -8,17 +8,40 @@ public class Channel1
     private byte _nr13;
     private byte _nr14;
 
+    private readonly byte[] _dutyCycles = [
+        0b01111111,
+        0b01111110,
+        0b00011110,
+        0b10000001,
+        ];
+
     private int _sweepCounter;
     private int _currentPace;
     private int _lengthTimer;
     private int _periodDiv;
     private int _sweepFrequency;
+    private int _sampleIndex;
+    private int _volume;
+    private int _envSweepPace;
+    private int _envSweepCounter;
 
     private bool _active;
+    private bool _envDir;
 
     public byte NR10 { get => _nr10; set => _nr10 = value; }
     public byte NR11 { get => (byte)(_nr11 & 0xC0); set => _nr11 = value; }
-    public byte NR12 { get => _nr12; set => _nr12 = value; }
+    public byte NR12
+    {
+        get => _nr12;
+        set
+        {
+            _nr12 = value;
+            if ((_nr12 & 0xF8) == 0)
+            {
+                _active = false;
+            }
+        }
+    }
     public byte NR13 { set => _nr13 = value; }
     public byte NR14 {
         get => (byte)(_nr14 & 0x40);
@@ -32,6 +55,9 @@ public class Channel1
                 _periodDiv = _nr13 | ((_nr14 & 0x07) << 8);
                 _sweepCounter = 0;
                 _sweepFrequency = _nr13 | ((_nr14 & 0x07) << 8);
+                _volume = (_nr12 & 0xF0) >> 4;
+                _envSweepPace = _nr12 & 0x7;
+                _envDir = (_nr12 & 0x8) > 0;
 
                 int step = _nr10 & 0x07;
                 if (step != 0)
@@ -44,9 +70,21 @@ public class Channel1
 
     public bool Active { get => _active; }
 
-    public void Tick()
+    public int Tick()
     {
+        if (!_active)
+        {
+            return 0;
+        }
 
+        if (++_periodDiv > 0x7FF)
+        {
+            _periodDiv = _nr13 | ((_nr14 & 0x07) << 8);
+            _sampleIndex = ++_sampleIndex % 8;
+        }
+
+        int dutyCycle = (_nr11 & 0xC0) >> 6;
+        return ((_dutyCycles[dutyCycle] >> _sampleIndex) & 0x1) * _volume;
     }
 
     public void ClearRegisters()
@@ -74,7 +112,7 @@ public class Channel1
         }
 
         _sweepCounter++;
-        if (_sweepCounter == _currentPace)
+        if (_sweepCounter >= _currentPace)
         {
             _sweepCounter = 0;
             _currentPace = (_nr10 & 0x70) >> 4;
@@ -106,7 +144,30 @@ public class Channel1
         }
     }
 
-    public int FrequencyCalculation()
+    public void EnvelopeSweep()
+    {
+        if (!_active || _envSweepPace == 0)
+        {
+            return;
+        }
+
+        _envSweepCounter++;
+        if (_envSweepCounter >= _envSweepPace)
+        {
+            if (_envDir && _volume > 0)
+            {
+                _volume--;
+            }
+            else if (!_envDir && _volume < 0xF)
+            {
+                _volume++;
+            }
+
+            _envSweepCounter = 0;
+        }
+    }
+
+    private int FrequencyCalculation()
     {
         int period = _sweepFrequency;
         int direction = _nr10 & 0x08;

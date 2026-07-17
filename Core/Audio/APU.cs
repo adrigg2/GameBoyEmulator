@@ -84,6 +84,7 @@ public class APU
 
         if (divApuCounter % 8 == 0)
         {
+            _channel1.EnvelopeSweep();
             // envelope sweep
         }
     }
