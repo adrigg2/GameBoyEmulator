@@ -55,7 +55,7 @@ public class Emulator
             _dma.Tick(cycles, _mmu);
             _joypad.Update(_mmu);
             int divApuCounter = _timer.Tick(cycles, _mmu);
-            _apu.Tick(divApuCounter);
+            _apu.Tick(cycles, divApuCounter);
             frameCycles += cycles;
 
             if (_cpu._lastInstruction != 0x76)

@@ -50,7 +50,7 @@ public class Channel2
         set
         {
             _nr24 = value;
-            if ((_nr24 & 0x80) != 0 && !Active)
+            if ((_nr24 & 0x80) != 0)
             {
                 Active = true;
                 _lengthTimer = _nr21 & 0x3F;
@@ -103,7 +103,7 @@ public class Channel2
             return;
         }
 
-        int timerActive = _nr24 & 0x80;
+        int timerActive = _nr24 & 0x40;
         if (timerActive != 0)
         {
             _lengthTimer++;

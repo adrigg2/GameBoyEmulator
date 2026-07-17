@@ -69,12 +69,13 @@ public class APU
         _channel4 = new();
     }
 
-    public void Tick(int divApuCounter)
+    public void Tick(int cycles, int divApuCounter)
     {
         if (divApuCounter % 2 == 0)
         {
             _channel1.LengthTimer();
             _channel2.LengthTimer();
+            _channel3.LengthTimer();
             // sound length
         }
 
@@ -86,8 +87,22 @@ public class APU
         if (divApuCounter % 8 == 0)
         {
             _channel1.EnvelopeSweep();
-            _channel2.LengthTimer();
+            _channel2.EnvelopeSweep();
             // envelope sweep
+        }
+
+        for (int i = 0; i < cycles; i++)
+        {
+            if (i % 2 == 0)
+            {
+                _channel3.Tick();
+            }
+
+            if (i % 4 == 0)
+            {
+                _channel1.Tick();
+                _channel2.Tick();
+            }
         }
     }
 }

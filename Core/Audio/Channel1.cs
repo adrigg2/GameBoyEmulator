@@ -54,10 +54,15 @@ public class Channel1
         set
         {
             _nr14 = value;
-            if ((_nr14 & 0x80) != 0 && !_active)
+            if ((_nr14 & 0x80) != 0)
             {
                 Active = true;
-                _lengthTimer = _nr11 & 0x3F;
+
+                if (_lengthTimer >= 64)
+                {
+                    _lengthTimer = _nr11 & 0x3F;
+                }
+
                 _periodDiv = _nr13 | ((_nr14 & 0x07) << 8);
                 _sweepCounter = 0;
                 _sweepFrequency = _nr13 | ((_nr14 & 0x07) << 8);
@@ -147,7 +152,7 @@ public class Channel1
             return;
         }
 
-        int timerActive = _nr14 & 0x80;
+        int timerActive = _nr14 & 0x40;
         if (timerActive != 0)
         {
             _lengthTimer++;
