@@ -89,6 +89,7 @@ public class Channel1
 
     public void ClearRegisters()
     {
+        _active = false;
         _nr10 = 0;
         _nr11 &= 0x3F;
         _nr12 = 0;

@@ -74,6 +74,7 @@ public class APU
         if (divApuCounter % 2 == 0)
         {
             _channel1.LengthTimer();
+            _channel2.LengthTimer();
             // sound length
         }
 
@@ -85,6 +86,7 @@ public class APU
         if (divApuCounter % 8 == 0)
         {
             _channel1.EnvelopeSweep();
+            _channel2.LengthTimer();
             // envelope sweep
         }
     }
