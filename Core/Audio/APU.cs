@@ -91,18 +91,9 @@ public class APU
             // envelope sweep
         }
 
-        for (int i = 0; i < cycles; i++)
-        {
-            if (i % 2 == 0)
-            {
-                _channel3.Tick();
-            }
-
-            if (i % 4 == 0)
-            {
-                _channel1.Tick();
-                _channel2.Tick();
-            }
-        }
+        _channel1.Tick(cycles);
+        _channel2.Tick(cycles);
+        _channel3.Tick(cycles);
+        _channel4.Tick(cycles);
     }
 }

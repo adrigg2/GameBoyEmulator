@@ -25,6 +25,8 @@ public class Channel1
     private int _envSweepPace;
     private int _envSweepCounter;
 
+    private float _output;
+
     private bool _active;
     private bool _dacActive;
     private bool _envDir;
@@ -81,27 +83,34 @@ public class Channel1
 
     public bool Active { get => _active; private set => _active = value && _dacActive; }
 
-    public float Tick()
+    public float Output { get => _output; }
+
+    public void Tick(int cycles)
     {
         if (!_dacActive)
         {
-            return 0;
+            _output = 0;
+            return;
         }
 
         if (!Active)
         {
-            return 1;
+            _output = 1;
+            return;
         }
 
-        if (++_periodDiv > 0x7FF)
+        _periodDiv += cycles / 4;
+        if (_periodDiv > 0x7FF)
         {
+            cycles = _periodDiv - 0x7FF;
             _periodDiv = _nr13 | ((_nr14 & 0x07) << 8);
+            _periodDiv += cycles;
             _sampleIndex = ++_sampleIndex % 8;
         }
 
         int dutyCycle = (_nr11 & 0xC0) >> 6;
         int digitalSignal = ((_dutyCycles[dutyCycle] >> _sampleIndex) & 0x1) * _volume;
-        return (-2.0f * digitalSignal / 15.0f) + 1.0f;
+        _output = (-2.0f * digitalSignal / 15.0f) + 1.0f;
     }
 
     public void ClearRegisters()

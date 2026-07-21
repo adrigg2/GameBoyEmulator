@@ -16,6 +16,8 @@ public class Channel3
     private int _waveIndex;
     private int _waveBuffer;
 
+    private float _output;
+
     private bool _active;
     private bool _dacActive;
 
@@ -63,6 +65,8 @@ public class Channel3
 
     public bool Active { get => _active; private set => _active = value && _dacActive; }
 
+    public float Output { get => _output; }
+
     public Channel3()
     {
         _waveRam = new byte[0x10];
@@ -86,28 +90,33 @@ public class Channel3
         _nr34 = 0;
     }
 
-    public float Tick()
+    public void Tick(int cycles)
     {
         if (!_dacActive)
         {
-            return 0;
+            _output = 0;
+            return;
         }
 
         if (!Active)
         {
-            return 1;
+            _output = 1;
+            return;
         }
 
-        if (++_periodDiv > 0x7FF)
+        _periodDiv += cycles / 2;
+        if (_periodDiv > 0x7FF)
         {
+            cycles = _periodDiv - 0x7FF;
             _periodDiv = _nr33 | ((_nr34 & 0x07) << 8);
+            _periodDiv += cycles;
             _waveIndex = ++_waveIndex % 32;
             byte waveByte = _waveRam[_waveIndex / 2];
             _waveBuffer = _waveIndex % 2 == 0 ? waveByte >> 4 : waveByte & 0x0F;
         }
 
         int digitalSignal = _waveBuffer >> _volume;
-        return (-2.0f * digitalSignal / 15.0f) + 1.0f;
+        _output = (-2.0f * digitalSignal / 15.0f) + 1.0f;
     }
 
     public void LengthTimer()
