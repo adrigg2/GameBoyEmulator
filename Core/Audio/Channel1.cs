@@ -9,10 +9,10 @@ public class Channel1
     private byte _nr14;
 
     private readonly byte[] _dutyCycles = [
-        0b01111111,
-        0b01111110,
-        0b00011110,
-        0b10000001,
+        0b00000001, // 12.5%
+        0b10000001, // 25%
+        0b10000111, // 50%
+        0b01111110, // 75%
         ];
 
     private int _sweepCounter;
@@ -30,6 +30,7 @@ public class Channel1
     private bool _active;
     private bool _dacActive;
     private bool _envDir;
+    private bool _sweepEnabled;
 
     public byte NR10 { get => _nr10; set => _nr10 = value; }
     public byte NR11 { get => (byte)(_nr11 & 0xC0); set => _nr11 = value; }
@@ -73,6 +74,9 @@ public class Channel1
                 _envDir = (_nr12 & 0x8) > 0;
 
                 int step = _nr10 & 0x07;
+                int pace = (_nr10 & 0x70) >> 4;
+                _sweepEnabled = pace != 0 || step != 0;
+                _currentPace = pace == 0 ? 8 : pace;
                 if (step != 0)
                 {
                     FrequencyCalculation();
@@ -126,7 +130,7 @@ public class Channel1
 
     public void FrequencySweep()
     {
-        if (!Active)
+        if (!Active || !_sweepEnabled)
         {
             return;
         }
@@ -201,7 +205,7 @@ public class Channel1
         int direction = _nr10 & 0x08;
         int step = _nr10 & 0x07;
 
-        int periodStep = period >> (2 * step);
+        int periodStep = period >> step;
         if (direction == 0)
         {
             period += periodStep;

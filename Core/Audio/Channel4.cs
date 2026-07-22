@@ -80,6 +80,18 @@ public class Channel4
 
     public void Tick(int cycles)
     {
+        if (!_dacActive)
+        {
+            _output = 0;
+            return;
+        }
+
+        if (!Active)
+        {
+            _output = 1;
+            return;
+        }
+
         if (_channelFrequency == 0)
         {
             return;

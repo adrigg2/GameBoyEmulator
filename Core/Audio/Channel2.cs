@@ -8,10 +8,10 @@ public class Channel2
     private byte _nr24;
 
     private readonly byte[] _dutyCycles = [
-        0b01111111,
-        0b01111110,
-        0b00011110,
-        0b10000001,
+        0b00000001, // 12.5%
+        0b10000001, // 25%
+        0b10000111, // 50%
+        0b01111110, // 75%
         ];
 
     private int _lengthTimer;

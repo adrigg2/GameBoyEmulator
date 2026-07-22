@@ -7,14 +7,18 @@ namespace GameBoyEmulator.Core.Audio;
 public class APU
 {
     private const float CyclesPerSample = 4194304.0f / 44100.0f;
+    private const float Charge = 0.996f;
 
     private byte _nr50;
     private byte _nr51;
     private byte _nr52;
 
     private float _sampleCycles;
+    private float _capacitorL, _capacitorR;
 
     private bool _active;
+
+    private bool _channel1a, _channel2a, _channel3a, _channel4a; // debug
 
     private Channel1 _channel1;
     private Channel2 _channel2;
@@ -62,6 +66,8 @@ public class APU
                 _active = false;
                 _nr50 = 0;
                 _nr51 = 0;
+                _capacitorL = 0;
+                _capacitorR = 0;
 
                 _channel1.ClearRegisters();
                 _channel2.ClearRegisters();
@@ -87,7 +93,13 @@ public class APU
         _waveProvider = new APUSampleProvider(format);
         _out = new WasapiOut(AudioClientShareMode.Shared, 50);
         _out.Init(_waveProvider);
+        _out.Volume = 0.04f;
         _out.Play();
+
+        _channel1a = true;
+        _channel2a = true;
+        _channel3a = true;
+        _channel4a = true;
     }
 
     public void Tick(int cycles, int divApuCounter)
@@ -136,42 +148,42 @@ public class APU
         float left = 0;
         float right = 0;
 
-        if ((_nr51 & 0x80) != 0)
+        if ((_nr51 & 0x80) != 0 && _channel4a)
         {
             left += _channel4.Output;
         }
 
-        if ((_nr51 & 0x40) != 0)
+        if ((_nr51 & 0x40) != 0 && _channel3a)
         {
             left += _channel3.Output;
         }
 
-        if ((_nr51 & 0x20) != 0)
+        if ((_nr51 & 0x20) != 0 && _channel2a)
         {
             left += _channel2.Output;
         }
 
-        if ((_nr51 & 0x10) != 0)
+        if ((_nr51 & 0x10) != 0 && _channel1a)
         {
             left += _channel1.Output;
         }
 
-        if ((_nr51 & 0x08) != 0)
+        if ((_nr51 & 0x08) != 0 && _channel4a)
         {
             right += _channel4.Output;
         }
 
-        if ((_nr51 & 0x04) != 0)
+        if ((_nr51 & 0x04) != 0 && _channel3a)
         {
             right += _channel3.Output;
         }
 
-        if ((_nr51 & 0x02) != 0)
+        if ((_nr51 & 0x02) != 0 && _channel2a)
         {
             right += _channel2.Output;
         }
 
-        if ((_nr51 & 0x01) != 0)
+        if ((_nr51 & 0x01) != 0 && _channel1a)
         {
             right += _channel1.Output;
         }
@@ -179,10 +191,20 @@ public class APU
         float volRight = ((_nr50 & 0x07) + 1) / 8.0f;
         float volLeft = (((_nr50 & 0x70) >> 4) + 1) / 8.0f;
 
-        left = (left / 4) * volLeft;
-        right = (right / 4) * volRight;
+        left = left / 4 * volLeft;
+        right = right / 4 * volRight;
+
+        left = HighPass(left, ref _capacitorL);
+        right = HighPass(right, ref _capacitorR);
 
         _waveProvider.WriteSample(left);
         _waveProvider.WriteSample(right);
+    }
+
+    private float HighPass(float input, ref float capacitor)
+    {
+        float output = input - capacitor;
+        capacitor = input - output * Charge;
+        return output;
     }
 }
