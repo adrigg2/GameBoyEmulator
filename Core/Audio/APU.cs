@@ -14,6 +14,8 @@ public class APU
 
     private float _sampleCycles;
 
+    private bool _active;
+
     private Channel1 _channel1;
     private Channel2 _channel2;
     private Channel3 _channel3;
@@ -54,8 +56,10 @@ public class APU
         set 
         {
             _nr52 = (byte)(value & 0x80);
+            _active = true;
             if ((_nr52 & 0x80) == 0)
             {
+                _active = false;
                 _nr50 = 0;
                 _nr51 = 0;
 
@@ -88,6 +92,11 @@ public class APU
 
     public void Tick(int cycles, int divApuCounter)
     {
+        if (!_active)
+        {
+            return;
+        }
+
         _sampleCycles += cycles;
 
         if (divApuCounter % 2 == 0)
@@ -173,6 +182,7 @@ public class APU
         left = (left / 4) * volLeft;
         right = (right / 4) * volRight;
 
-        _waveProvider.WriteSample((left + right) / 2);
+        _waveProvider.WriteSample(left);
+        _waveProvider.WriteSample(right);
     }
 }
