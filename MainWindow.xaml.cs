@@ -31,24 +31,47 @@ public partial class MainWindow : Window
     {
         Task.Run(() =>
         {
-            using StreamWriter logFile = new("./emulatorLog.log");
-            logFile.WriteLine("Frame 0");
-
-            var stopwatch = Stopwatch.StartNew();
+            /*var stopwatch = Stopwatch.StartNew();
             _emulator.ProcessFrame();
-            var frames = 1;
+
+            while (_emulator.APU.SampleProvider.SampleCount < 44100 * 2 / 20)
+            {
+                if (stopwatch.ElapsedMilliseconds >= Emulator.FrameTime * 1000)
+                {
+                    stopwatch.Restart();
+                    _emulator.ProcessFrame();
+                }
+            }
+
+            _emulator.APU.StartAudio();
 
             while (true)
             {
                 if (stopwatch.ElapsedMilliseconds >= Emulator.FrameTime * 1000)
                 {
-                    logFile.WriteLine($"Frame {frames}");
-                    //Console.WriteLine("Tick");
                     stopwatch.Restart();
                     _emulator.ProcessFrame();
-                    frames++;
+                }
+            }*/
 
-                    logFile.Flush();
+            const int primeTarget = 44100 * 2 / 20;
+            const int throttleTarget = 44100 * 2 / 10;
+
+            while (_emulator.APU.SampleProvider.SampleCount < primeTarget)
+            {
+                _emulator.ProcessFrame();
+            }
+
+
+            _emulator.APU.StartAudio();
+
+            while (true)
+            {
+                _emulator.ProcessFrame();
+
+                while (_emulator.APU.SampleProvider.SampleCount > throttleTarget)
+                {
+                    Thread.Sleep(1);
                 }
             }
         });

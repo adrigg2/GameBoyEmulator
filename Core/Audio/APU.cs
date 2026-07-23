@@ -1,6 +1,5 @@
 ﻿using NAudio.Wave;
 using NAudio.CoreAudioApi;
-using System.Printing;
 
 namespace GameBoyEmulator.Core.Audio;
 
@@ -27,7 +26,7 @@ public class APU
     private Channel3 _channel3;
     private Channel4 _channel4;
 
-    private APUSampleProvider _waveProvider;
+    private APUSampleProvider _sampleProvider;
     private WasapiOut _out;
     
     public byte NR50 { get => _nr50; set => _nr50 = value; }
@@ -84,6 +83,8 @@ public class APU
     public Channel3 Channel3 { get => _channel3; }
     public Channel4 Channel4 { get => _channel4; }
 
+    public APUSampleProvider SampleProvider { get => _sampleProvider; }
+
     public APU()
     {
         _channel1 = new();
@@ -92,10 +93,9 @@ public class APU
         _channel4 = new();
 
         var format = WaveFormat.CreateIeeeFloatWaveFormat(44100, 2);
-        _waveProvider = new APUSampleProvider(format);
-        _out = new WasapiOut(AudioClientShareMode.Shared, 50);
-        _out.Init(_waveProvider);
-        _out.Play();
+        _sampleProvider = new APUSampleProvider(format, 70560);
+        _out = new WasapiOut(AudioClientShareMode.Shared, 200);
+        _out.Init(_sampleProvider);
 
         _channel1a = true;
         _channel2a = true;
@@ -147,6 +147,11 @@ public class APU
             _sampleCycles -= CyclesPerSample;
             GenerateSample();
         }
+    }
+
+    public void StartAudio()
+    {
+        _out.Play();
     }
 
     private void GenerateSample()
@@ -206,8 +211,8 @@ public class APU
         left *= 0.1f;
         right *= 0.1f;
 
-        _waveProvider.WriteSample(left);
-        _waveProvider.WriteSample(right);
+        _sampleProvider.WriteSample(left);
+        _sampleProvider.WriteSample(right);
     }
 
     private float HighPass(float input, ref float capacitor)

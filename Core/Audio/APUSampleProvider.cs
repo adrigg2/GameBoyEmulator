@@ -5,22 +5,20 @@ namespace GameBoyEmulator.Core.Audio;
 
 public class APUSampleProvider : ISampleProvider
 {
-    private readonly ConcurrentQueue<float> _ringBuffer;
+    private readonly RingBuffer _ringBuffer;
     public WaveFormat WaveFormat { get; }
 
-    public APUSampleProvider(WaveFormat waveFormat)
+    public int SampleCount { get => _ringBuffer.Count; }
+
+    public APUSampleProvider(WaveFormat waveFormat, int capacity)
     {
         WaveFormat = waveFormat;
-        _ringBuffer = new();
+        _ringBuffer = new(capacity);
     }
 
     public int Read(float[] buffer, int offset, int count)
     {
-        int written = 0;
-        while (written < count && _ringBuffer.TryDequeue(out float sample))
-        {
-            buffer[offset + written++] = sample;
-        }
+        int written = _ringBuffer.Read(buffer, offset, count);
 
         while (written < count)
         {
@@ -31,6 +29,6 @@ public class APUSampleProvider : ISampleProvider
 
     public void WriteSample(float sample)
     {
-        _ringBuffer.Enqueue(sample);
+        _ringBuffer.Write(sample);
     }
 }

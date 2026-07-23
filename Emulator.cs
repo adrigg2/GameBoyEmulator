@@ -22,6 +22,7 @@ public class Emulator
 
     public PPU PPU { get => _ppu; }
     public JOYPAD JOYPAD { get => _joypad; }
+    public APU APU { get => _apu; }
 
     public Emulator(string rom, string bootRom, Dispatcher windowDispatcher)
     {
