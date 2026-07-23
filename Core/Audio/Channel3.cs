@@ -38,7 +38,14 @@ public class Channel3
             }
         }
     }
-    public byte NR31 { set => _nr31 = value; }
+    public byte NR31
+    {
+        set
+        {
+            _nr31 = value;
+            _lengthTimer = _nr31;
+        }
+    }
     public byte NR32 { get => _nr32; set => _nr32 = value; }
     public byte NR33 { set => _nr33 = value; }
     public byte NR34
@@ -107,7 +114,7 @@ public class Channel3
         _periodDiv += cycles / 2;
         if (_periodDiv > 0x7FF)
         {
-            cycles = _periodDiv - 0x7FF;
+            cycles = _periodDiv - 0x800;
             _periodDiv = _nr33 | ((_nr34 & 0x07) << 8);
             _periodDiv += cycles;
             _waveIndex = ++_waveIndex % 32;

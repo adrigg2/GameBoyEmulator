@@ -33,7 +33,15 @@ public class Channel1
     private bool _sweepEnabled;
 
     public byte NR10 { get => _nr10; set => _nr10 = value; }
-    public byte NR11 { get => (byte)(_nr11 & 0xC0); set => _nr11 = value; }
+    public byte NR11 
+    {
+        get => (byte)(_nr11 & 0xC0);
+        set
+        {
+            _nr11 = value;
+            _lengthTimer = _nr11 & 0x3F;
+        }
+    }
     public byte NR12
     {
         get => _nr12;
@@ -72,6 +80,7 @@ public class Channel1
                 _volume = (_nr12 & 0xF0) >> 4;
                 _envSweepPace = _nr12 & 0x7;
                 _envDir = (_nr12 & 0x8) > 0;
+                _envSweepCounter = 0;
 
                 int step = _nr10 & 0x07;
                 int pace = (_nr10 & 0x70) >> 4;
@@ -106,7 +115,7 @@ public class Channel1
         _periodDiv += cycles / 4;
         if (_periodDiv > 0x7FF)
         {
-            cycles = _periodDiv - 0x7FF;
+            cycles = _periodDiv - 0x800;
             _periodDiv = _nr13 | ((_nr14 & 0x07) << 8);
             _periodDiv += cycles;
             _sampleIndex = ++_sampleIndex % 8;
@@ -135,27 +144,35 @@ public class Channel1
             return;
         }
 
-        int period = FrequencyCalculation();
+        //if (_currentPace == 0)
+        //{
+        //    int pace = (_nr10 & 0x70) >> 4;
+        //    _sweepCounter = 0;
+        //    _currentPace = pace == 0 ? 8 : pace;
+        //}
+        _sweepCounter++;
 
-        if (_currentPace == 0)
+        if (_sweepCounter < _currentPace)
         {
-            _sweepCounter = 0;
-            _currentPace = (_nr10 & 0x70) >> 4;
+            return;
         }
 
-        _sweepCounter++;
-        if (_sweepCounter >= _currentPace)
-        {
-            _sweepCounter = 0;
-            _currentPace = (_nr10 & 0x70) >> 4;
+        _sweepCounter = 0;
+        int pace = (_nr10 & 0x70) >> 4;
+        _currentPace = pace == 0 ? 8 : pace;
 
+        int period = FrequencyCalculation();
+        int step = _nr10 & 0x07;
+
+        if (period <= 0x7FF && step != 0)
+        {
             _nr13 = (byte)(period & 0xFF);
             _nr14 = (byte)(_nr14 & ~(0x7));
             _nr14 = (byte)(_nr14 | ((period >> 8) & 0x7));
             _sweepFrequency = period;
-
-            FrequencyCalculation();
         }
+
+        FrequencyCalculation();
     }
 
     public void LengthTimer()
@@ -186,11 +203,11 @@ public class Channel1
         _envSweepCounter++;
         if (_envSweepCounter >= _envSweepPace)
         {
-            if (_envDir && _volume > 0)
+            if (!_envDir && _volume > 0)
             {
                 _volume--;
             }
-            else if (!_envDir && _volume < 0xF)
+            else if (_envDir && _volume < 0xF)
             {
                 _volume++;
             }

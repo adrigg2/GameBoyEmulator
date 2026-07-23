@@ -13,6 +13,8 @@ public class APU
     private byte _nr51;
     private byte _nr52;
 
+    private int _oldDivApu;
+
     private float _sampleCycles;
     private float _capacitorL, _capacitorR;
 
@@ -93,7 +95,6 @@ public class APU
         _waveProvider = new APUSampleProvider(format);
         _out = new WasapiOut(AudioClientShareMode.Shared, 50);
         _out.Init(_waveProvider);
-        _out.Volume = 0.04f;
         _out.Play();
 
         _channel1a = true;
@@ -111,24 +112,29 @@ public class APU
 
         _sampleCycles += cycles;
 
-        if (divApuCounter % 2 == 0)
+        if (divApuCounter != _oldDivApu)
         {
-            _channel1.LengthTimer();
-            _channel2.LengthTimer();
-            _channel3.LengthTimer();
-            _channel4.LengthTimer();
-        }
+            if (divApuCounter % 2 == 0)
+            {
+                _channel1.LengthTimer();
+                _channel2.LengthTimer();
+                _channel3.LengthTimer();
+                _channel4.LengthTimer();
+            }
 
-        if (divApuCounter % 4 == 0)
-        {
-            _channel1.FrequencySweep();
-        }
+            if (divApuCounter % 4 == 0)
+            {
+                _channel1.FrequencySweep();
+            }
 
-        if (divApuCounter % 8 == 0)
-        {
-            _channel1.EnvelopeSweep();
-            _channel2.EnvelopeSweep();
-            _channel4.EnvelopeSweep();
+            if (divApuCounter % 8 == 0)
+            {
+                _channel1.EnvelopeSweep();
+                _channel2.EnvelopeSweep();
+                _channel4.EnvelopeSweep();
+            }
+
+            _oldDivApu = divApuCounter;
         }
 
         _channel1.Tick(cycles);
@@ -196,6 +202,9 @@ public class APU
 
         left = HighPass(left, ref _capacitorL);
         right = HighPass(right, ref _capacitorR);
+
+        left *= 0.1f;
+        right *= 0.1f;
 
         _waveProvider.WriteSample(left);
         _waveProvider.WriteSample(right);

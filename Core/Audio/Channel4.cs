@@ -22,7 +22,14 @@ public class Channel4
     private bool _dacActive;
     private bool _envDir;
 
-    public byte NR41 { set => _nr41 = value; }
+    public byte NR41
+    {
+        set
+        {
+            _nr41 = value;
+            _lengthTimer = _nr41 & 0x3F;
+        }
+    }
     public byte NR42
     {
         get => _nr42;
@@ -61,6 +68,7 @@ public class Channel4
                 _volume = (_nr42 & 0xF0) >> 4;
                 _envSweepPace = _nr42 & 0x7;
                 _envDir = (_nr42 & 0x8) > 0;
+                _envSweepCounter = 0;
                 _lsfr = 0;
             }
         }
@@ -135,11 +143,11 @@ public class Channel4
         _envSweepCounter++;
         if (_envSweepCounter >= _envSweepPace)
         {
-            if (_envDir && _volume > 0)
+            if (!_envDir && _volume > 0)
             {
                 _volume--;
             }
-            else if (!_envDir && _volume < 0xF)
+            else if (_envDir && _volume < 0xF)
             {
                 _volume++;
             }

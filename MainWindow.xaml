@@ -9,9 +9,19 @@
         ContentRendered="Tick"
         KeyDown="Window_KeyDown"
         KeyUp="Window_KeyUp">
-    <Grid Background="Black">
-        <Image x:Name="Screen" HorizontalAlignment="Center" Height="144" Margin="0,0,0,0" VerticalAlignment="Center" Width="160" RenderTransformOrigin="0.5,0.5" RenderOptions.BitmapScalingMode="NearestNeighbor" Stretch="Uniform">
-        </Image>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open ROM"></MenuItem>
+            </MenuItem>
+            <MenuItem Header="_Options">
+                
+            </MenuItem>
+        </Menu>
+        <Grid Background="Black">
+            <Image x:Name="Screen" HorizontalAlignment="Center" Height="144" Margin="0,0,0,0" VerticalAlignment="Center" Width="160" RenderTransformOrigin="0.5,0.5" RenderOptions.BitmapScalingMode="NearestNeighbor" Stretch="Uniform">
+            </Image>
 
-    </Grid>
+        </Grid>
+    </DockPanel>
 </Window>

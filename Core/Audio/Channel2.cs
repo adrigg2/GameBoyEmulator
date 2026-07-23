@@ -27,7 +27,15 @@ public class Channel2
     private bool _dacActive;
     private bool _envDir;
 
-    public byte NR21 { get => (byte)(_nr21 & 0xC0); set => _nr21 = value; }
+    public byte NR21 
+    {
+        get => (byte)(_nr21 & 0xC0);
+        set
+        {
+            _nr21 = value;
+            _lengthTimer = _nr21 & 0x3F;
+        }
+    }
     public byte NR22
     {
         get => _nr22;
@@ -55,11 +63,17 @@ public class Channel2
             if ((_nr24 & 0x80) != 0)
             {
                 Active = true;
-                _lengthTimer = _nr21 & 0x3F;
+
+                if (_lengthTimer >= 64)
+                {
+                    _lengthTimer = _nr21 & 0x3F;
+                }
+
                 _periodDiv = _nr23 | ((_nr24 & 0x07) << 8);
                 _volume = (_nr22 & 0xF0) >> 4;
                 _envSweepPace = _nr22 & 0x7;
                 _envDir = (_nr22 & 0x8) > 0;
+                _envSweepCounter = 0;
             }
         }
     }
@@ -85,7 +99,7 @@ public class Channel2
         _periodDiv += cycles / 4;
         if (_periodDiv > 0x7FF)
         {
-            cycles = _periodDiv - 0x7FF;
+            cycles = _periodDiv - 0x800;
             _periodDiv = _nr23 | ((_nr24 & 0x07) << 8);
             _periodDiv += cycles;
             _sampleIndex = ++_sampleIndex % 8;
@@ -133,11 +147,11 @@ public class Channel2
         _envSweepCounter++;
         if (_envSweepCounter >= _envSweepPace)
         {
-            if (_envDir && _volume > 0)
+            if (!_envDir && _volume > 0)
             {
                 _volume--;
             }
-            else if (!_envDir && _volume < 0xF)
+            else if (_envDir && _volume < 0xF)
             {
                 _volume++;
             }
