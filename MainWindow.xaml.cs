@@ -15,6 +15,8 @@ public partial class MainWindow : Window
     const int GbWidth = 160;
     const int GbHeight = 144;
 
+    private bool _turboMode;
+    
     private Emulator _emulator;
 
     public MainWindow(string[] args)
@@ -69,7 +71,7 @@ public partial class MainWindow : Window
             {
                 _emulator.ProcessFrame();
 
-                while (_emulator.APU.SampleProvider.SampleCount > throttleTarget)
+                while (_emulator.APU.SampleProvider.SampleCount > throttleTarget && !_turboMode)
                 {
                     Thread.Sleep(1);
                 }
@@ -79,11 +81,21 @@ public partial class MainWindow : Window
 
     private void Window_KeyDown(object sender, KeyEventArgs e)
     {
+        if (e.Key == Key.Space)
+        {
+            _turboMode = true;
+        }
+
         _emulator.JOYPAD.HandleKeyDown(e.Key);
     }
 
     private void Window_KeyUp(object sender, KeyEventArgs e)
     {
+        if (e.Key == Key.Space)
+        {
+            _turboMode = false;
+        }
+
         _emulator.JOYPAD.HandleKeyUp(e.Key);
     }
 

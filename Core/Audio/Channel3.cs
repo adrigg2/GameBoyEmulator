@@ -122,8 +122,15 @@ public class Channel3
             _waveBuffer = _waveIndex % 2 == 0 ? waveByte >> 4 : waveByte & 0x0F;
         }
 
-        int digitalSignal = _waveBuffer >> _volume;
-        _output = (-2.0f * digitalSignal / 15.0f) + 1.0f;
+        if (_volume != 0)
+        {
+            int digitalSignal = _waveBuffer >> (_volume - 1);
+            _output = (-2.0f * digitalSignal / 15.0f) + 1.0f;
+        }
+        else
+        {
+            _output = 1;
+        }
     }
 
     public void LengthTimer()
