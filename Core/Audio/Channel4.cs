@@ -21,6 +21,7 @@ public class Channel4
     private bool _active;
     private bool _dacActive;
     private bool _envDir;
+    private bool _envFinished;
 
     public byte NR41
     {
@@ -36,6 +37,7 @@ public class Channel4
         set
         {
             _nr42 = value;
+
             if ((_nr42 & 0xF8) == 0)
             {
                 _active = false;
@@ -69,6 +71,7 @@ public class Channel4
                 _envSweepPace = _nr42 & 0x7;
                 _envDir = (_nr42 & 0x8) > 0;
                 _envSweepCounter = 0;
+                _envFinished = false;
                 _lsfr = 0;
             }
         }
@@ -151,6 +154,10 @@ public class Channel4
             {
                 _volume++;
             }
+            else
+            {
+                _envFinished = true;
+            }
 
             _envSweepCounter = 0;
         }
@@ -185,6 +192,8 @@ public class Channel4
             _lsfr = (ushort)(_lsfr & ~0x80);
             _lsfr = (ushort)(_lsfr | (bitToWrite << 7));
         }
+
+        _lsfr >>= 1;
 
         return _lsfr & 0x1;
     }

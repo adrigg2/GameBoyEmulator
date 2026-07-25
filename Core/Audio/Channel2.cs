@@ -26,6 +26,7 @@ public class Channel2
     private bool _active;
     private bool _dacActive;
     private bool _envDir;
+    private bool _envFinished;
 
     public byte NR21 
     {
@@ -42,6 +43,7 @@ public class Channel2
         set
         {
             _nr22 = value;
+
             if ((_nr22 & 0xF8) == 0)
             {
                 _active = false;
@@ -74,6 +76,7 @@ public class Channel2
                 _envSweepPace = _nr22 & 0x7;
                 _envDir = (_nr22 & 0x8) > 0;
                 _envSweepCounter = 0;
+                _envFinished = false;
             }
         }
     }
@@ -154,6 +157,10 @@ public class Channel2
             else if (_envDir && _volume < 0xF)
             {
                 _volume++;
+            }
+            else
+            {
+                _envFinished = true;
             }
 
             _envSweepCounter = 0;

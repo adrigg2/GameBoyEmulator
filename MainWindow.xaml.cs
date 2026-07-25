@@ -56,12 +56,17 @@ public partial class MainWindow : Window
                 }
             }*/
 
+            int frames = 0;
+
             const int primeTarget = 44100 * 2 / 20;
             const int throttleTarget = 44100 * 2 / 10;
+
+            Stopwatch stopwatch = Stopwatch.StartNew();
 
             while (_emulator.APU.SampleProvider.SampleCount < primeTarget)
             {
                 _emulator.ProcessFrame();
+                frames++;
             }
 
 
@@ -70,10 +75,18 @@ public partial class MainWindow : Window
             while (true)
             {
                 _emulator.ProcessFrame();
+                frames++;
 
                 while (_emulator.APU.SampleProvider.SampleCount > throttleTarget && !_turboMode)
                 {
                     Thread.Sleep(1);
+                }
+
+                if (stopwatch.ElapsedMilliseconds >= 60 * 1000)
+                {
+                    Console.WriteLine(frames / (stopwatch.ElapsedMilliseconds / 1000.0f));
+                    frames = 0;
+                    stopwatch.Restart();
                 }
             }
         });

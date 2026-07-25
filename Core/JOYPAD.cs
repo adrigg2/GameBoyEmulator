@@ -35,8 +35,6 @@ public class JOYPAD
             }
         }
 
-        if (_oldButtons != _buttons) { Console.WriteLine($"{_joyp:X2}"); }
-        if (_oldPad != _pad) { Console.WriteLine($"{_joyp:X2}"); }
         _oldPad = _pad;
         _oldButtons = _buttons;
     }

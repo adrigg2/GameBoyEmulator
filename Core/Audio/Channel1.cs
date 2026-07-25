@@ -31,6 +31,7 @@ public class Channel1
     private bool _dacActive;
     private bool _envDir;
     private bool _sweepEnabled;
+    private bool _envFinished;
 
     public byte NR10 { get => _nr10; set => _nr10 = value; }
     public byte NR11 
@@ -48,6 +49,7 @@ public class Channel1
         set
         {
             _nr12 = value;
+
             if ((_nr12 & 0xF8) == 0)
             {
                 _active = false;
@@ -81,6 +83,7 @@ public class Channel1
                 _envSweepPace = _nr12 & 0x7;
                 _envDir = (_nr12 & 0x8) > 0;
                 _envSweepCounter = 0;
+                _envFinished = false;
 
                 int step = _nr10 & 0x07;
                 int pace = (_nr10 & 0x70) >> 4;
@@ -195,7 +198,7 @@ public class Channel1
 
     public void EnvelopeSweep()
     {
-        if (!Active || _envSweepPace == 0)
+        if (!Active || _envSweepPace == 0 || _envFinished)
         {
             return;
         }
@@ -207,9 +210,13 @@ public class Channel1
             {
                 _volume--;
             }
-            else if (_envDir && _volume < 0xF)
+            else if (_envDir && _volume < 0x0F)
             {
                 _volume++;
+            }
+            else
+            {
+                _envFinished = true;
             }
 
             _envSweepCounter = 0;
