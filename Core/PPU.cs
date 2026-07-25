@@ -1,10 +1,7 @@
-﻿using System.Drawing;
-using System.IO;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using System.Xaml;
 
 namespace GameBoyEmulator.Core;
 
@@ -63,7 +60,13 @@ public class PPU
 
     public PPU(Dispatcher windowDispatcher)
     {
-        _screenImage = new WriteableBitmap(ScreenWidth, ScreenHeigth, 96, 96, PixelFormats.Gray2, null);
+        Color color0 = Color.FromRgb(136, 240, 0);  // 155, 188, 15
+        Color color1 = Color.FromRgb(32, 152, 96);  // 139, 172, 15
+        Color color2 = Color.FromRgb(64, 128, 16);  // 48,  98,  48
+        Color color3 = Color.FromRgb(8, 72, 0);     // 15,  56,  15
+
+        BitmapPalette palette = new([color0, color1, color2, color3]);
+        _screenImage = new WriteableBitmap(ScreenWidth, ScreenHeigth, 96, 96, PixelFormats.Indexed2, palette);
         int stride = (ScreenWidth + 3) / 4;
         int totalBytes = ScreenHeigth * stride;
         byte[] pixels = Enumerable.Repeat((byte)0xFF, totalBytes).ToArray();
@@ -237,6 +240,16 @@ public class PPU
     {
         byte WX = _wx >= 7 ? (byte)(_wx - 7) : (byte)0;
 
+        byte wxOffset = 0;
+        if (_wx == 0)
+        {
+            wxOffset = (byte)(_scx % 8);
+        }
+        else if (WX == 0)
+        {
+            wxOffset = (byte)(7 - _wx);
+        }
+
         byte tileDataLow = 0;
         byte tileDataHigh = 0;
         bool isWindow = false;
@@ -258,8 +271,8 @@ public class PPU
                 tileMapAddress = (_lcdc & 0x08) != 0 ? (ushort)0x9C00 : (ushort)0x9800;
             }
 
-            byte x = isWindow ? (byte)(i - WX) : (byte)(i + _scx);
-            if ((i & 0x7) == 0 || ((i + _scx) & 0x7) == 0)
+            byte x = isWindow ? (byte)(i - WX + wxOffset) : (byte)(i + _scx);
+            if ((i & 0x7) == 0 || ((i + _scx) & 0x7) == 0 || ((i - WX + wxOffset) & 0x7) == 0)
             {
                 ushort tileCol = (ushort)(x / 8);
                 ushort tileIndex = (ushort)(tileMapAddress + tileRow + tileCol);
@@ -284,7 +297,6 @@ public class PPU
             int colorIdHigh = (tileDataHigh & colorBit) != 0 ? 2 : 0;
             int colorId = colorIdLow + colorIdHigh;
             int color = (_bgp >> (colorId * 2)) & 0x3;
-            color = ~color & 0x3; // Invert the color bits
 
             SetPixel(i, _ly, color);
             _bgColorIds[i] = (byte)colorId;
@@ -351,7 +363,6 @@ public class PPU
                         objX = x;
                         byte OBP = palette > 0 ? _obp1 : _obp0;
                         int color = (OBP >> (colorId * 2)) & 0x3;
-                        color = ~color & 0x3; // Invert the color bits
 
                         SetObjectPixel(i, _ly, color);
                     }

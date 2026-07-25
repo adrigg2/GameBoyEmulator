@@ -16,6 +16,7 @@ public partial class MainWindow : Window
     const int GbHeight = 144;
 
     private bool _turboMode;
+    private bool _closed;
     
     private Emulator _emulator;
 
@@ -27,6 +28,8 @@ public partial class MainWindow : Window
         _emulator.PPU.SetWindowSource(this); // TODO: Consider transfering logic to the main window
 
         SizeChanged += (_, _) => UpdateScale();
+
+        Closed += (_, _) => _closed = true;
     }
 
     private void Tick(object? sender, EventArgs e)
@@ -72,7 +75,7 @@ public partial class MainWindow : Window
 
             _emulator.APU.StartAudio();
 
-            while (true)
+            while (!_closed)
             {
                 _emulator.ProcessFrame();
                 frames++;
