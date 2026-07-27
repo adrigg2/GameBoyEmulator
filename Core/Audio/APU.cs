@@ -103,6 +103,26 @@ public class APU
         _channel4a = true;
     }
 
+    //DEBUG
+    public void ToggleChannel(int channel)
+    {
+        switch (channel)
+        {
+            case 1:
+                _channel1a = !_channel1a;
+                break;
+            case 2:
+                _channel2a = !_channel2a;
+                break;
+            case 3:
+                _channel3a = !_channel3a;
+                break;
+            case 4:
+                _channel4a = !_channel4a;
+                break;
+        }
+    }
+
     public void Tick(int cycles, int divApuCounter)
     {
         if (!_active)
@@ -208,8 +228,8 @@ public class APU
         left = HighPass(left, ref _capacitorL);
         right = HighPass(right, ref _capacitorR);
 
-        /*left *= 0.1f;
-        right *= 0.1f;*/
+        left *= 0.2f;
+        right *= 0.2f;
 
         _sampleProvider.WriteSample(left);
         _sampleProvider.WriteSample(right);

@@ -67,6 +67,9 @@ public class JOYPAD
             case Key.L: // SELECT
                 _buttons = (byte)(_buttons & ~0x4);
                 break;
+            case Key.K: // ALL BUTTONS
+                _buttons = 0;
+                break;
         }
     }
 
@@ -97,6 +100,9 @@ public class JOYPAD
                 break;
             case Key.L: // SELECT
                 _buttons |= 0x4;
+                break;
+            case Key.K: // ALL BUTTONS
+                _buttons = 0xF;
                 break;
         }
     }

@@ -25,6 +25,8 @@ public class MMU
     public byte IE { get => _ie; set => _ie = value; }
     public byte IF { get => _if; set => _if = value; }
 
+    public ICartridge Cartridge { get => _cartridge; }
+
     public MMU(DMA dma, JOYPAD joypad, PPU ppu, TIMER timer, APU apu)
     {
         _bootRomMapped = true;

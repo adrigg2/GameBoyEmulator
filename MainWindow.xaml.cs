@@ -92,11 +92,31 @@ public partial class MainWindow : Window
                     stopwatch.Restart();
                 }
             }
+
+            _emulator.MMU.Cartridge.SaveRam();
         });
     }
 
     private void Window_KeyDown(object sender, KeyEventArgs e)
     {
+        //DEBUG
+        if (e.Key == Key.D1)
+        {
+            _emulator.APU.ToggleChannel(1);
+        }
+        else if (e.Key == Key.D2)
+        {
+            _emulator.APU.ToggleChannel(2);
+        }
+        else if (e.Key == Key.D3)
+        {
+            _emulator.APU.ToggleChannel(3);
+        }
+        else if (e.Key == Key.D4)
+        {
+            _emulator.APU.ToggleChannel(4);
+        }
+
         if (e.Key == Key.Space)
         {
             _turboMode = true;

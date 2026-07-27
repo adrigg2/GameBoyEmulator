@@ -12,7 +12,6 @@ public class Channel3
 
     private int _lengthTimer;
     private int _periodDiv;
-    private int _volume;
     private int _waveIndex;
     private int _waveBuffer;
 
@@ -64,7 +63,6 @@ public class Channel3
                 }
 
                 _periodDiv = _nr33 | ((_nr34 & 0x07) << 8);
-                _volume = (_nr32 & 0x60) >> 5;
                 _waveIndex = 0;
             }
         }
@@ -122,15 +120,8 @@ public class Channel3
             _waveBuffer = _waveIndex % 2 == 0 ? waveByte >> 4 : waveByte & 0x0F;
         }
 
-        if (_volume != 0)
-        {
-            int digitalSignal = _waveBuffer >> (_volume - 1);
-            _output = (-2.0f * digitalSignal / 15.0f) + 1.0f;
-        }
-        else
-        {
-            _output = 1;
-        }
+        int digitalSignal = _waveBuffer >> ((((_nr32 & 0x60) >> 5) - 1) & 0x3);
+        _output = (-2.0f * digitalSignal / 15.0f) + 1.0f;
     }
 
     public void LengthTimer()
