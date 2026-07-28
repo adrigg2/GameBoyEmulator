@@ -26,6 +26,7 @@ public class MMU
     public byte IF { get => _if; set => _if = value; }
 
     public ICartridge Cartridge { get => _cartridge; }
+    public byte[] VRAM { get => _vram; }
 
     public MMU(DMA dma, JOYPAD joypad, PPU ppu, TIMER timer, APU apu)
     {

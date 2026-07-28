@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.IO;
+using System.Runtime.Intrinsics.Arm;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -17,6 +18,7 @@ public partial class MainWindow : Window
 
     private bool _turboMode;
     private bool _closed;
+    private bool _paused;
     
     private Emulator _emulator;
 
@@ -25,7 +27,11 @@ public partial class MainWindow : Window
         InitializeComponent();
         Directory.CreateDirectory("./saves/");
         _emulator = new Emulator(args[0], args[1], Dispatcher);
-        _emulator.PPU.SetWindowSource(this); // TODO: Consider transfering logic to the main window
+        _emulator.PPU.SetWindowSource(this);
+
+        string romName = args[0].Split('\\').Last();
+        romName = romName[..^3];
+        Title = romName; // TODO: Improve this
 
         SizeChanged += (_, _) => UpdateScale();
 
@@ -80,7 +86,7 @@ public partial class MainWindow : Window
                 _emulator.ProcessFrame();
                 frames++;
 
-                while (_emulator.APU.SampleProvider.SampleCount > throttleTarget && !_turboMode)
+                while ((_emulator.APU.SampleProvider.SampleCount > throttleTarget && !_turboMode) || _paused)
                 {
                     Thread.Sleep(1);
                 }
@@ -120,6 +126,17 @@ public partial class MainWindow : Window
         if (e.Key == Key.Space)
         {
             _turboMode = true;
+        }
+
+        if (e.Key == Key.F1)
+        {
+            _paused = true;
+            var window = new VRAMViewer();
+
+            window.Owner = this;
+            window.RenderVRAM(_emulator.MMU.VRAM);
+            window.ShowDialog();
+            _paused = false;
         }
 
         _emulator.JOYPAD.HandleKeyDown(e.Key);
