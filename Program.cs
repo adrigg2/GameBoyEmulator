@@ -8,9 +8,9 @@ public class Program
     [STAThread]
     public static void Main(string[] args)
     {
-        if (args.Length < 2)
+        if (args.Length < 1)
         {
-            Console.WriteLine("A ROM and Boot ROM filepath should be given as a parameter");
+            Console.WriteLine("A Boot ROM filepath must be given as a parameter");
             return;
         }
         

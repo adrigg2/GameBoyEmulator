@@ -27,29 +27,26 @@ public partial class MainWindow : Window
     private bool _closed;
     private bool _paused;
 
+    private string _bootRomFilePath;
+
     private BitmapPalette _paletteInUse;
     
-    private Emulator _emulator;
+    private Emulator? _emulator;
 
     public MainWindow(string[] args)
     {
         InitializeComponent();
         Directory.CreateDirectory("./saves/");
-        _emulator = new Emulator(args[0], args[1], Dispatcher);
-        _emulator.PPU.SetWindowSource(this);
-
-        string romName = args[0].Split('\\').Last();
-        romName = romName[..^3];
-        Title = romName; // TODO: Improve this
 
         SizeChanged += (_, _) => UpdateScale();
 
         Closed += (_, _) => _closed = true;
 
         _paletteInUse = lcd2;
+        _bootRomFilePath = args[0];
     }
 
-    private void Tick(object? sender, EventArgs e)
+    private void Tick()
     {
         Task.Run(() =>
         {
@@ -227,7 +224,18 @@ public partial class MainWindow : Window
 
         if (result == true)
         {
-            Console.WriteLine(dialog.FileName);
+            string romFilePath = dialog.FileName;
+            if (romFilePath.Split('\\').Last().EndsWith(".gb"))
+            {
+                _emulator = new Emulator(romFilePath, _bootRomFilePath, Dispatcher);
+                _emulator.PPU.SetWindowSource(this);
+
+                string romName = romFilePath.Split('\\').Last();
+                romName = romName[..^3];
+                Title = romName; // TODO: Improve this
+                Tick();
+            }
+
         }
     }
 }

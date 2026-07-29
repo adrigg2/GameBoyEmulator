@@ -6,7 +6,6 @@
         xmlns:local="clr-namespace:GameBoyEmulator"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
-        ContentRendered="Tick"
         KeyDown="Window_KeyDown"
         KeyUp="Window_KeyUp">
     <DockPanel>
