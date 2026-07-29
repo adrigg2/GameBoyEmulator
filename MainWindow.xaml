@@ -12,7 +12,7 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
-                <MenuItem Header="_Open ROM"></MenuItem>
+                <MenuItem Header="_Open ROM" Click="OpenROM"></MenuItem>
             </MenuItem>
             <MenuItem Header="_Options">
                 <MenuItem Header="_Palettes">

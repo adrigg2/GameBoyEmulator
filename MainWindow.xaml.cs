@@ -26,6 +26,8 @@ public partial class MainWindow : Window
     private bool _turboMode;
     private bool _closed;
     private bool _paused;
+
+    private BitmapPalette _paletteInUse;
     
     private Emulator _emulator;
 
@@ -43,6 +45,8 @@ public partial class MainWindow : Window
         SizeChanged += (_, _) => UpdateScale();
 
         Closed += (_, _) => _closed = true;
+
+        _paletteInUse = lcd2;
     }
 
     private void Tick(object? sender, EventArgs e)
@@ -141,7 +145,7 @@ public partial class MainWindow : Window
             var window = new VRAMViewer();
 
             window.Owner = this;
-            window.RenderVRAM(_emulator.MMU.VRAM);
+            window.RenderVRAM(_emulator.MMU.VRAM, _paletteInUse.Colors);
             window.ShowDialog();
             _paused = false;
         }
@@ -179,6 +183,7 @@ public partial class MainWindow : Window
             LCD3.IsChecked = false;
             BaW.IsChecked = false;
             _emulator.PPU.SetBitmapPalette(this, lcd1);
+            _paletteInUse = lcd1;
         }
         else if (sender.Equals(LCD2))
         {
@@ -187,6 +192,7 @@ public partial class MainWindow : Window
             LCD3.IsChecked = false;
             BaW.IsChecked = false;
             _emulator.PPU.SetBitmapPalette(this, lcd2);
+            _paletteInUse = lcd2;
         }
         else if (sender.Equals(LCD3))
         {
@@ -195,6 +201,7 @@ public partial class MainWindow : Window
             LCD3.IsChecked = true;
             BaW.IsChecked = false;
             _emulator.PPU.SetBitmapPalette(this, lcd3);
+            _paletteInUse = lcd3;
         }
         else if (sender.Equals(BaW))
         {
@@ -203,6 +210,24 @@ public partial class MainWindow : Window
             LCD3.IsChecked = false;
             BaW.IsChecked = true;
             _emulator.PPU.SetBitmapPalette(this, baw);
+            _paletteInUse = baw;
+        }
+    }
+
+    private void OpenROM(object sender, RoutedEventArgs e)
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            FileName = "Game",
+            DefaultExt = ".gb",
+            Filter = "GameBoy ROM (.gb)|*.gb"
+        };
+
+        bool? result = dialog.ShowDialog();
+
+        if (result == true)
+        {
+            Console.WriteLine(dialog.FileName);
         }
     }
 }

@@ -15,19 +15,17 @@ public partial class VRAMViewer : Window
         SizeChanged += (_, _) => UpdateScale();
     }
 
-    public void RenderVRAM(byte[] vram)
+    public void RenderVRAM(byte[] vram, IList<Color> colorsInUse)
     {
-        Color color0 = Color.FromRgb(136, 240, 0);  // 155, 188, 15
-        Color color1 = Color.FromRgb(32, 152, 96);  // 139, 172, 15
-        Color color2 = Color.FromRgb(64, 128, 16);  // 48,  98,  48
-        Color color3 = Color.FromRgb(8, 72, 0);     // 15,  56,  15
-        Color color4 = Color.FromRgb(0, 0, 0);
+        List<Color> colors = [.. colorsInUse];
+        colors.Add(Color.FromRgb(255, 255, 255));
+        colors.Add(Color.FromRgb(0, 0, 255));
 
-        BitmapPalette palette = new([color0, color1, color2, color3, color4]);
+        BitmapPalette palette = new(colors);
         WriteableBitmap screenImage = new((int)Screen.Width, (int)Screen.Height, 96, 96, PixelFormats.Indexed8, palette);
         int stride = (int)Screen.Width;
         int totalBytes = (int)Screen.Height * stride;
-        byte[] pixels = [.. Enumerable.Repeat((byte)5, totalBytes)];
+        byte[] pixels = [.. Enumerable.Repeat((byte)4, totalBytes)];
         Screen.Source = screenImage;
 
         int offsetX = 0;
@@ -50,7 +48,7 @@ public partial class VRAMViewer : Window
 
             if (offsetX + 9 < Screen.Width)
             {
-                pixels[(y + offsetY) * (int)Screen.Width + offsetX + 8] = 5;
+                pixels[(y + offsetY) * (int)Screen.Width + offsetX + 8] = 4;
             }
 
             y++;
@@ -65,6 +63,14 @@ public partial class VRAMViewer : Window
                 y = 0;
                 offsetY += 9;
                 offsetX = 0;
+
+                if (offsetY / 9 == 8 || offsetY / 9 == 16)
+                {
+                    for (int j = 0; j < Screen.Width; j++)
+                    {
+                        pixels[(offsetY - 1) * (int)Screen.Width + j] = 5;
+                    }
+                }
             }
         }
 
