@@ -149,7 +149,15 @@ public class PPU
                     if (_ly == ScreenHeigth)
                     {
                         ChangeMode(VBlank);
-                        _windowDispatcher.Invoke(UpdateScreen); // NOTE: Consider transferring logic to the main window
+
+                        byte[] bufferCopy = (byte[])_screenBuffer.Clone();
+                        _windowDispatcher.BeginInvoke(() =>
+                        {
+                            int stride = (ScreenWidth + 3) / 4;
+                            _screenImage.WritePixels(new Int32Rect(0, 0, ScreenWidth, ScreenHeigth), bufferCopy, stride, 0);
+                        });
+                        Array.Clear(_screenBuffer);
+                        _windowY = 0;
                         mmu.IF |= 0x1;
                     }
                     else
@@ -389,13 +397,5 @@ public class PPU
 
         _screenBuffer[index] &= (byte)~(0x3 << colorShift);
         _screenBuffer[index] |= (byte)(color << colorShift);
-    }
-
-    private void UpdateScreen()
-    {
-        int stride = (ScreenWidth + 3) / 4;
-        _screenImage.WritePixels(new Int32Rect(0, 0, ScreenWidth, ScreenHeigth), _screenBuffer, stride, 0);
-        Array.Clear(_screenBuffer);
-        _windowY = 0;
     }
 }

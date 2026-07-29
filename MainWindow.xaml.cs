@@ -6,7 +6,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Threading;
 
 namespace GameBoyEmulator;
 
@@ -24,7 +23,6 @@ public partial class MainWindow : Window
     readonly BitmapPalette baw = new([Color.FromRgb(255, 255, 255), Color.FromRgb(170, 170, 170), Color.FromRgb(85, 85, 85), Color.FromRgb(0, 0, 0)]);
 
     private bool _turboMode;
-    private bool _closed;
     private bool _paused;
 
     private string _bootRomFilePath;
@@ -33,6 +31,9 @@ public partial class MainWindow : Window
     
     private Emulator? _emulator;
 
+    private Thread? _emulatorThread;
+    private CancellationTokenSource? _cts;
+
     public MainWindow(string[] args)
     {
         InitializeComponent();
@@ -40,75 +41,54 @@ public partial class MainWindow : Window
 
         SizeChanged += (_, _) => UpdateScale();
 
-        Closed += (_, _) => _closed = true;
+        Closed += (_, _) => _cts?.Cancel();
 
         _paletteInUse = lcd2;
         _bootRomFilePath = args[0];
     }
 
-    private void Tick()
+    private void Tick(CancellationToken token)
     {
-        Task.Run(() =>
+        int frames = 0;
+
+        const int primeTarget = 44100 * 2 / 20;
+        const int throttleTarget = 44100 * 2 / 10;
+
+        Stopwatch stopwatch = Stopwatch.StartNew();
+
+        if (_emulator == null)
         {
-            /*var stopwatch = Stopwatch.StartNew();
+            return;
+        }
+
+        while (_emulator.APU.SampleProvider.SampleCount < primeTarget)
+        {
             _emulator.ProcessFrame();
+            frames++;
+        }
 
-            while (_emulator.APU.SampleProvider.SampleCount < 44100 * 2 / 20)
+
+        _emulator.APU.StartAudio();
+
+        while (!token.IsCancellationRequested)
+        {
+            _emulator.ProcessFrame();
+            frames++;
+
+            while ((_emulator.APU.SampleProvider.SampleCount > throttleTarget && !_turboMode) || _paused)
             {
-                if (stopwatch.ElapsedMilliseconds >= Emulator.FrameTime * 1000)
-                {
-                    stopwatch.Restart();
-                    _emulator.ProcessFrame();
-                }
+                Thread.Sleep(1);
             }
 
-            _emulator.APU.StartAudio();
-
-            while (true)
+            if (stopwatch.ElapsedMilliseconds >= 60 * 1000)
             {
-                if (stopwatch.ElapsedMilliseconds >= Emulator.FrameTime * 1000)
-                {
-                    stopwatch.Restart();
-                    _emulator.ProcessFrame();
-                }
-            }*/
-
-            int frames = 0;
-
-            const int primeTarget = 44100 * 2 / 20;
-            const int throttleTarget = 44100 * 2 / 10;
-
-            Stopwatch stopwatch = Stopwatch.StartNew();
-
-            while (_emulator.APU.SampleProvider.SampleCount < primeTarget)
-            {
-                _emulator.ProcessFrame();
-                frames++;
+                Console.WriteLine(frames / (stopwatch.ElapsedMilliseconds / 1000.0f));
+                frames = 0;
+                stopwatch.Restart();
             }
+        }
 
-
-            _emulator.APU.StartAudio();
-
-            while (!_closed)
-            {
-                _emulator.ProcessFrame();
-                frames++;
-
-                while ((_emulator.APU.SampleProvider.SampleCount > throttleTarget && !_turboMode) || _paused)
-                {
-                    Thread.Sleep(1);
-                }
-
-                if (stopwatch.ElapsedMilliseconds >= 60 * 1000)
-                {
-                    Console.WriteLine(frames / (stopwatch.ElapsedMilliseconds / 1000.0f));
-                    frames = 0;
-                    stopwatch.Restart();
-                }
-            }
-
-            _emulator.MMU.Cartridge.SaveRam();
-        });
+        _emulator.MMU.Cartridge.SaveRam();
     }
 
     private void Window_KeyDown(object sender, KeyEventArgs e)
@@ -116,19 +96,19 @@ public partial class MainWindow : Window
         //DEBUG
         if (e.Key == Key.D1)
         {
-            _emulator.APU.ToggleChannel(1);
+            _emulator?.APU.ToggleChannel(1);
         }
         else if (e.Key == Key.D2)
         {
-            _emulator.APU.ToggleChannel(2);
+            _emulator?.APU.ToggleChannel(2);
         }
         else if (e.Key == Key.D3)
         {
-            _emulator.APU.ToggleChannel(3);
+            _emulator?.APU.ToggleChannel(3);
         }
         else if (e.Key == Key.D4)
         {
-            _emulator.APU.ToggleChannel(4);
+            _emulator?.APU.ToggleChannel(4);
         }
 
         if (e.Key == Key.Space)
@@ -139,15 +119,16 @@ public partial class MainWindow : Window
         if (e.Key == Key.F1)
         {
             _paused = true;
-            var window = new VRAMViewer();
-
-            window.Owner = this;
-            window.RenderVRAM(_emulator.MMU.VRAM, _paletteInUse.Colors);
+            var window = new VRAMViewer
+            {
+                Owner = this
+            };
+            window.RenderVRAM(_emulator?.MMU.VRAM ?? new byte[0x2000], _paletteInUse.Colors);
             window.ShowDialog();
             _paused = false;
         }
 
-        _emulator.JOYPAD.HandleKeyDown(e.Key);
+        _emulator?.JOYPAD.HandleKeyDown(e.Key);
     }
 
     private void Window_KeyUp(object sender, KeyEventArgs e)
@@ -157,7 +138,7 @@ public partial class MainWindow : Window
             _turboMode = false;
         }
 
-        _emulator.JOYPAD.HandleKeyUp(e.Key);
+        _emulator?.JOYPAD.HandleKeyUp(e.Key);
     }
 
     private void UpdateScale()
@@ -179,7 +160,7 @@ public partial class MainWindow : Window
             LCD2.IsChecked = false;
             LCD3.IsChecked = false;
             BaW.IsChecked = false;
-            _emulator.PPU.SetBitmapPalette(this, lcd1);
+            _emulator?.PPU.SetBitmapPalette(this, lcd1);
             _paletteInUse = lcd1;
         }
         else if (sender.Equals(LCD2))
@@ -188,7 +169,7 @@ public partial class MainWindow : Window
             LCD2.IsChecked = true;
             LCD3.IsChecked = false;
             BaW.IsChecked = false;
-            _emulator.PPU.SetBitmapPalette(this, lcd2);
+            _emulator?.PPU.SetBitmapPalette(this, lcd2);
             _paletteInUse = lcd2;
         }
         else if (sender.Equals(LCD3))
@@ -197,7 +178,7 @@ public partial class MainWindow : Window
             LCD2.IsChecked = false;
             LCD3.IsChecked = true;
             BaW.IsChecked = false;
-            _emulator.PPU.SetBitmapPalette(this, lcd3);
+            _emulator?.PPU.SetBitmapPalette(this, lcd3);
             _paletteInUse = lcd3;
         }
         else if (sender.Equals(BaW))
@@ -206,7 +187,7 @@ public partial class MainWindow : Window
             LCD2.IsChecked = false;
             LCD3.IsChecked = false;
             BaW.IsChecked = true;
-            _emulator.PPU.SetBitmapPalette(this, baw);
+            _emulator?.PPU.SetBitmapPalette(this, baw);
             _paletteInUse = baw;
         }
     }
@@ -227,13 +208,24 @@ public partial class MainWindow : Window
             string romFilePath = dialog.FileName;
             if (romFilePath.Split('\\').Last().EndsWith(".gb"))
             {
+                _cts?.Cancel();
+
+                if (_emulatorThread?.IsAlive == true)
+                {
+                    _emulatorThread.Join();
+                }
+
                 _emulator = new Emulator(romFilePath, _bootRomFilePath, Dispatcher);
-                _emulator.PPU.SetWindowSource(this);
+                _emulator?.PPU.SetWindowSource(this);
+                _emulator?.PPU.SetBitmapPalette(this, _paletteInUse);
 
                 string romName = romFilePath.Split('\\').Last();
                 romName = romName[..^3];
-                Title = romName; // TODO: Improve this
-                Tick();
+                Title = romName;
+
+                _cts = new CancellationTokenSource();
+                _emulatorThread = new Thread(() => Tick(_cts.Token));
+                _emulatorThread.Start();
             }
 
         }
