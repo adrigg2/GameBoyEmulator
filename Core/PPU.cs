@@ -82,6 +82,12 @@ public class PPU
         window.Screen.Source = _screenImage;
     }
 
+    public void SetBitmapPalette(MainWindow window, BitmapPalette palette)
+    {
+        _screenImage = new(ScreenWidth, ScreenHeigth, 96, 96, PixelFormats.Indexed2, palette);
+        window.Screen.Source = _screenImage;
+    }
+
     public void Update(int cycles, MMU mmu)
     {
         if ((_lcdc & 0x80) == 0)

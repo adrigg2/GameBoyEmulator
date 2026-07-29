@@ -21,7 +21,7 @@ public partial class VRAMViewer : Window
         Color color1 = Color.FromRgb(32, 152, 96);  // 139, 172, 15
         Color color2 = Color.FromRgb(64, 128, 16);  // 48,  98,  48
         Color color3 = Color.FromRgb(8, 72, 0);     // 15,  56,  15
-        Color color4 = Color.FromRgb(255, 255, 255);
+        Color color4 = Color.FromRgb(0, 0, 0);
 
         BitmapPalette palette = new([color0, color1, color2, color3, color4]);
         WriteableBitmap screenImage = new((int)Screen.Width, (int)Screen.Height, 96, 96, PixelFormats.Indexed8, palette);

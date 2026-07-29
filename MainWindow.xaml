@@ -15,7 +15,12 @@
                 <MenuItem Header="_Open ROM"></MenuItem>
             </MenuItem>
             <MenuItem Header="_Options">
-                
+                <MenuItem Header="_Palettes">
+                    <MenuItem x:Name="LCD1" Header="LCD 1" Click="ChangePalette"></MenuItem>
+                    <MenuItem x:Name="LCD2" Header="LCD 2" Click="ChangePalette" IsChecked="True"></MenuItem>
+                    <MenuItem x:Name="LCD3" Header="LCD 3" Click="ChangePalette"></MenuItem>
+                    <MenuItem x:Name="BaW" Header="Black and White" Click="ChangePalette"></MenuItem>
+                </MenuItem>
             </MenuItem>
         </Menu>
         <Grid Background="Black">
