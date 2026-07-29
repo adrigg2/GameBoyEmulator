@@ -116,14 +116,14 @@ public partial class MainWindow : Window
             _turboMode = true;
         }
 
-        if (e.Key == Key.F1)
+        if (e.Key == Key.F1 && _emulator != null)
         {
             _paused = true;
             var window = new VRAMViewer
             {
                 Owner = this
             };
-            window.RenderVRAM(_emulator?.MMU.VRAM ?? new byte[0x2000], _paletteInUse.Colors);
+            window.RenderVRAM(_emulator.MMU.VRAM, _paletteInUse.Colors);
             window.ShowDialog();
             _paused = false;
         }

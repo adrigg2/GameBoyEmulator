@@ -7,7 +7,12 @@
     <Nullable>enable</Nullable>
 	<UseWPF>true</UseWPF>
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	<ApplicationIcon>icons\MainIcon.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="icons\MainIcon.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="NAudio" Version="2.3.0" />
