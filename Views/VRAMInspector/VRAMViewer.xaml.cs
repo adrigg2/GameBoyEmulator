@@ -2,7 +2,7 @@
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace GameBoyEmulator;
+namespace GameBoyEmulator.Views;
 
 /// <summary>
 /// Lógica de interacción para VRAMViewer.xaml

@@ -11,13 +11,24 @@ public class MBC3 : ICartridge
     private readonly byte[]? _sram;
 
     private readonly bool _battery;
+    private readonly bool _hasRTC;
     private bool _ramEnabled;
+    private bool _latchReady;
 
     private string _romName;
 
+    private byte _rtcS;
+    private byte _rtcM;
+    private byte _rtcH;
+    private byte _rtcDL;
+    private byte _rtcDH;
+
     private int _romBank;
     private int _sramBank;
-    private int _rtcRegister;   // TODO: RTC
+    private int _rtcTime;
+
+
+    private DateTime _lastDateTime;
 
     public MBC3(byte[] rom, string cartridgeName)
     {
@@ -40,6 +51,12 @@ public class MBC3 : ICartridge
             }
         }
 
+        if (type == 0x0F || type == 0x10)
+        {
+            _hasRTC = true;
+            _lastDateTime = DateTime.Now;
+        }
+
         _romBank = 1;
 
         if (_battery && File.Exists($"./saves/{_romName}.save"))
@@ -50,9 +67,21 @@ public class MBC3 : ICartridge
 
     public byte ReadRam(ushort address)
     {
-        if (_ramEnabled)
+        if (_ramEnabled && _sramBank <= 0x07)
         {
             return _sram?[(_sramBank * SRamOffset + (address & 0x1FFF)) & (_sram.Length - 1)] ?? 0xFF;
+        }
+        else if (_ramEnabled && _sramBank > 0x07 && _hasRTC)
+        {
+            return _sramBank switch
+            {
+                0x08 => _rtcS,
+                0x09 => _rtcM,
+                0x0A => _rtcH,
+                0x0B => _rtcDL,
+                0x0C => _rtcDH,
+                _ => 0xFF,
+            };
         }
         return 0xFF;
     }
@@ -79,9 +108,30 @@ public class MBC3 : ICartridge
 
     public void WriteRam(ushort address, byte value)
     {
-        if (_ramEnabled && _sram != null)
+        if (_ramEnabled && _sram != null && _sramBank <= 0x07)
         {
             _sram[(_sramBank * SRamOffset + (address & 0x1FFF)) & (_sram.Length - 1)] = value;
+        }
+        else if (_ramEnabled && _sramBank > 0x07 && _hasRTC)
+        {
+            switch (_sramBank)
+            {
+                case 0x08:
+                    _rtcS = value;
+                    break;
+                case 0x09:
+                    _rtcM = value;
+                    break;
+                case 0x0A:
+                    _rtcH = value;
+                    break;
+                case 0x0B:
+                    _rtcDL = value;
+                    break;
+                case 0x0C:
+                    _rtcDH = value;
+                    break;
+            };
         }
     }
 
@@ -105,13 +155,42 @@ public class MBC3 : ICartridge
         }
         else if (address <= 0x5FFF)
         {
-            if (value < 0x07)
+            _sramBank = value & 0x0F;
+        }
+        else if (address <= 0x7FFF)
+        {
+            if (!_hasRTC)
             {
-                _sramBank = value & 0x07;
+                return;
             }
-            else
+
+            if (value == 0)
             {
-                _rtcRegister = value & 0x0F;
+                _latchReady = true;
+            }
+            else if (value == 1 && _latchReady)
+            {
+                _rtcTime += (DateTime.Now - _lastDateTime).Seconds;
+                _lastDateTime = DateTime.Now;
+
+                _rtcS = (byte)(_rtcTime % 60);
+                _rtcM = (byte)(_rtcTime / 60 % 60);
+                _rtcH = (byte)(_rtcTime / 3600 % 24);
+
+                int day = _rtcTime / 3600 / 24;
+                bool overflow = day > 0x1FF;
+                bool previousOverflow = (_rtcDH & 0x80) != 0;
+
+                _rtcDL = (byte)(day & 0xFF);
+                _rtcDH = (byte)((day >> 8) & 0x01);
+                _rtcDH |= (byte)(overflow || previousOverflow ? 0x80 : 0);
+
+                if (overflow)
+                {
+                    _rtcTime -= 0x1FF * 3600 * 24 + 23 * 3600 + 59 * 60 + 59;
+                }
+
+                _latchReady = false;
             }
         }
     }

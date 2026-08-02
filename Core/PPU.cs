@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using GameBoyEmulator.Views;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
