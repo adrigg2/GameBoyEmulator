@@ -25,7 +25,7 @@ public class MBC3 : ICartridge
 
     private int _romBank;
     private int _sramBank;
-    private int _rtcTime;
+    private double _rtcTime;
 
 
     private DateTime _lastDateTime;
@@ -54,14 +54,26 @@ public class MBC3 : ICartridge
         if (type == 0x0F || type == 0x10)
         {
             _hasRTC = true;
-            _lastDateTime = DateTime.Now;
+            _lastDateTime = DateTime.UtcNow;
         }
 
         _romBank = 1;
 
         if (_battery && File.Exists($"./saves/{_romName}.save"))
         {
-            _sram = File.ReadAllBytes($"./saves/{_romName}.save");
+            using BinaryReader reader = new(File.OpenRead($"./saves/{_romName}.save"));
+            if (_sram != null)
+            {
+                int sramLength = reader.ReadInt32();
+                _sram = reader.ReadBytes(sramLength);
+            }
+            _rtcTime = reader.ReadDouble();
+            long serializedDate = reader.ReadInt64();
+            _lastDateTime = DateTime.FromBinary(serializedDate);
+
+            var now = DateTime.UtcNow;
+            _rtcTime += (now - _lastDateTime).TotalSeconds;
+            _lastDateTime = now;
         }
     }
 
@@ -100,9 +112,16 @@ public class MBC3 : ICartridge
 
     public void SaveRam()
     {
-        if (_battery && _sram != null)
+        if (_battery)
         {
-            File.WriteAllBytes($"./saves/{_romName}.save", _sram);
+            using BinaryWriter writer = new(File.OpenWrite($"./saves/{_romName}.save"));
+            if (_sram != null)
+            {
+                writer.Write(_sram.Length);
+                writer.Write(_sram);
+            }
+            writer.Write(_rtcTime);
+            writer.Write(_lastDateTime.ToBinary());
         }
     }
 
@@ -170,14 +189,15 @@ public class MBC3 : ICartridge
             }
             else if (value == 1 && _latchReady)
             {
-                _rtcTime += (DateTime.Now - _lastDateTime).Seconds;
-                _lastDateTime = DateTime.Now;
+                var now = DateTime.UtcNow;
+                _rtcTime += (now - _lastDateTime).TotalSeconds;
+                _lastDateTime = now;
 
                 _rtcS = (byte)(_rtcTime % 60);
                 _rtcM = (byte)(_rtcTime / 60 % 60);
                 _rtcH = (byte)(_rtcTime / 3600 % 24);
 
-                int day = _rtcTime / 3600 / 24;
+                int day = (int)_rtcTime / 3600 / 24;
                 bool overflow = day > 0x1FF;
                 bool previousOverflow = (_rtcDH & 0x80) != 0;
 
@@ -192,6 +212,10 @@ public class MBC3 : ICartridge
 
                 _latchReady = false;
             }
+        }
+        else
+        {
+            _latchReady = false;
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Windows;
-using GameBoyEmulator.Core;
 
 namespace GameBoyEmulator;
 public class Program
@@ -15,7 +14,7 @@ public class Program
         }
         
         var app = new Application();
-        var window = new MainWindow(args);
+        var window = new Views.MainWindow(args);
         app.Run(window);
     }
 }

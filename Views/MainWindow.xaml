@@ -1,4 +1,4 @@
-﻿<Window x:Class="GameBoyEmulator.MainWindow"
+﻿<Window x:Class="GameBoyEmulator.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -15,8 +15,8 @@
             </MenuItem>
             <MenuItem Header="_Options">
                 <MenuItem Header="_Palettes">
-                    <MenuItem x:Name="LCD1" Header="LCD 1" Click="ChangePalette"></MenuItem>
-                    <MenuItem x:Name="LCD2" Header="LCD 2" Click="ChangePalette" IsChecked="True"></MenuItem>
+                    <MenuItem x:Name="LCD1" Header="LCD 1" Click="ChangePalette" IsChecked="True"></MenuItem>
+                    <MenuItem x:Name="LCD2" Header="LCD 2" Click="ChangePalette"></MenuItem>
                     <MenuItem x:Name="LCD3" Header="LCD 3" Click="ChangePalette"></MenuItem>
                     <MenuItem x:Name="BaW" Header="Black and White" Click="ChangePalette"></MenuItem>
                 </MenuItem>

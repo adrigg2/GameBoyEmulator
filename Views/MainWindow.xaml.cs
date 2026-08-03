@@ -119,7 +119,7 @@ public partial class MainWindow : Window
         if (e.Key == Key.F1 && _emulator != null)
         {
             _paused = true;
-            var window = new VRAMViewer
+            var window = new VRAMInspector.VRAMViewer
             {
                 Owner = this
             };
