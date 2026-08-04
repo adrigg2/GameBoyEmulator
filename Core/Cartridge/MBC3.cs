@@ -14,6 +14,7 @@ public class MBC3 : ICartridge
     private readonly bool _hasRTC;
     private bool _ramEnabled;
     private bool _latchReady;
+    private bool _rtcHalted;
 
     private string _romName;
 
@@ -74,6 +75,9 @@ public class MBC3 : ICartridge
             var now = DateTime.UtcNow;
             _rtcTime += (now - _lastDateTime).TotalSeconds;
             _lastDateTime = now;
+
+            _rtcDH = reader.ReadByte();
+            _rtcHalted = (_rtcDH & 0x40) != 0;
         }
     }
 
@@ -122,6 +126,7 @@ public class MBC3 : ICartridge
             }
             writer.Write(_rtcTime);
             writer.Write(_lastDateTime.ToBinary());
+            writer.Write(_rtcDH);
         }
     }
 
@@ -149,6 +154,7 @@ public class MBC3 : ICartridge
                     break;
                 case 0x0C:
                     _rtcDH = value;
+                    _rtcHalted = (_rtcDH & 0x40) != 0;
                     break;
             };
         }
@@ -189,9 +195,12 @@ public class MBC3 : ICartridge
             }
             else if (value == 1 && _latchReady)
             {
-                var now = DateTime.UtcNow;
-                _rtcTime += (now - _lastDateTime).TotalSeconds;
-                _lastDateTime = now;
+                if (!_rtcHalted)
+                {
+                    var now = DateTime.UtcNow;
+                    _rtcTime += (now - _lastDateTime).TotalSeconds;
+                    _lastDateTime = now;
+                }
 
                 _rtcS = (byte)(_rtcTime % 60);
                 _rtcM = (byte)(_rtcTime / 60 % 60);
@@ -202,7 +211,9 @@ public class MBC3 : ICartridge
                 bool previousOverflow = (_rtcDH & 0x80) != 0;
 
                 _rtcDL = (byte)(day & 0xFF);
-                _rtcDH = (byte)((day >> 8) & 0x01);
+
+                _rtcDH &= 0xFE;
+                _rtcDH |= (byte)((day >> 8) & 0x01);
                 _rtcDH |= (byte)(overflow || previousOverflow ? 0x80 : 0);
 
                 if (overflow)
