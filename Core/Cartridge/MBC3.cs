@@ -141,20 +141,32 @@ public class MBC3 : ICartridge
             switch (_sramBank)
             {
                 case 0x08:
-                    _rtcS = value;
+                    byte oldRtcS = _rtcS;
+                    _rtcS = (byte)(value % 60);
+                    _rtcTime += _rtcS - oldRtcS;
                     break;
                 case 0x09:
-                    _rtcM = value;
+                    byte oldRtcM = _rtcM;
+                    _rtcM = (byte)(value % 60);
+                    _rtcTime += _rtcM * 60 - oldRtcM * 60;
                     break;
                 case 0x0A:
-                    _rtcH = value;
+                    byte oldRtcH = _rtcH;
+                    _rtcH = (byte)(value % 24);
+                    _rtcTime += _rtcH * 3600 - oldRtcH * 3600;
                     break;
                 case 0x0B:
+                    byte oldRtcDl = _rtcDL;
                     _rtcDL = value;
+                    _rtcTime += _rtcDL * 24 * 3600 - oldRtcDl * 24 * 3600;
                     break;
                 case 0x0C:
+                    int oldRtcDHday = (_rtcDH & 0x01) << 8;
                     _rtcDH = value;
                     _rtcHalted = (_rtcDH & 0x40) != 0;
+
+                    int newRtcDHday = (_rtcDH & 0x01) << 8;
+                    _rtcTime += newRtcDHday * 24 * 3600 - oldRtcDHday * 24 * 3600;
                     break;
             };
         }
