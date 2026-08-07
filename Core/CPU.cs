@@ -1,4 +1,5 @@
-﻿using System.Windows.Media.Animation;
+﻿using GameBoyEmulator.SaveState;
+using System.Windows.Media.Animation;
 
 namespace GameBoyEmulator.Core;
 public class CPU
@@ -423,8 +424,26 @@ public class CPU
         return cycles;
     }
 
-    // TODO: Implement Interrupts
-    public int HandleInterrupt()
+    public CPUState SaveState()
+    {
+        return new CPUState(_eiCounter, AF, BC, DE, HL, _pc, _sp, _ime, _halted, _haltBug);
+    }
+
+    public void LoadState(CPUState state)
+    {
+        _eiCounter = state.EiCounter;
+        AF = state.AF;
+        BC = state.BC;
+        DE = state.BC;
+        HL = state.HL;
+        _pc = state.PC;
+        _sp = state.SP;
+        _ime = state.IME;
+        _halted = state.Halted;
+        _haltBug = state.HaltBug;
+    }
+
+    private int HandleInterrupt()
     {
         if (_halted)
         {

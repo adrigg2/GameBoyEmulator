@@ -1,6 +1,6 @@
 ﻿using GameBoyEmulator.Core.Audio;
 using GameBoyEmulator.Core.Cartridge;
-using System.Diagnostics.Contracts;
+using GameBoyEmulator.SaveState;
 
 namespace GameBoyEmulator.Core;
 public class MMU
@@ -371,5 +371,29 @@ public class MMU
     public void LoadBootRom(byte[] rom)
     {
         Array.Copy(rom, _bootROM, Math.Min(_bootROM.Length, rom.Length));
+    }
+
+    public MMUState SaveState()
+    {
+        return new MMUState(
+            _bootRomMapped,
+            _ie,
+            _if,
+            (byte[])_wram.Clone(),
+            (byte[])_vram.Clone(),
+            (byte[])_hram.Clone(),
+            (byte[])_oam.Clone()
+            );
+    }
+
+    public void LoadState(MMUState state)
+    {
+        _bootRomMapped = state.BootRomMapped;
+        _ie = state.IE;
+        _if = state.IF;
+        _wram = (byte[])state.WRAM.Clone();
+        _vram = (byte[])state.VRAM.Clone();
+        _hram = (byte[])state.HRAM.Clone();
+        _oam = (byte[])state.OAM.Clone();
     }
 }

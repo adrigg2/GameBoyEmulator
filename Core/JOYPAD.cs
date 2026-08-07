@@ -1,4 +1,5 @@
-﻿using System.Windows.Input;
+﻿using GameBoyEmulator.SaveState;
+using System.Windows.Input;
 
 namespace GameBoyEmulator.Core;
 
@@ -6,8 +7,6 @@ public class JOYPAD
 {
     private byte _pad = 0x0F;
     private byte _buttons = 0x0F;
-    private byte _oldPad = 0x0F;
-    private byte _oldButtons = 0x0F;
     private byte _joyp = 0x3F;
     
     public byte JOYP { get => _joyp; set => _joyp = (byte)((value & 0xF0) | (_joyp & 0x0F)); }
@@ -34,9 +33,6 @@ public class JOYPAD
                 mmu.IF |= 0x10;
             }
         }
-
-        _oldPad = _pad;
-        _oldButtons = _buttons;
     }
 
     public void HandleKeyDown(Key key)
@@ -105,5 +101,15 @@ public class JOYPAD
                 _buttons = 0xF;
                 break;
         }
+    }
+
+    public JOYPADState SaveState()
+    {
+        return new JOYPADState(JOYP);
+    }
+
+    public void LoadState(JOYPADState state)
+    {
+        JOYP = state.JOYP;
     }
 }

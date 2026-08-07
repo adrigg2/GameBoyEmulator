@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GameBoyEmulator.SaveState;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -53,5 +54,18 @@ public class DMA
         {
             _active = false;
         }
+    }
+
+    public DMAState SaveState()
+    {
+        return new DMAState(_address, _cycles, _transfers, _active);
+    }
+
+    public void LoadState(DMAState state)
+    {
+        _address = state.Address;
+        _cycles = state.Cycles;
+        _transfers = state.Transfers;
+        _active = state.Active;
     }
 }
