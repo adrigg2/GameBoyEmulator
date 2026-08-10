@@ -1,4 +1,5 @@
-﻿using GameBoyEmulator.Views;
+﻿using GameBoyEmulator.SaveState;
+using GameBoyEmulator.Views;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -192,6 +193,52 @@ public class PPU
         }
 
         STATInterrupt(mmu);
+    }
+
+    public PPUState SaveState()
+    {
+        return new PPUState(
+            _cycleCount,
+            _windowY,
+            _lcdc,
+            _stat,
+            _scy,
+            _scx,
+            _ly,
+            _lyc,
+            _bgp,
+            _obp0,
+            _obp1,
+            _wy,
+            _wx,
+            _STATInterruptRequest,
+            _screenOff,
+            (byte[])_screenBuffer.Clone(),
+            (byte[])_bgColorIds.Clone(),
+            [.. _objectPool]
+            );
+    }
+
+    public void LoadState(PPUState state)
+    {
+        _cycleCount = state.CycleCount;
+        _windowY = state.WindowY;
+        _lcdc = state.LCDC;
+        _stat = state.STAT;
+        _scy = state.SCY;
+        _scx = state.SCX;
+        _ly = state.LY;
+        _lyc = state.LYC;
+        _bgp = state.BGP;
+        _obp0 = state.OBP0;
+        _obp1 = state.OBP1;
+        _wy = state.WY;
+        _wx = state.WX;
+        _STATInterruptRequest = state.STATInterruptRequest;
+        _screenOff = state.ScreenOff;
+        _screenBuffer = (byte[])state.ScreenBuffer.Clone();
+        _bgColorIds = (byte[])state.BgColorIds.Clone();
+        _objectPool = [.. state.ObjectPool];
     }
 
     private void ChangeMode(int mode)
