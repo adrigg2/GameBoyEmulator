@@ -1,4 +1,6 @@
-﻿namespace GameBoyEmulator.Core;
+﻿using GameBoyEmulator.SaveState;
+
+namespace GameBoyEmulator.Core;
 
 public class TIMER
 {
@@ -121,6 +123,30 @@ public class TIMER
         }
 
         return _divApu;
+    }
+
+    public TIMERState SaveState()
+    {
+        return new TIMERState(
+            _timaResetCounter,
+            _timaIgnoreWritesCounter,
+            _divApu,
+            _counter,
+            _tima,
+            _tma,
+            _tac
+            );
+    }
+
+    public void LoadState(TIMERState state)
+    {
+        _timaResetCounter = state.TIMAResetCounter;
+        _timaIgnoreWritesCounter = state.TIMAIgnoreWritesCounter;
+        _divApu = state.DivAPU;
+        _counter = state.Counter;
+        _tima = state.TIMA;
+        _tma = state.TMA;
+        _tac = state.TAC;
     }
 
     private void TimerTick()
