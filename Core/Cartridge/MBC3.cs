@@ -63,7 +63,8 @@ public class MBC3 : ICartridge
 
         if (_battery && File.Exists($"./saves/{_romName}.save"))
         {
-            using BinaryReader reader = new(File.OpenRead($"./saves/{_romName}.save"));
+            using FileStream stream = File.OpenRead($"./saves/{_romName}.save");
+            using BinaryReader reader = new(stream);
             if (_sram != null)
             {
                 int sramLength = reader.ReadInt32();
@@ -119,7 +120,8 @@ public class MBC3 : ICartridge
     {
         if (_battery)
         {
-            using BinaryWriter writer = new(File.OpenWrite($"./saves/{_romName}.save"));
+            using FileStream stream = File.OpenWrite($"./saves/{_romName}.save");
+            using BinaryWriter writer = new(stream);
             if (_sram != null)
             {
                 writer.Write(_sram.Length);
