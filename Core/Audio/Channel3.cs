@@ -1,4 +1,6 @@
-﻿namespace GameBoyEmulator.Core.Audio;
+﻿using GameBoyEmulator.SaveState.Components.APU;
+
+namespace GameBoyEmulator.Core.Audio;
 
 public class Channel3
 {
@@ -8,7 +10,7 @@ public class Channel3
     private byte _nr33;
     private byte _nr34;
 
-    private readonly byte[] _waveRam;
+    private byte[] _waveRam;
 
     private int _lengthTimer;
     private int _periodDiv;
@@ -148,5 +150,41 @@ public class Channel3
                 Active = false;
             }
         }
+    }
+
+    public Channel3State SaveState()
+    {
+        return new Channel3State(
+            _nr30,
+            _nr31,
+            _nr32,
+            _nr33,
+            _nr34,
+            (byte[])_waveRam.Clone(),
+            _lengthTimer,
+            _periodDiv,
+            _waveIndex,
+            _waveBuffer,
+            _output,
+            _active,
+            _dacActive
+            );
+    }
+
+    public void LoadState(Channel3State state)
+    {
+        _nr30 = state.NR30;
+        _nr31 = state.NR31;
+        _nr32 = state.NR32;
+        _nr33 = state.NR33;
+        _nr34 = state.NR34;
+        _waveRam = (byte[])state.WaveRam.Clone();
+        _lengthTimer = state.LengthTimer;
+        _periodDiv = state.PeriodDiv;
+        _waveIndex = state.WaveIndex;
+        _waveBuffer = state.WaveBuffer;
+        _output = state.Output;
+        _active = state.Active;
+        _dacActive = state.DacActive;
     }
 }
