@@ -1,4 +1,6 @@
-﻿namespace GameBoyEmulator.Core.Audio;
+﻿using GameBoyEmulator.SaveState.Components.APU;
+
+namespace GameBoyEmulator.Core.Audio;
 
 public class Channel4
 {
@@ -138,7 +140,7 @@ public class Channel4
 
     public void EnvelopeSweep()
     {
-        if (!Active || _envSweepPace == 0)
+        if (!Active || _envSweepPace == 0 || _envFinished)
         {
             return;
         }
@@ -161,6 +163,48 @@ public class Channel4
 
             _envSweepCounter = 0;
         }
+    }
+
+    public Channel4State SaveState()
+    {
+        return new Channel4State(
+            _nr41,
+            _nr42,
+            _nr43,
+            _nr44,
+            _lsfr,
+            _lengthTimer,
+            _volume,
+            _envSweepPace,
+            _envSweepCounter,
+            _channelFrequency,
+            _channelCycles,
+            _output,
+            _active,
+            _dacActive,
+            _envDir,
+            _envFinished
+            );
+    }
+
+    public void LoadState(Channel4State state)
+    {
+        _nr41 = state.NR41;
+        _nr42 = state.NR42;
+        _nr43 = state.NR43;
+        _nr44 = state.NR44;
+        _lsfr = state.LSFR;
+        _lengthTimer = state.LengthTimer;
+        _volume = state.Volume;
+        _envSweepPace = state.EnvSweepPace;
+        _envSweepCounter = state.EnvSweepCounter;
+        _channelFrequency = state.ChannelFrequency;
+        _channelCycles = state.ChannelCycles;
+        _output = state.Output;
+        _active = state.Active;
+        _dacActive = state.DacActive;
+        _envDir = state.EnvDir;
+        _envFinished = state.EnvFinished;
     }
 
     private void ResetFrequency()
