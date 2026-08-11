@@ -1,4 +1,4 @@
-﻿namespace GameBoyEmulator.SaveState;
+﻿namespace GameBoyEmulator.SaveState.Components;
 
 public class PPUState(int cycleCount, int windowY, byte lcdc, byte stat, byte scy, byte scx, byte ly, byte lyc, byte bgp, byte obp0, byte obp1, byte wy, byte wx, bool statInterruptRequest, bool screenOff, byte[] screenBuffer, byte[] bgColorIds, List<ushort> objectPool)
 {

@@ -1,4 +1,4 @@
-﻿namespace GameBoyEmulator.SaveState;
+﻿namespace GameBoyEmulator.SaveState.Components;
 
 public class TIMERState(int timaResetCounter, int timaIgnoreWritesCounter, int divApu, ushort counter, byte tima, byte tma, byte tac)
 {

@@ -1,6 +1,6 @@
 ﻿using GameBoyEmulator.Core.Cartridge;
 
-namespace GameBoyEmulator.SaveState;
+namespace GameBoyEmulator.SaveState.Components;
 
 public class MMUState(bool bootRomMapped, byte ie, byte IF, byte[] wram, byte[] vram, byte[] hram, byte[] oam)
 {

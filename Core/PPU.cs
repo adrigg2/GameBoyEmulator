@@ -1,4 +1,4 @@
-﻿using GameBoyEmulator.SaveState;
+﻿using GameBoyEmulator.SaveState.Components;
 using GameBoyEmulator.Views;
 using System.Windows;
 using System.Windows.Media;

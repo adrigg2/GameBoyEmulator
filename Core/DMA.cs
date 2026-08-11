@@ -1,4 +1,4 @@
-﻿using GameBoyEmulator.SaveState;
+﻿using GameBoyEmulator.SaveState.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;

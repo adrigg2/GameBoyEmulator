@@ -1,4 +1,4 @@
-﻿namespace GameBoyEmulator.SaveState;
+﻿namespace GameBoyEmulator.SaveState.Components;
 
 public class DMAState(ushort address, int cycles, int transfers, bool active)
 {

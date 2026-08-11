@@ -1,6 +1,6 @@
 ﻿using GameBoyEmulator.Core.Audio;
 using GameBoyEmulator.Core.Cartridge;
-using GameBoyEmulator.SaveState;
+using GameBoyEmulator.SaveState.Components;
 
 namespace GameBoyEmulator.Core;
 public class MMU

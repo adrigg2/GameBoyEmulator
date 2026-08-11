@@ -1,4 +1,4 @@
-﻿using GameBoyEmulator.SaveState;
+﻿using GameBoyEmulator.SaveState.Components;
 
 namespace GameBoyEmulator.Core;
 

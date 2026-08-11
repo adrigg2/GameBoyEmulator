@@ -1,4 +1,4 @@
-﻿using GameBoyEmulator.SaveState;
+﻿using GameBoyEmulator.SaveState.Components;
 using System.Windows.Media.Animation;
 
 namespace GameBoyEmulator.Core;
