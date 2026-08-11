@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using GameBoyEmulator.SaveState.Components;
+using System.IO;
 
 namespace GameBoyEmulator.Core.Cartridge;
 
@@ -8,7 +9,7 @@ internal class MBC1 : ICartridge
     private const int RomOffset = 0x4000;
 
     private readonly byte[] _rom;
-    private readonly byte[]? _sram;
+    private byte[]? _sram;
 
     private readonly bool _battery;
     private bool _ramEnabled;
@@ -17,7 +18,7 @@ internal class MBC1 : ICartridge
     private readonly string _romName;
 
     private int _romBank;
-    private int _ramBank;
+    private int _sramBank;
 
     public MBC1(byte[] rom, string romName)
     {
@@ -50,7 +51,7 @@ internal class MBC1 : ICartridge
     {
         if (_ramEnabled)
         {
-            int bank = _advancedBanking ? _ramBank : 0;
+            int bank = _advancedBanking ? _sramBank : 0;
             return _sram?[(bank * SRamOffset + (address & 0x1FFF)) & (_sram.Length - 1)] ?? 0xFF;
         }
         return 0xFF;
@@ -62,14 +63,14 @@ internal class MBC1 : ICartridge
         {
             if (_advancedBanking)
             {
-                int bank = _ramBank << 5;
+                int bank = _sramBank << 5;
                 return _rom[(bank * RomOffset + address) & (_rom.Length - 1)];
             }
             return _rom[address];
         }
         else
         {
-            int bank = (_ramBank << 5) + _romBank;
+            int bank = (_sramBank << 5) + _romBank;
             return _rom[(bank * RomOffset + (address & 0x3FFF)) & (_rom.Length - 1)];
         }
     }
@@ -86,7 +87,7 @@ internal class MBC1 : ICartridge
     {
         if (_ramEnabled && _sram != null)
         {
-            int bank = _advancedBanking ? _ramBank : 0;
+            int bank = _advancedBanking ? _sramBank : 0;
             _sram[(bank * SRamOffset + (address & 0x1FFF)) & (_sram.Length - 1)] = value;
         }
     }
@@ -111,11 +112,40 @@ internal class MBC1 : ICartridge
         }
         else if (address <= 0x5FFF)
         {
-            _ramBank = value & 0x03;
+            _sramBank = value & 0x03;
         }
         else if (address <= 0x7FFF)
         {
             _advancedBanking = (value & 0x1) == 1;
         }
+    }
+
+    public MBCState SaveState()
+    {
+        byte[] additionalRegisters = [(byte)(_advancedBanking ? 1 : 0)];
+        byte[] headerCheck = [.. _rom[0x0134..0x0144], .. _rom[0x014D..0x0150]];
+        return new MBCState(
+            _romBank,
+            _sramBank,
+            _ramEnabled,
+            headerCheck,
+            additionalRegisters,
+            _sram
+            );
+    }
+
+    public void LoadState(MBCState state)
+    {
+        byte[] headerCheck = [.. _rom[0x0134..0x0144], .. _rom[0x014D..0x0150]];
+        if (!Enumerable.SequenceEqual(headerCheck, state.HeaderCheck))
+        {
+            throw new ArgumentException("The ROM corresponding to the given save state is not currently loaded");
+        }
+
+        _romBank = state.ROMBank;
+        _sramBank = state.SRAMBank;
+        _ramEnabled = state.RAMEnabled;
+        _sram = state.SRAM;
+        _advancedBanking = state.AdditionalRegisters?[0] == 1;
     }
 }

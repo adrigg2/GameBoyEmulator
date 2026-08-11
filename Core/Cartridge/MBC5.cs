@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using GameBoyEmulator.SaveState.Components;
+using System.IO;
 
 namespace GameBoyEmulator.Core.Cartridge;
 
@@ -8,12 +9,12 @@ public class MBC5 : ICartridge
     private const int RomOffset = 0x4000;
 
     private readonly byte[] _rom;
-    private readonly byte[]? _sram;
+    private byte[]? _sram;
 
     private readonly bool _battery;
     private bool _ramEnabled;
 
-    private string _romName;
+    private readonly string _romName;
 
     private int _romBank;
     private int _sramBank;
@@ -112,5 +113,32 @@ public class MBC5 : ICartridge
         {
             _sramBank = value & 0x0F;
         }
+    }
+
+    public MBCState SaveState()
+    {
+        byte[] headerCheck = [.. _rom[0x0134..0x0144], .. _rom[0x014D..0x0150]];
+        return new MBCState(
+            _romBank,
+            _sramBank,
+            _ramEnabled,
+            headerCheck,
+            null,
+            _sram
+            );
+    }
+
+    public void LoadState(MBCState state)
+    {
+        byte[] headerCheck = [.. _rom[0x0134..0x0144], .. _rom[0x014D..0x0150]];
+        if (!Enumerable.SequenceEqual(headerCheck, state.HeaderCheck))
+        {
+            throw new ArgumentException("The ROM corresponding to the given save state is not currently loaded");
+        }
+
+        _romBank = state.ROMBank;
+        _sramBank = state.SRAMBank;
+        _ramEnabled = state.RAMEnabled;
+        _sram = state.SRAM;
     }
 }

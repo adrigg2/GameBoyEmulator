@@ -1,4 +1,6 @@
-﻿namespace GameBoyEmulator.Core.Cartridge;
+﻿using GameBoyEmulator.SaveState.Components;
+
+namespace GameBoyEmulator.Core.Cartridge;
 
 public class NoMBC(byte[] rom) : ICartridge
 {
@@ -25,6 +27,16 @@ public class NoMBC(byte[] rom) : ICartridge
     }
 
     public void WriteRegister(ushort address, byte value)
+    {
+        
+    }
+
+    public MBCState SaveState()
+    {
+        return new MBCState(0, 0, false, [], null, null);
+    }
+
+    public void LoadState(MBCState state)
     {
         
     }

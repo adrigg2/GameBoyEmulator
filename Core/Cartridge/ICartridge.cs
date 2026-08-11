@@ -1,4 +1,6 @@
-﻿namespace GameBoyEmulator.Core.Cartridge;
+﻿using GameBoyEmulator.SaveState.Components;
+
+namespace GameBoyEmulator.Core.Cartridge;
 
 public interface ICartridge
 {
@@ -7,4 +9,6 @@ public interface ICartridge
     byte ReadRam(ushort address);
     void WriteRam(ushort address, byte value);
     void SaveRam();
+    MBCState SaveState();
+    void LoadState(MBCState state);
 }

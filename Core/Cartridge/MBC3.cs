@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using GameBoyEmulator.SaveState.Components;
+using System.IO;
 
 namespace GameBoyEmulator.Core.Cartridge;
 
@@ -8,7 +9,7 @@ public class MBC3 : ICartridge
     private const int RomOffset = 0x4000;
 
     private readonly byte[] _rom;
-    private readonly byte[]? _sram;
+    private byte[]? _sram;
 
     private readonly bool _battery;
     private readonly bool _hasRTC;
@@ -16,7 +17,7 @@ public class MBC3 : ICartridge
     private bool _latchReady;
     private bool _rtcHalted;
 
-    private string _romName;
+    private readonly string _romName;
 
     private byte _rtcS;
     private byte _rtcM;
@@ -240,5 +241,52 @@ public class MBC3 : ICartridge
         {
             _latchReady = false;
         }
+    }
+
+    public MBCState SaveState()
+    {
+        byte[] additionalRegisters = [
+            (byte)(_latchReady ? 1 : 0),
+            (byte)(_rtcHalted ? 1 : 0),
+            _rtcS,
+            _rtcM,
+            _rtcH,
+            _rtcDL,
+            _rtcDH,
+            .. BitConverter.GetBytes(_lastDateTime.ToBinary()),
+            .. BitConverter.GetBytes(_rtcTime),
+            ];
+        byte[] headerCheck = [.. _rom[0x0134..0x0144], .. _rom[0x014D..0x0150]];
+        return new MBCState(
+            _romBank,
+            _sramBank,
+            _ramEnabled,
+            headerCheck,
+            additionalRegisters,
+            _sram
+            );
+    }
+
+    public void LoadState(MBCState state)
+    {
+        byte[] headerCheck = [.. _rom[0x0134..0x0144], .. _rom[0x014D..0x0150]];
+        if (!Enumerable.SequenceEqual(headerCheck, state.HeaderCheck))
+        {
+            throw new ArgumentException("The ROM corresponding to the given save state is not currently loaded");
+        }
+
+        _romBank = state.ROMBank;
+        _sramBank = state.SRAMBank;
+        _ramEnabled = state.RAMEnabled;
+        _sram = state.SRAM;
+        _latchReady = state.AdditionalRegisters?[0] == 1;
+        _rtcHalted = state.AdditionalRegisters?[1] == 1;
+        _rtcS = state.AdditionalRegisters?[2] ?? 0;
+        _rtcM = state.AdditionalRegisters?[3] ?? 0;
+        _rtcH = state.AdditionalRegisters?[4] ?? 0;
+        _rtcDL = state.AdditionalRegisters?[5] ?? 0;
+        _rtcDH = state.AdditionalRegisters?[6] ?? 0;
+        _lastDateTime = DateTime.FromBinary(BitConverter.ToInt64(state.AdditionalRegisters ?? new byte[8], 7));
+        _rtcTime = BitConverter.ToDouble(state.AdditionalRegisters ?? new byte[8], 15);
     }
 }

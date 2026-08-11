@@ -3,47 +3,30 @@ using GameBoyEmulator.Core.Cartridge;
 using GameBoyEmulator.SaveState.Components;
 
 namespace GameBoyEmulator.Core;
-public class MMU
+public class MMU(DMA dma, JOYPAD joypad, PPU ppu, TIMER timer, APU apu)
 {
-    private DMA _dma;
-    private JOYPAD _joypad;
-    private PPU _ppu;
-    private TIMER _timer;
-    private APU _apu;
+    private DMA _dma = dma;
+    private JOYPAD _joypad = joypad;
+    private PPU _ppu = ppu;
+    private TIMER _timer = timer;
+    private APU _apu = apu;
 
-    public bool _bootRomMapped; // DEBUG: Public
+    public bool _bootRomMapped = true; // DEBUG: Public
 
-    private readonly byte[] _bootROM;
-    private byte[] _wram;
-    private byte[] _vram;   // NOTE: Move to PPU?
-    private byte[] _hram;
-    private byte[] _oam;    // NOTE: Move to PPU?
-    private byte _ie;
+    private readonly byte[] _bootROM = new byte[0x100];
+    private byte[] _wram = new byte[0x2000];
+    private byte[] _vram = new byte[0x2000];   // NOTE: Move to PPU?
+    private byte[] _hram = new byte[0x7F];
+    private byte[] _oam = new byte[0xA0];    // NOTE: Move to PPU?
+    private byte _ie = 0;
     private byte _if;
-    private ICartridge _cartridge;
+    private ICartridge _cartridge = new NoCartridge();
 
     public byte IE { get => _ie; set => _ie = value; }
     public byte IF { get => _if; set => _if = value; }
 
     public ICartridge Cartridge { get => _cartridge; }
     public byte[] VRAM { get => _vram; }
-
-    public MMU(DMA dma, JOYPAD joypad, PPU ppu, TIMER timer, APU apu)
-    {
-        _bootRomMapped = true;
-        _bootROM = new byte[0x100];
-        _vram = new byte[0x2000];
-        _wram = new byte[0x2000];
-        _oam = new byte[0xA0];
-        _hram = new byte[0x7F];
-        _ie = 0;
-        _dma = dma;
-        _joypad = joypad;
-        _ppu = ppu;
-        _timer = timer;
-        _apu = apu;
-        _cartridge = new NoCartridge();
-    }
 
     public byte ReadByte(ushort address)
     {
@@ -382,7 +365,8 @@ public class MMU
             (byte[])_wram.Clone(),
             (byte[])_vram.Clone(),
             (byte[])_hram.Clone(),
-            (byte[])_oam.Clone()
+            (byte[])_oam.Clone(),
+            _cartridge.SaveState()
             );
     }
 
@@ -395,5 +379,6 @@ public class MMU
         _vram = (byte[])state.VRAM.Clone();
         _hram = (byte[])state.HRAM.Clone();
         _oam = (byte[])state.OAM.Clone();
+        _cartridge.LoadState(state.Cartridge);
     }
 }
