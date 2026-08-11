@@ -1,18 +1,19 @@
 ﻿using GameBoyEmulator.Core;
 using GameBoyEmulator.Core.Audio;
+using GameBoyEmulator.SaveState;
 using System.IO;
 using System.Windows.Threading;
 
 namespace GameBoyEmulator;
 public class Emulator
 {
-    private MMU _mmu;
-    private CPU _cpu;
-    private PPU _ppu;
-    private DMA _dma;
-    private JOYPAD _joypad;
-    private TIMER _timer;
-    private APU _apu;
+    private readonly MMU _mmu;
+    private readonly CPU _cpu;
+    private readonly PPU _ppu;
+    private readonly DMA _dma;
+    private readonly JOYPAD _joypad;
+    private readonly TIMER _timer;
+    private readonly APU _apu;
 
     private const int CPUFrequency = 4194304; // 4.194304 MHz
     private const int CyclesPerFrame = 70224; // ~60 FPS
@@ -102,5 +103,29 @@ public class Emulator
         }
 
         _frames++;
+    }
+
+    public SaveState.SaveState SaveState()
+    {
+        return new SaveState.SaveState(
+            _cpu.SaveState(),
+            _dma.SaveState(),
+            _joypad.SaveState(),
+            _mmu.SaveState(),
+            _ppu.SaveState(),
+            _timer.SaveState(),
+            _apu.SaveState()
+            );
+    }
+
+    public void LoadState(SaveState.SaveState state)
+    {
+        _cpu.LoadState(state.CPU);
+        _dma.LoadState(state.DMA);
+        _joypad.LoadState(state.JOYPAD);
+        _mmu.LoadState(state.MMU);
+        _ppu.LoadState(state.PPU);
+        _timer.LoadState(state.TIMER);
+        _apu.LoadState(state.APU);
     }
 }
