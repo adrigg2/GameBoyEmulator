@@ -4,19 +4,17 @@ namespace GameBoyEmulator.SaveState.Components;
 
 public record CPUState(int EiCounter, ushort AF, ushort BC, ushort DE, ushort HL, ushort PC, ushort SP, bool IME, bool Halted, bool HaltBug)
 {
-    public byte[] Serialize()
+    public void Write(BinaryWriter writer)
     {
-        return [
-            .. BitConverter.GetBytes(EiCounter),
-            .. BitConverter.GetBytes(AF),
-            .. BitConverter.GetBytes(BC),
-            .. BitConverter.GetBytes(HL),
-            .. BitConverter.GetBytes(PC),
-            .. BitConverter.GetBytes(SP),
-            .. BitConverter.GetBytes(IME),
-            .. BitConverter.GetBytes(Halted),
-            .. BitConverter.GetBytes(HaltBug),
-            ];
+        writer.Write(EiCounter);
+        writer.Write(AF);
+        writer.Write(BC);
+        writer.Write(HL);
+        writer.Write(PC);
+        writer.Write(SP);
+        writer.Write(IME);
+        writer.Write(Halted);
+        writer.Write(HaltBug);
     }
 
     public static CPUState FromBinaryData(BinaryReader reader)

@@ -16,6 +16,7 @@ public static class SaveStateSerializer
         writer.Write(Magic);
         writer.Write(Version);
 
-        writer.Write(saveState.CPU.Serialize());
+        saveState.CPU.Write(writer);
+        saveState.PPU.Write(writer);
     }
 }
