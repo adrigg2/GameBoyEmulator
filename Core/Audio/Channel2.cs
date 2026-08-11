@@ -1,4 +1,6 @@
-﻿namespace GameBoyEmulator.Core.Audio;
+﻿using GameBoyEmulator.SaveState.Components.APU;
+
+namespace GameBoyEmulator.Core.Audio;
 
 public class Channel2
 {
@@ -142,7 +144,7 @@ public class Channel2
 
     public void EnvelopeSweep()
     {
-        if (!Active || _envSweepPace == 0)
+        if (!Active || _envSweepPace == 0 || _envFinished)
         {
             return;
         }
@@ -165,5 +167,45 @@ public class Channel2
 
             _envSweepCounter = 0;
         }
+    }
+
+    public Channel2State SaveState()
+    {
+        return new Channel2State(
+            _nr21,
+            _nr22,
+            _nr23,
+            _nr24,
+            _lengthTimer,
+            _periodDiv,
+            _sampleIndex,
+            _volume,
+            _envSweepPace,
+            _envSweepCounter,
+            _output,
+            _active,
+            _dacActive,
+            _envDir,
+            _envFinished
+            );
+    }
+
+    public void LoadState(Channel2State state)
+    {
+        _nr21 = state.NR21;
+        _nr22 = state.NR22;
+        _nr23 = state.NR23;
+        _nr24 = state.NR24;
+        _lengthTimer = state.LengthTimer;
+        _periodDiv = state.PeriodDiv;
+        _sampleIndex = state.SampleIndex;
+        _volume = state.Volume;
+        _envSweepPace = state.EnvSweepPace;
+        _envSweepCounter = state.EnvSweepCounter;
+        _output = state.Output;
+        _active = state.Active;
+        _dacActive = state.DacActive;
+        _envDir = state.EnvDir;
+        _envFinished = state.EnvFinished;
     }
 }
