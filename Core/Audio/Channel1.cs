@@ -1,4 +1,6 @@
-﻿namespace GameBoyEmulator.Core.Audio;
+﻿using GameBoyEmulator.SaveState.Components.APU;
+
+namespace GameBoyEmulator.Core.Audio;
 
 public class Channel1
 {
@@ -221,6 +223,56 @@ public class Channel1
 
             _envSweepCounter = 0;
         }
+    }
+
+    public Channel1State SaveState()
+    {
+        return new Channel1State(
+            _nr10,
+            _nr11,
+            _nr12,
+            _nr13,
+            _nr14,
+            _sweepCounter,
+            _currentPace,
+            _lengthTimer,
+            _periodDiv,
+            _sweepFrequency,
+            _sampleIndex,
+            _volume,
+            _envSweepPace,
+            _envSweepCounter,
+            _output,
+            _active,
+            _dacActive,
+            _envDir,
+            _sweepEnabled,
+            _envFinished
+            );
+    }
+
+    public void LoadState(Channel1State state)
+    {
+        _nr10 = state.NR10;
+        _nr11 = state.NR11;
+        _nr12 = state.NR12;
+        _nr13 = state.NR13;
+        _nr14 = state.NR14;
+        _sweepCounter = state.SweepCounter;
+        _currentPace = state.CurrentPace;
+        _lengthTimer = state.LengthTimer;
+        _periodDiv = state.PeriodDiv;
+        _sweepFrequency = state.SweepFrequency;
+        _sampleIndex = state.SampleIndex;
+        _volume = state.Volume;
+        _envSweepPace = state.EnvSweepPace;
+        _envSweepCounter = state.EnvSweepCounter;
+        _output = state.Output;
+        _active = state.Active;
+        _dacActive = state.DacActive;
+        _envDir = state.EnvDir;
+        _sweepEnabled = state.SweepEnabled;
+        _envFinished = state.EnvFinished;
     }
 
     private int FrequencyCalculation()

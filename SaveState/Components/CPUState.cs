@@ -1,4 +1,4 @@
-﻿namespace GameBoyEmulator.SaveState;
+﻿namespace GameBoyEmulator.SaveState.Components;
 
 public class CPUState(int eiCounter, ushort af, ushort bc, ushort de, ushort hl, ushort pc, ushort sp, bool ime, bool halted, bool haltBug)
 {
