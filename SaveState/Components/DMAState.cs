@@ -1,11 +1,3 @@
 ﻿namespace GameBoyEmulator.SaveState.Components;
 
-public class DMAState(ushort address, int cycles, int transfers, bool active)
-{
-    public ushort Address { get; } = address;
-
-    public int Cycles { get; } = cycles;
-    public int Transfers { get; } = transfers;
-
-    public bool Active { get; } = active;
-}
+public record DMAState(ushort Address, int Cycles, int Transfers, bool Active);
