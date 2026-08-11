@@ -1,5 +1,6 @@
 ﻿using NAudio.Wave;
 using NAudio.CoreAudioApi;
+using GameBoyEmulator.SaveState.Components.APU;
 
 namespace GameBoyEmulator.Core.Audio;
 
@@ -21,13 +22,13 @@ public class APU
 
     private bool _channel1a, _channel2a, _channel3a, _channel4a; // debug
 
-    private Channel1 _channel1;
-    private Channel2 _channel2;
-    private Channel3 _channel3;
-    private Channel4 _channel4;
+    private readonly Channel1 _channel1;
+    private readonly Channel2 _channel2;
+    private readonly Channel3 _channel3;
+    private readonly Channel4 _channel4;
 
-    private APUSampleProvider _sampleProvider;
-    private WasapiOut _out;
+    private readonly APUSampleProvider _sampleProvider;
+    private readonly WasapiOut _out;
     
     public byte NR50 { get => _nr50; set => _nr50 = value; }
     public byte NR51 { get => _nr51; set => _nr51 = value; }
@@ -235,7 +236,41 @@ public class APU
         _sampleProvider.WriteSample(right);
     }
 
-    private float HighPass(float input, ref float capacitor)
+    public APUState SaveState()
+    {
+        return new APUState(
+            _nr50,
+            _nr51,
+            _nr52,
+            _oldDivApu,
+            _sampleCycles,
+            _capacitorL,
+            _capacitorR,
+            _active,
+            _channel1.SaveState(),
+            _channel2.SaveState(),
+            _channel3.SaveState(),
+            _channel4.SaveState()
+            );
+    }
+
+    public void LoadState(APUState state)
+    {
+        _nr50 = state.NR50;
+        _nr51 = state.NR51;
+        _nr52 = state.NR52;
+        _oldDivApu = state.OldDivApu;
+        _sampleCycles = state.SampleCycles;
+        _capacitorL = state.CapacitorL;
+        _capacitorR = state.CapacitorR;
+        _active = state.Active;
+        _channel1.LoadState(state.Channel1);
+        _channel2.LoadState(state.Channel2);
+        _channel3.LoadState(state.Channel3);
+        _channel4.LoadState(state.Channel4);
+    }
+
+    private static float HighPass(float input, ref float capacitor)
     {
         float output = input - capacitor;
         capacitor = input - output * Charge;
