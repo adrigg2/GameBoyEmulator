@@ -15,8 +15,13 @@ public static class SaveStateSerializer
 
         writer.Write(Magic);
         writer.Write(Version);
+        writer.Write(saveState.MMU.Cartridge.HeaderCheck);
 
         saveState.CPU.Write(writer);
         saveState.PPU.Write(writer);
+        saveState.JOYPAD.Write(writer);
+        saveState.DMA.Write(writer);
+        saveState.TIMER.Write(writer);
+        saveState.MMU.Write(writer);
     }
 }
