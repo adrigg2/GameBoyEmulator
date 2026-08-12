@@ -33,7 +33,8 @@ public class NoMBC(byte[] rom) : ICartridge
 
     public MBCState SaveState()
     {
-        return new MBCState(0, 0, false, [], null, null);
+        byte[] headerCheck = [.. _rom[0x0134..0x0144], .. _rom[0x014D..0x0150]];
+        return new MBCState(0, 0, false, headerCheck, null, null);
     }
 
     public void LoadState(MBCState state)

@@ -16,7 +16,7 @@ public record MMUState(bool BootRomMapped, byte IE, byte IF, byte[] WRAM, byte[]
         Cartridge.Write(writer);
     }
 
-    public static MMUState FromBinaryData(BinaryReader reader, byte[] headerCheck)
+    public static MMUState FromBinaryData(BinaryReader reader)
     {
         return new MMUState(
             reader.ReadBoolean(),
@@ -26,7 +26,7 @@ public record MMUState(bool BootRomMapped, byte IE, byte IF, byte[] WRAM, byte[]
             reader.ReadBytes(0x2000),
             reader.ReadBytes(0x7F),
             reader.ReadBytes(0xA0),
-            MBCState.FromBinaryData(reader, headerCheck)
+            MBCState.FromBinaryData(reader)
             );
     }
 }

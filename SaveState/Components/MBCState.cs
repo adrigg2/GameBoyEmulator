@@ -31,7 +31,7 @@ public record MBCState(int ROMBank, int SRAMBank, bool RAMEnabled, byte[] Header
         }
     }
 
-    public static MBCState FromBinaryData(BinaryReader reader, byte[] headerCheck)
+    public static MBCState FromBinaryData(BinaryReader reader)
     {
         int ROMBank = reader.ReadInt32();
         int SRAMBank = reader.ReadInt32();
@@ -55,7 +55,7 @@ public record MBCState(int ROMBank, int SRAMBank, bool RAMEnabled, byte[] Header
             ROMBank,
             SRAMBank,
             RAMEnabled,
-            headerCheck,
+            [],
             additionalRegisters,
             sram
             );

@@ -136,12 +136,6 @@ internal class MBC1 : ICartridge
 
     public void LoadState(MBCState state)
     {
-        byte[] headerCheck = [.. _rom[0x0134..0x0144], .. _rom[0x014D..0x0150]];
-        if (!Enumerable.SequenceEqual(headerCheck, state.HeaderCheck))
-        {
-            throw new ArgumentException("The ROM corresponding to the given save state is not currently loaded");
-        }
-
         _romBank = state.ROMBank;
         _sramBank = state.SRAMBank;
         _ramEnabled = state.RAMEnabled;

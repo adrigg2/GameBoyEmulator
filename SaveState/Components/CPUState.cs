@@ -9,6 +9,7 @@ public record CPUState(int EiCounter, ushort AF, ushort BC, ushort DE, ushort HL
         writer.Write(EiCounter);
         writer.Write(AF);
         writer.Write(BC);
+        writer.Write(DE);
         writer.Write(HL);
         writer.Write(PC);
         writer.Write(SP);

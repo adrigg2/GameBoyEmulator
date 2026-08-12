@@ -13,7 +13,7 @@ public static class SaveStateSerializer
         using FileStream stream = File.OpenWrite(path);
         using BinaryWriter writer = new(stream);
 
-        writer.Write(Magic);
+        writer.Write(Magic.ToCharArray());
         writer.Write(Version);
         writer.Write(saveState.MMU.Cartridge.HeaderCheck);
 
@@ -23,5 +23,6 @@ public static class SaveStateSerializer
         saveState.DMA.Write(writer);
         saveState.TIMER.Write(writer);
         saveState.MMU.Write(writer);
+        saveState.APU.Write(writer);
     }
 }
