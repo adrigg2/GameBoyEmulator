@@ -138,6 +138,7 @@ public partial class MainWindow : Window
             if (File.Exists("./states/save.state"))
             {
                 SaveState.SaveState state = SaveStateSerializer.DeserializeSaveState("./states/save.state", _emulator.MMU.Cartridge.HeaderCheck);
+                _emulator.LoadState(state);
             }
         }
 
