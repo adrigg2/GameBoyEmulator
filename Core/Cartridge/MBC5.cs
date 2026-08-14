@@ -56,7 +56,7 @@ public class MBC5 : ICartridge
     {
         if (_ramEnabled)
         {
-            return _sram?[(_sramBank * SRamOffset + (address & 0x1FFF)) & (_sram.Length - 1)] ?? 0xFF;
+            return _sram?[(_sramBank * SRamOffset + (address & 0x1FFF)) % _sram.Length] ?? 0xFF;
         }
         return 0xFF;
     }
@@ -69,7 +69,7 @@ public class MBC5 : ICartridge
         }
         else
         {
-            return _rom[(_romBank * RomOffset + (address & 0x3FFF)) & (_rom.Length - 1)];
+            return _rom[(_romBank * RomOffset + (address & 0x3FFF)) % _rom.Length];
         }
     }
 
@@ -85,7 +85,7 @@ public class MBC5 : ICartridge
     {
         if (_ramEnabled && _sram != null)
         {
-            _sram[(_sramBank * SRamOffset + (address & 0x1FFF)) & (_sram.Length - 1)] = value;
+            _sram[(_sramBank * SRamOffset + (address & 0x1FFF)) % _sram.Length] = value;
         }
     }
 

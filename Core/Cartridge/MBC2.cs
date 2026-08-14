@@ -49,7 +49,7 @@ public class MBC2 : ICartridge
         {
             return _rom[address];
         }
-        return _rom[(_romBank * RomOffset + (address & 0x3FFF)) & (_rom.Length - 1)];
+        return _rom[(_romBank * RomOffset + (address & 0x3FFF)) % _rom.Length];
     }
 
     public void SaveRam()

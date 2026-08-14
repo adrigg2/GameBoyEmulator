@@ -52,7 +52,7 @@ internal class MBC1 : ICartridge
         if (_ramEnabled)
         {
             int bank = _advancedBanking ? _sramBank : 0;
-            return _sram?[(bank * SRamOffset + (address & 0x1FFF)) & (_sram.Length - 1)] ?? 0xFF;
+            return _sram?[(bank * SRamOffset + (address & 0x1FFF)) % _sram.Length] ?? 0xFF;
         }
         return 0xFF;
     }
@@ -71,7 +71,7 @@ internal class MBC1 : ICartridge
         else
         {
             int bank = (_sramBank << 5) + _romBank;
-            return _rom[(bank * RomOffset + (address & 0x3FFF)) & (_rom.Length - 1)];
+            return _rom[(bank * RomOffset + (address & 0x3FFF)) % _rom.Length];
         }
     }
 
@@ -88,7 +88,7 @@ internal class MBC1 : ICartridge
         if (_ramEnabled && _sram != null)
         {
             int bank = _advancedBanking ? _sramBank : 0;
-            _sram[(bank * SRamOffset + (address & 0x1FFF)) & (_sram.Length - 1)] = value;
+            _sram[(bank * SRamOffset + (address & 0x1FFF)) % _sram.Length] = value;
         }
     }
 
