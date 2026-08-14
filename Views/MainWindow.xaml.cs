@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using GameBoyEmulator.SaveState;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.Intrinsics.Arm;
 using System.Windows;
@@ -34,10 +35,13 @@ public partial class MainWindow : Window
     private Thread? _emulatorThread;
     private CancellationTokenSource? _cts;
 
+    private RewindStack _rewindStack;
+
     public MainWindow(string[] args)
     {
         InitializeComponent();
         Directory.CreateDirectory("./saves/");
+        Directory.CreateDirectory("./states/");
 
         SizeChanged += (_, _) => UpdateScale();
 
@@ -45,6 +49,8 @@ public partial class MainWindow : Window
 
         _paletteInUse = lcd1;
         _bootRomFilePath = args[0];
+
+        _rewindStack = new(50);
     }
 
     private void Tick(CancellationToken token)
@@ -53,6 +59,7 @@ public partial class MainWindow : Window
 
         const int primeTarget = 44100 * 2 / 20;
         const int throttleTarget = 44100 * 2 / 10;
+        const int framesPerSave = 6; // 5 seconds of rewind
 
         Stopwatch stopwatch = Stopwatch.StartNew();
 
@@ -74,6 +81,11 @@ public partial class MainWindow : Window
         {
             _emulator.ProcessFrame();
             frames++;
+
+            if (frames % framesPerSave == 0)
+            {
+                _rewindStack.Push(_emulator.SaveState());
+            }
 
             while ((_emulator.APU.SampleProvider.SampleCount > throttleTarget && !_turboMode) || _paused)
             {
@@ -114,6 +126,11 @@ public partial class MainWindow : Window
         if (e.Key == Key.Space)
         {
             _turboMode = true;
+        }
+
+        if (e.Key == Key.Tab && _rewindStack.Count > 0)
+        {
+            SaveStateSerializer.SerializeSaveState("./states/save.state", _rewindStack.Peek());
         }
 
         if (e.Key == Key.F1 && _emulator != null)

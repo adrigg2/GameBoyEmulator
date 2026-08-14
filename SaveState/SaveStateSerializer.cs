@@ -32,30 +32,27 @@ public static class SaveStateSerializer
         using FileStream stream = File.OpenRead(path);
         using BinaryReader reader = new(stream);
 
-        try
+        byte[] magic = reader.ReadBytes(4);
+        byte version = reader.ReadByte();
+        if (!Enumerable.SequenceEqual(magic, Magic) || version != Version)
         {
-            byte[] magic = reader.ReadBytes(4);
-            byte version = reader.ReadByte();
-            if (!Enumerable.SequenceEqual(magic, Magic) || version != Version)
-            {
-                throw new Exception("The file given is not a save state file for this emulator");
-            }
-
-            byte[] fileHeaderCheck = reader.ReadBytes(19);
-            if (!Enumerable.SequenceEqual(fileHeaderCheck, headerCheck))
-            {
-                throw new Exception("The save state given is not for the ROM currently loaded");
-            }
-
-            CPUState cpu = CPUState.FromBinaryData(reader);
-            PPUState ppu = PPUState.FromBinaryData(reader);
-            JOYPADState joypad = JOYPADState.FromBinaryData(reader);
-            DMAState dma = DMAState.FromBinaryData(reader);
-            TIMERState timer = TIMERState.FromBinaryData(reader);
-            MMUState mmu = MMUState.FromBinaryData(reader);
-            APUState apu = APUState.FromBinaryData(reader);
-
-            return new SaveState(cpu, dma, joypad, mmu, ppu, timer, apu);
+            throw new FileFormatException("The file given is not a save state file for this emulator");
         }
+
+        byte[] fileHeaderCheck = reader.ReadBytes(19);
+        if (!Enumerable.SequenceEqual(fileHeaderCheck, headerCheck))
+        {
+            throw new FileFormatException("The save state given is not for the ROM currently loaded");
+        }
+
+        CPUState cpu = CPUState.FromBinaryData(reader);
+        PPUState ppu = PPUState.FromBinaryData(reader);
+        JOYPADState joypad = JOYPADState.FromBinaryData(reader);
+        DMAState dma = DMAState.FromBinaryData(reader);
+        TIMERState timer = TIMERState.FromBinaryData(reader);
+        MMUState mmu = MMUState.FromBinaryData(reader);
+        APUState apu = APUState.FromBinaryData(reader);
+
+        return new SaveState(cpu, dma, joypad, mmu, ppu, timer, apu);
     }
 }

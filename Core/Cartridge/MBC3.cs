@@ -70,16 +70,20 @@ public class MBC3 : ICartridge
                 int sramLength = reader.ReadInt32();
                 _sram = reader.ReadBytes(sramLength);
             }
-            _rtcTime = reader.ReadDouble();
-            long serializedDate = reader.ReadInt64();
-            _lastDateTime = DateTime.FromBinary(serializedDate);
 
-            var now = DateTime.UtcNow;
-            _rtcTime += (now - _lastDateTime).TotalSeconds;
-            _lastDateTime = now;
+            if (_hasRTC)
+            {
+                _rtcTime = reader.ReadDouble();
+                long serializedDate = reader.ReadInt64();
+                _lastDateTime = DateTime.FromBinary(serializedDate);
 
-            _rtcDH = reader.ReadByte();
-            _rtcHalted = (_rtcDH & 0x40) != 0;
+                var now = DateTime.UtcNow;
+                _rtcTime += (now - _lastDateTime).TotalSeconds;
+                _lastDateTime = now;
+
+                _rtcDH = reader.ReadByte();
+                _rtcHalted = (_rtcDH & 0x40) != 0;
+            }
         }
     }
 
@@ -127,9 +131,13 @@ public class MBC3 : ICartridge
                 writer.Write(_sram.Length);
                 writer.Write(_sram);
             }
-            writer.Write(_rtcTime);
-            writer.Write(_lastDateTime.ToBinary());
-            writer.Write(_rtcDH);
+
+            if (_hasRTC)
+            {
+                writer.Write(_rtcTime);
+                writer.Write(_lastDateTime.ToBinary());
+                writer.Write(_rtcDH);
+            }
         }
     }
 
