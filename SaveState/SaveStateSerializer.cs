@@ -32,14 +32,14 @@ public static class SaveStateSerializer
         using FileStream stream = File.OpenRead(path);
         using BinaryReader reader = new(stream);
 
-        byte[] magic = reader.ReadBytes(4);
+        byte[] magic = reader.ReadBytes(Magic.Length);
         byte version = reader.ReadByte();
         if (!Enumerable.SequenceEqual(magic, Magic) || version != Version)
         {
             throw new FileFormatException("The file given is not a save state file for this emulator");
         }
 
-        byte[] fileHeaderCheck = reader.ReadBytes(19);
+        byte[] fileHeaderCheck = reader.ReadBytes(headerCheck.Length);
         if (!Enumerable.SequenceEqual(fileHeaderCheck, headerCheck))
         {
             throw new FileFormatException("The save state given is not for the ROM currently loaded");
