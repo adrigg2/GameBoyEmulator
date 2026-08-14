@@ -25,6 +25,7 @@ public partial class MainWindow : Window
 
     private bool _turboMode;
     private bool _paused;
+    private bool _rewinding;
 
     private string _bootRomFilePath;
 
@@ -130,16 +131,8 @@ public partial class MainWindow : Window
 
         if (e.Key == Key.Tab && _rewindStack.Count > 0)
         {
-            SaveStateSerializer.SerializeSaveState("./states/save.state", _rewindStack.Peek());
-        }
-
-        if (e.Key == Key.B && _emulator != null)
-        {
-            if (File.Exists("./states/save.state"))
-            {
-                SaveState.SaveState state = SaveStateSerializer.DeserializeSaveState("./states/save.state", _emulator.MMU.Cartridge.HeaderCheck);
-                _emulator.LoadState(state);
-            }
+            _rewinding = true;
+            Task.Run(Rewind);
         }
 
         if (e.Key == Key.F1 && _emulator != null)
@@ -162,6 +155,11 @@ public partial class MainWindow : Window
         if (e.Key == Key.Space)
         {
             _turboMode = false;
+        }
+
+        if (e.Key == Key.Tab && _rewindStack.Count > 0)
+        {
+            _rewinding = false;
         }
 
         _emulator?.JOYPAD.HandleKeyUp(e.Key);
@@ -254,6 +252,15 @@ public partial class MainWindow : Window
                 _emulatorThread.Start();
             }
 
+        }
+    }
+
+    private void Rewind()
+    {
+        while (_rewinding && _rewindStack.Count > 0)
+        {
+            _emulator?.LoadState(_rewindStack.Pop());
+            Thread.Sleep(100);
         }
     }
 }
