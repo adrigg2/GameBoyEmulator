@@ -19,6 +19,8 @@ public class MBC5 : ICartridge
     private int _romBank;
     private int _sramBank;
 
+    public byte[] HeaderCheck => [.. _rom[0x0134..0x0144], .. _rom[0x014D..0x0150]];
+
     public MBC5(byte[] rom, string cartridgeName)
     {
         _rom = rom;
@@ -117,12 +119,11 @@ public class MBC5 : ICartridge
 
     public MBCState SaveState()
     {
-        byte[] headerCheck = [.. _rom[0x0134..0x0144], .. _rom[0x014D..0x0150]];
         return new MBCState(
             _romBank,
             _sramBank,
             _ramEnabled,
-            headerCheck,
+            HeaderCheck,
             null,
             _sram
             );

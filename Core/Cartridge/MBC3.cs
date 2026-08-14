@@ -32,6 +32,8 @@ public class MBC3 : ICartridge
 
     private DateTime _lastDateTime;
 
+    public byte[] HeaderCheck => [.. _rom[0x0134..0x0144], .. _rom[0x014D..0x0150]];
+
     public MBC3(byte[] rom, string cartridgeName)
     {
         _rom = rom;
@@ -266,12 +268,11 @@ public class MBC3 : ICartridge
             .. BitConverter.GetBytes(_lastDateTime.ToBinary()),
             .. BitConverter.GetBytes(_rtcTime),
             ];
-        byte[] headerCheck = [.. _rom[0x0134..0x0144], .. _rom[0x014D..0x0150]];
         return new MBCState(
             _romBank,
             _sramBank,
             _ramEnabled,
-            headerCheck,
+            HeaderCheck,
             additionalRegisters,
             _sram
             );

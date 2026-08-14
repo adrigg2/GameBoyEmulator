@@ -6,6 +6,8 @@ public class NoMBC(byte[] rom) : ICartridge
 {
     private readonly byte[] _rom = rom;
 
+    public byte[] HeaderCheck => [.. _rom[0x0134..0x0144], .. _rom[0x014D..0x0150]];
+
     public byte ReadRam(ushort address)
     {
         return 0xFF;
@@ -33,8 +35,7 @@ public class NoMBC(byte[] rom) : ICartridge
 
     public MBCState SaveState()
     {
-        byte[] headerCheck = [.. _rom[0x0134..0x0144], .. _rom[0x014D..0x0150]];
-        return new MBCState(0, 0, false, headerCheck, null, null);
+        return new MBCState(0, 0, false, HeaderCheck, null, null);
     }
 
     public void LoadState(MBCState state)

@@ -20,6 +20,8 @@ internal class MBC1 : ICartridge
     private int _romBank;
     private int _sramBank;
 
+    public byte[] HeaderCheck => [.. _rom[0x0134..0x0144], .. _rom[0x014D..0x0150]];
+
     public MBC1(byte[] rom, string romName)
     {
         _rom = rom;
@@ -123,12 +125,11 @@ internal class MBC1 : ICartridge
     public MBCState SaveState()
     {
         byte[] additionalRegisters = [(byte)(_advancedBanking ? 1 : 0)];
-        byte[] headerCheck = [.. _rom[0x0134..0x0144], .. _rom[0x014D..0x0150]];
         return new MBCState(
             _romBank,
             _sramBank,
             _ramEnabled,
-            headerCheck,
+            HeaderCheck,
             additionalRegisters,
             _sram
             );

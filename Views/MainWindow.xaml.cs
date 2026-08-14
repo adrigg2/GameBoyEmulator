@@ -133,6 +133,14 @@ public partial class MainWindow : Window
             SaveStateSerializer.SerializeSaveState("./states/save.state", _rewindStack.Peek());
         }
 
+        if (e.Key == Key.B && _emulator != null)
+        {
+            if (File.Exists("./states/save.state"))
+            {
+                SaveState.SaveState state = SaveStateSerializer.DeserializeSaveState("./states/save.state", _emulator.MMU.Cartridge.HeaderCheck);
+            }
+        }
+
         if (e.Key == Key.F1 && _emulator != null)
         {
             _paused = true;

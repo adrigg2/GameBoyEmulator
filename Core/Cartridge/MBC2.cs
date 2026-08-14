@@ -17,6 +17,8 @@ public class MBC2 : ICartridge
 
     private readonly string _romName;
 
+    public byte[] HeaderCheck => [.. _rom[0x0134..0x0144], .. _rom[0x014D..0x0150]];
+
     public MBC2(byte[] rom, string romName)
     {
         _rom = rom;
@@ -95,12 +97,11 @@ public class MBC2 : ICartridge
 
     public MBCState SaveState()
     {
-        byte[] headerCheck = [.. _rom[0x0134..0x0144], .. _rom[0x014D..0x0150]];
         return new MBCState(
             _romBank,
             0,
             _ramEnabled,
-            headerCheck,
+            HeaderCheck,
             null,
             _sram
             );

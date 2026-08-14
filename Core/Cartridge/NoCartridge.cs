@@ -4,6 +4,8 @@ namespace GameBoyEmulator.Core.Cartridge;
 
 public class NoCartridge : ICartridge
 {
+    public byte[] HeaderCheck => [];
+
     public byte ReadRam(ushort address)
     {
         return 0xFF;
