@@ -9,7 +9,7 @@
         KeyDown="Window_KeyDown"
         KeyUp="Window_KeyUp">
     <DockPanel>
-        <Menu DockPanel.Dock="Top">
+        <Menu DockPanel.Dock="Top" x:Name="MenuContainer">
             <MenuItem Header="_File">
                 <MenuItem Header="_Open ROM" Click="OpenROM"></MenuItem>
             </MenuItem>
@@ -22,7 +22,7 @@
                 </MenuItem>
             </MenuItem>
         </Menu>
-        <Grid Background="Black">
+        <Grid Background="Black" x:Name="ScreenContainer">
             <Image x:Name="Screen" HorizontalAlignment="Center" Height="144" Margin="0,0,0,0" VerticalAlignment="Center" Width="160" RenderTransformOrigin="0.5,0.5" RenderOptions.BitmapScalingMode="NearestNeighbor" Stretch="Uniform">
             </Image>
 

@@ -63,6 +63,9 @@ public partial class MainWindow : Window
         _bootRomFilePath = args[0];
 
         _rewindStack = new(50);
+
+        MinWidth = GbWidth + 100;
+        MinHeight = GbHeight + 100;
     }
 
     private void Tick(CancellationToken token)
@@ -179,8 +182,8 @@ public partial class MainWindow : Window
 
     private void UpdateScale()
     {
-        double scaleX = ActualWidth / GbWidth;
-        double scaleY = ActualHeight / GbHeight;
+        double scaleX = ScreenContainer.ActualWidth / GbWidth;
+        double scaleY = ScreenContainer.ActualHeight / GbHeight;
 
         int scale = Math.Max(1, (int)Math.Floor(Math.Min(scaleX, scaleY)));
 
