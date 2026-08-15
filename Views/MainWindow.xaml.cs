@@ -92,6 +92,7 @@ public partial class MainWindow : Window
             while (_rewinding && _rewindStack.Count > 0)
             {
                 _emulator.LoadState(_rewindStack.Pop());
+                _emulator.ProcessFrame();
                 Thread.Sleep(10);
             }
 
