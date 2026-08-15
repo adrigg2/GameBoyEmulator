@@ -3,18 +3,12 @@ using System.Collections.Concurrent;
 
 namespace GameBoyEmulator.Core.Audio;
 
-public class APUSampleProvider : ISampleProvider
+public class APUSampleProvider(WaveFormat waveFormat, int capacity) : ISampleProvider
 {
-    private readonly RingBuffer _ringBuffer;
-    public WaveFormat WaveFormat { get; }
+    private readonly RingBuffer _ringBuffer = new(capacity);
+    public WaveFormat WaveFormat { get; } = waveFormat;
 
     public int SampleCount { get => _ringBuffer.Count; }
-
-    public APUSampleProvider(WaveFormat waveFormat, int capacity)
-    {
-        WaveFormat = waveFormat;
-        _ringBuffer = new(capacity);
-    }
 
     public int Read(float[] buffer, int offset, int count)
     {
@@ -30,5 +24,10 @@ public class APUSampleProvider : ISampleProvider
     public void WriteSample(float sample)
     {
         _ringBuffer.Write(sample);
+    }
+
+    public void Clear()
+    {
+        _ringBuffer.Clear();
     }
 }

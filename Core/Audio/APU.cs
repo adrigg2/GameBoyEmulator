@@ -95,8 +95,9 @@ public class APU
 
         var format = WaveFormat.CreateIeeeFloatWaveFormat(44100, 2);
         _sampleProvider = new APUSampleProvider(format, 70560);
-        _out = new WasapiOut(AudioClientShareMode.Shared, 200);
+        _out = new WasapiOut(AudioClientShareMode.Shared, 50);
         _out.Init(_sampleProvider);
+        _out.Play();
 
         _channel1a = true;
         _channel2a = true;
@@ -122,6 +123,11 @@ public class APU
                 _channel4a = !_channel4a;
                 break;
         }
+    }
+
+    public void ClearAudioBuffer()
+    {
+        _sampleProvider.Clear();
     }
 
     public void Tick(int cycles, int divApuCounter)
@@ -168,11 +174,6 @@ public class APU
             _sampleCycles -= CyclesPerSample;
             GenerateSample();
         }
-    }
-
-    public void StartAudio()
-    {
-        _out.Play();
     }
 
     private void GenerateSample()

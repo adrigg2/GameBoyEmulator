@@ -1,9 +1,7 @@
 ﻿using GameBoyEmulator.SaveState;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.Intrinsics.Arm;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -46,7 +44,20 @@ public partial class MainWindow : Window
 
         SizeChanged += (_, _) => UpdateScale();
 
-        Closed += (_, _) => _cts?.Cancel();
+        Closed += (_, _) =>
+        {
+            _cts?.Cancel();
+
+            if (_emulatorThread?.IsAlive == true)
+            {
+                _emulatorThread.Join();
+            }
+
+            _emulatorThread = null;
+
+            _cts?.Dispose();
+            _cts = null;
+        };
 
         _paletteInUse = lcd1;
         _bootRomFilePath = args[0];
@@ -58,8 +69,7 @@ public partial class MainWindow : Window
     {
         int frames = 0;
 
-        const int primeTarget = 44100 * 2 / 20;
-        const int throttleTarget = 44100 * 2 / 10;
+        const int throttleTarget = 44100 / 50;
         const int framesPerSave = 6; // 5 seconds of rewind
 
         Stopwatch stopwatch = Stopwatch.StartNew();
@@ -68,15 +78,6 @@ public partial class MainWindow : Window
         {
             return;
         }
-
-        while (_emulator.APU.SampleProvider.SampleCount < primeTarget)
-        {
-            _emulator.ProcessFrame();
-            frames++;
-        }
-
-
-        _emulator.APU.StartAudio();
 
         while (!token.IsCancellationRequested)
         {
@@ -88,9 +89,20 @@ public partial class MainWindow : Window
                 _rewindStack.Push(_emulator.SaveState());
             }
 
+            while (_rewinding && _rewindStack.Count > 0)
+            {
+                _emulator.LoadState(_rewindStack.Pop());
+                Thread.Sleep(10);
+            }
+
             while ((_emulator.APU.SampleProvider.SampleCount > throttleTarget && !_turboMode) || _paused)
             {
                 Thread.Sleep(1);
+            }
+
+            if (_turboMode)
+            {
+                _emulator.APU.ClearAudioBuffer();
             }
 
             if (stopwatch.ElapsedMilliseconds >= 60 * 1000)
@@ -129,10 +141,9 @@ public partial class MainWindow : Window
             _turboMode = true;
         }
 
-        if (e.Key == Key.Tab && _rewindStack.Count > 0)
+        if (e.Key == Key.LeftCtrl)
         {
             _rewinding = true;
-            Task.Run(Rewind);
         }
 
         if (e.Key == Key.F1 && _emulator != null)
@@ -157,7 +168,7 @@ public partial class MainWindow : Window
             _turboMode = false;
         }
 
-        if (e.Key == Key.Tab && _rewindStack.Count > 0)
+        if (e.Key == Key.LeftCtrl)
         {
             _rewinding = false;
         }
@@ -247,20 +258,13 @@ public partial class MainWindow : Window
                 romName = romName[..^3];
                 Title = romName;
 
+                _rewindStack?.Clear();
+
                 _cts = new CancellationTokenSource();
                 _emulatorThread = new Thread(() => Tick(_cts.Token));
                 _emulatorThread.Start();
             }
 
-        }
-    }
-
-    private void Rewind()
-    {
-        while (_rewinding && _rewindStack.Count > 0)
-        {
-            _emulator?.LoadState(_rewindStack.Pop());
-            Thread.Sleep(100);
         }
     }
 }

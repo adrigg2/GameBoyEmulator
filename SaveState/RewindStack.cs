@@ -38,4 +38,10 @@ public class RewindStack(int capacity)
     {
         return _stack[(_top + _capacity - 1) % _capacity];
     }
+
+    public void Clear()
+    {
+        _top = 0;
+        _count = 0;
+    }
 }

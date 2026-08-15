@@ -43,4 +43,11 @@ public class RingBuffer(int capacity)
             return toRead;
         }
     }
+
+    public void Clear()
+    {
+        _count = 0;
+        _head = 0;
+        _tail = 0;
+    }
 }
