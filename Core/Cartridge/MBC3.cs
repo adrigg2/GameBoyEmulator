@@ -63,9 +63,9 @@ public class MBC3 : ICartridge
 
         _romBank = 1;
 
-        if (_battery && File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"/saves/{_romName}.save"))
+        if (_battery && File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"/GEGB/saves/{_romName}.save"))
         {
-            using FileStream stream = File.OpenRead(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"/saves/{_romName}.save");
+            using FileStream stream = File.OpenRead(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"/GEGB/saves/{_romName}.save");
             using BinaryReader reader = new(stream);
             if (_sram != null)
             {
@@ -126,8 +126,8 @@ public class MBC3 : ICartridge
     {
         if (_battery)
         {
-            Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/saves/");
-            using FileStream stream = File.OpenWrite(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"/saves/{_romName}.save");
+            Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/GEGB/saves/");
+            using FileStream stream = File.OpenWrite(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"/GEGB/saves/{_romName}.save");
             using BinaryWriter writer = new(stream);
             if (_sram != null)
             {

@@ -43,9 +43,9 @@ internal class MBC1 : ICartridge
 
         _romBank = 1;
 
-        if (_battery && File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"/saves/{_romName}.save"))
+        if (_battery && File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"/GEGB/saves/{_romName}.save"))
         {
-            _sram = File.ReadAllBytes(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"/saves/{_romName}.save");
+            _sram = File.ReadAllBytes(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"/GEGB/saves/{_romName}.save");
         }
     }
 
@@ -81,8 +81,8 @@ internal class MBC1 : ICartridge
     {
         if (_battery && _sram != null)
         {
-            Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/saves/");
-            File.WriteAllBytes(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"/saves/{_romName}.save", _sram);
+            Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/GEGB/saves/");
+            File.WriteAllBytes(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"/GEGB/saves/{_romName}.save", _sram);
         }
     }
 

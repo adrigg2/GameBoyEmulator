@@ -37,7 +37,7 @@ public partial class MainWindow : Window
     public MainWindow(string[] args)
     {
         InitializeComponent();
-        Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/states/");
+        Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/GEGB/states/");
 
         SizeChanged += (_, _) => UpdateScale();
 
@@ -49,6 +49,8 @@ public partial class MainWindow : Window
             {
                 _emulatorThread.Join();
             }
+
+            _emulator?.MMU.Cartridge.SaveRam();
 
             _emulatorThread = null;
 
@@ -250,6 +252,8 @@ public partial class MainWindow : Window
                 {
                     _emulatorThread.Join();
                 }
+
+                _emulator?.MMU.Cartridge.SaveRam();
 
                 _emulator = new Emulator(romFilePath, _bootRomFilePath, Dispatcher);
                 _emulator?.PPU.SetWindowSource(this);
