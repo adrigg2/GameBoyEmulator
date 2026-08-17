@@ -230,8 +230,8 @@ public class APU
         left = HighPass(left, ref _capacitorL);
         right = HighPass(right, ref _capacitorR);
 
-        left *= 0.2f;
-        right *= 0.2f;
+        left *= Settings.Volume;
+        right *= Settings.Volume;
 
         _sampleProvider.WriteSample(left);
         _sampleProvider.WriteSample(right);

@@ -29,9 +29,9 @@ public class MBC2 : ICartridge
         if (rom[0x0147] == 0x06)
         {
             _battery = true;
-            if (File.Exists($"./saves/{_romName}.save"))
+            if (File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"/saves/{_romName}.save"))
             {
-                _sram = File.ReadAllBytes($"./saves/{_romName}.save");
+                _sram = File.ReadAllBytes(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"/saves/{_romName}.save");
             }
         }
     }
@@ -58,7 +58,8 @@ public class MBC2 : ICartridge
     {
         if (_battery)
         {
-            File.WriteAllBytes($"./saves/{_romName}.save", _sram);
+            Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/saves/");
+            File.WriteAllBytes(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"/saves/{_romName}.save", _sram);
         }
     }
 

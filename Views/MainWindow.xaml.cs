@@ -26,8 +26,6 @@ public partial class MainWindow : Window
     private bool _rewinding;
 
     private string _bootRomFilePath;
-
-    private BitmapPalette _paletteInUse;
     
     private Emulator? _emulator;
 
@@ -39,8 +37,7 @@ public partial class MainWindow : Window
     public MainWindow(string[] args)
     {
         InitializeComponent();
-        Directory.CreateDirectory("./saves/");
-        Directory.CreateDirectory("./states/");
+        Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/states/");
 
         SizeChanged += (_, _) => UpdateScale();
 
@@ -59,7 +56,6 @@ public partial class MainWindow : Window
             _cts = null;
         };
 
-        _paletteInUse = lcd1;
         _bootRomFilePath = args[0];
 
         _rewindStack = new(50);
@@ -157,7 +153,7 @@ public partial class MainWindow : Window
             {
                 Owner = this
             };
-            window.RenderVRAM(_emulator.MMU.VRAM, _paletteInUse.Colors);
+            window.RenderVRAM(_emulator.MMU.VRAM, Settings.Palette.Colors);
             window.ShowDialog();
             _paused = false;
         }
@@ -200,7 +196,7 @@ public partial class MainWindow : Window
             LCD3.IsChecked = false;
             BaW.IsChecked = false;
             _emulator?.PPU.SetBitmapPalette(this, lcd1);
-            _paletteInUse = lcd1;
+            Settings.Palette = lcd1;
         }
         else if (sender.Equals(LCD2))
         {
@@ -209,7 +205,7 @@ public partial class MainWindow : Window
             LCD3.IsChecked = false;
             BaW.IsChecked = false;
             _emulator?.PPU.SetBitmapPalette(this, lcd2);
-            _paletteInUse = lcd2;
+            Settings.Palette = lcd2;
         }
         else if (sender.Equals(LCD3))
         {
@@ -218,7 +214,7 @@ public partial class MainWindow : Window
             LCD3.IsChecked = true;
             BaW.IsChecked = false;
             _emulator?.PPU.SetBitmapPalette(this, lcd3);
-            _paletteInUse = lcd3;
+            Settings.Palette = lcd3;
         }
         else if (sender.Equals(BaW))
         {
@@ -227,7 +223,7 @@ public partial class MainWindow : Window
             LCD3.IsChecked = false;
             BaW.IsChecked = true;
             _emulator?.PPU.SetBitmapPalette(this, baw);
-            _paletteInUse = baw;
+            Settings.Palette = baw;
         }
     }
 
@@ -245,7 +241,8 @@ public partial class MainWindow : Window
         if (result == true)
         {
             string romFilePath = dialog.FileName;
-            if (romFilePath.Split('\\').Last().EndsWith(".gb"))
+            string fileExtension = Path.GetExtension(romFilePath);
+            if (fileExtension.ToLower().Equals(".gb"))
             {
                 _cts?.Cancel();
 
@@ -256,10 +253,9 @@ public partial class MainWindow : Window
 
                 _emulator = new Emulator(romFilePath, _bootRomFilePath, Dispatcher);
                 _emulator?.PPU.SetWindowSource(this);
-                _emulator?.PPU.SetBitmapPalette(this, _paletteInUse);
+                _emulator?.PPU.SetBitmapPalette(this, Settings.Palette);
 
-                string romName = romFilePath.Split('\\').Last();
-                romName = romName[..^3];
+                string romName = Path.GetFileNameWithoutExtension(romFilePath);
                 Title = romName;
 
                 _rewindStack?.Clear();

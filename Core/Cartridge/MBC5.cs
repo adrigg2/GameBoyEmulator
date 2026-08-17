@@ -48,9 +48,9 @@ public class MBC5 : ICartridge
 
         _romBank = 1;
 
-        if (_battery && File.Exists($"./saves/{_romName}.save"))
+        if (_battery && File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"/saves/{_romName}.save"))
         {
-            _sram = File.ReadAllBytes($"./saves/{_romName}.save");
+            _sram = File.ReadAllBytes(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"/saves/{_romName}.save");
         }
     }
 
@@ -79,7 +79,8 @@ public class MBC5 : ICartridge
     {
         if (_battery && _sram != null)
         {
-            File.WriteAllBytes($"./saves/{_romName}.save", _sram);
+            Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/saves/");
+            File.WriteAllBytes(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"/saves/{_romName}.save", _sram);
         }
     }
 
