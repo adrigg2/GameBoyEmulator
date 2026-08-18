@@ -37,69 +37,81 @@ public class JOYPAD
 
     public void HandleKeyDown(Key key)
     {
-        switch (key)
+        if (key == Settings.DPadUp)
         {
-            case Key.W: // UP
-                _pad = (byte)(_pad & ~0x4);
-                break;
-            case Key.A: // LEFT
-                _pad = (byte)(_pad & ~0x2);
-                break;
-            case Key.S: // DOWN
-                _pad = (byte)(_pad & ~0x8);
-                break;
-            case Key.D: // RIGHT
-                _pad = (byte)(_pad & ~0x1);
-                break;
-            case Key.U: // A
-                _buttons = (byte)(_buttons & ~0x1);
-                break;
-            case Key.I: // B
-                _buttons = (byte)(_buttons & ~0x2);
-                break;
-            case Key.O: // START
-                _buttons = (byte)(_buttons & ~0x8);
-                break;
-            case Key.L: // SELECT
-                _buttons = (byte)(_buttons & ~0x4);
-                break;
-            case Key.K: // ALL BUTTONS
-                _buttons = 0;
-                break;
+            _pad = (byte)(_pad & ~0x4);
+        }
+        else if (key == Settings.DPadLeft)
+        {
+            _pad = (byte)(_pad & ~0x2);
+        }
+        else if (key == Settings.DPadRight)
+        {
+            _pad = (byte)(_pad & ~0x8);
+        }
+        else if (key == Settings.DPadDown)
+        {
+            _pad = (byte)(_pad & ~0x1);
+        }
+        else if (key == Settings.ButtonA)
+        {
+            _buttons = (byte)(_buttons & ~0x1);
+        }
+        else if (key == Settings.ButtonB)
+        {
+            _buttons = (byte)(_buttons & ~0x2);
+        }
+        else if (key == Settings.ButtonStart)
+        {
+            _buttons = (byte)(_buttons & ~0x8);
+        }
+        else if (key == Settings.ButtonSelect)
+        {
+            _buttons = (byte)(_buttons & ~0x4);
+        }
+        else if (key == Settings.AllButtons)
+        {
+            _buttons = 0;
         }
     }
 
     public void HandleKeyUp(Key key)
     {
-        switch (key)
+        if (key == Settings.DPadUp)
         {
-            case Key.W: // UP
-                _pad |= 0x4;
-                break;
-            case Key.A: // LEFT
-                _pad |= 0x2;
-                break;
-            case Key.S: // DOWN
-                _pad |= 0x8;
-                break;
-            case Key.D: // RIGHT
-                _pad |= 0x1;
-                break;
-            case Key.U: // A
-                _buttons |= 0x1;
-                break;
-            case Key.I: // B
-                _buttons |= 0x2;
-                break;
-            case Key.O: // START
-                _buttons |= 0x8;
-                break;
-            case Key.L: // SELECT
-                _buttons |= 0x4;
-                break;
-            case Key.K: // ALL BUTTONS
-                _buttons = 0xF;
-                break;
+            _pad |= 0x4;
+        }
+        else if (key == Settings.DPadLeft)
+        {
+            _pad |= 0x2;
+        }
+        else if (key == Settings.DPadRight)
+        {
+            _pad |= 0x8;
+        }
+        else if (key == Settings.DPadDown)
+        {
+            _pad |= 0x1;
+        }
+        else if (key == Settings.ButtonA)
+        {
+            _buttons |= 0x1;
+        }
+        else if (key == Settings.ButtonB)
+        {
+            _buttons |= 0x2;
+        }
+        else if (key == Settings.ButtonStart)
+        {
+            _buttons |= 0x8;
+        }
+        else if (key == Settings.ButtonSelect)
+        {
+            _buttons |= 0x4;
+        }
+        else if (key == Settings.AllButtons)
+        {
+            _buttons = 0xF;
         }
     }
 

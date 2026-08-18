@@ -16,10 +16,10 @@ public partial class MainWindow : Window
     const int GbWidth = 160;
     const int GbHeight = 144;
 
-    readonly BitmapPalette lcd1 = new([Color.FromRgb(198, 222, 140), Color.FromRgb(132, 165, 99), Color.FromRgb(57, 97, 57), Color.FromRgb(8, 24, 16)]);
-    readonly BitmapPalette lcd2 = new([Color.FromRgb(136, 240, 0), Color.FromRgb(32, 152, 96), Color.FromRgb(64, 128, 16), Color.FromRgb(8, 72, 0)]);
-    readonly BitmapPalette lcd3 = new([Color.FromRgb(155, 188, 15), Color.FromRgb(139, 172, 15), Color.FromRgb(48, 98, 48), Color.FromRgb(15, 56, 15)]);
-    readonly BitmapPalette baw = new([Color.FromRgb(255, 255, 255), Color.FromRgb(170, 170, 170), Color.FromRgb(85, 85, 85), Color.FromRgb(0, 0, 0)]);
+    readonly Color[] lcd1 = [Color.FromRgb(198, 222, 140), Color.FromRgb(132, 165, 99), Color.FromRgb(57, 97, 57), Color.FromRgb(8, 24, 16)];
+    readonly Color[] lcd2 = [Color.FromRgb(136, 240, 0), Color.FromRgb(32, 152, 96), Color.FromRgb(64, 128, 16), Color.FromRgb(8, 72, 0)];
+    readonly Color[] lcd3 = [Color.FromRgb(155, 188, 15), Color.FromRgb(139, 172, 15), Color.FromRgb(48, 98, 48), Color.FromRgb(15, 56, 15)];
+    readonly Color[] baw = [Color.FromRgb(255, 255, 255), Color.FromRgb(170, 170, 170), Color.FromRgb(85, 85, 85), Color.FromRgb(0, 0, 0)];
 
     private bool _turboMode;
     private bool _paused;
@@ -121,41 +121,41 @@ public partial class MainWindow : Window
     private void Window_KeyDown(object sender, KeyEventArgs e)
     {
         //DEBUG
-        if (e.Key == Key.D1)
+        if (e.Key == Settings.ToggleChannel1)
         {
             _emulator?.APU.ToggleChannel(1);
         }
-        else if (e.Key == Key.D2)
+        else if (e.Key == Settings.ToggleChannel2)
         {
             _emulator?.APU.ToggleChannel(2);
         }
-        else if (e.Key == Key.D3)
+        else if (e.Key == Settings.ToggleChannel3)
         {
             _emulator?.APU.ToggleChannel(3);
         }
-        else if (e.Key == Key.D4)
+        else if (e.Key == Settings.ToggleChannel4)
         {
             _emulator?.APU.ToggleChannel(4);
         }
 
-        if (e.Key == Key.Space)
+        if (e.Key == Settings.TurboMode)
         {
             _turboMode = true;
         }
 
-        if (e.Key == Key.LeftCtrl)
+        if (e.Key == Settings.RewindButton)
         {
             _rewinding = true;
         }
 
-        if (e.Key == Key.F1 && _emulator != null)
+        if (e.Key == Settings.OpenVramViewer && _emulator != null)
         {
             _paused = true;
             var window = new VRAMInspector.VRAMViewer
             {
                 Owner = this
             };
-            window.RenderVRAM(_emulator.MMU.VRAM, Settings.Palette.Colors);
+            window.RenderVRAM(_emulator.MMU.VRAM, Settings.Palette);
             window.ShowDialog();
             _paused = false;
         }
@@ -165,12 +165,12 @@ public partial class MainWindow : Window
 
     private void Window_KeyUp(object sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Space)
+        if (e.Key == Settings.TurboMode)
         {
             _turboMode = false;
         }
 
-        if (e.Key == Key.LeftCtrl)
+        if (e.Key == Settings.RewindButton)
         {
             _rewinding = false;
         }

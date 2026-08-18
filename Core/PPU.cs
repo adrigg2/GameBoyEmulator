@@ -84,9 +84,9 @@ public class PPU
         window.Screen.Source = _screenImage;
     }
 
-    public void SetBitmapPalette(MainWindow window, BitmapPalette palette)
+    public void SetBitmapPalette(MainWindow window, Color[] palette)
     {
-        _screenImage = new(ScreenWidth, ScreenHeigth, 96, 96, PixelFormats.Indexed2, palette);
+        _screenImage = new(ScreenWidth, ScreenHeigth, 96, 96, PixelFormats.Indexed2, new BitmapPalette(palette));
         window.Screen.Source = _screenImage;
     }
 
