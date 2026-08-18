@@ -64,6 +64,47 @@ public partial class MainWindow : Window
 
         MinWidth = GbWidth + 100;
         MinHeight = GbHeight + 100;
+
+        if (Enumerable.SequenceEqual(lcd1, Settings.Palette))
+        {
+            LCD1.IsChecked = true;
+            LCD2.IsChecked = false;
+            LCD3.IsChecked = false;
+            BaW.IsChecked = false;
+            CustomPalette.IsChecked = false;
+        }
+        else if (Enumerable.SequenceEqual(lcd2, Settings.Palette))
+        {
+            LCD1.IsChecked = false;
+            LCD2.IsChecked = true;
+            LCD3.IsChecked = false;
+            BaW.IsChecked = false;
+            CustomPalette.IsChecked = false;
+        }
+        else if (Enumerable.SequenceEqual(lcd3, Settings.Palette))
+        {
+            LCD1.IsChecked = false;
+            LCD2.IsChecked = false;
+            LCD3.IsChecked = true;
+            BaW.IsChecked = false;
+            CustomPalette.IsChecked = false;
+        }
+        else if (Enumerable.SequenceEqual(baw, Settings.Palette))
+        {
+            LCD1.IsChecked = false;
+            LCD2.IsChecked = false;
+            LCD3.IsChecked = false;
+            BaW.IsChecked = true;
+            CustomPalette.IsChecked = false;
+        }
+        else
+        {
+            LCD1.IsChecked = false;
+            LCD2.IsChecked = false;
+            LCD3.IsChecked = false;
+            BaW.IsChecked = false;
+            CustomPalette.IsChecked = true;
+        }
     }
 
     private void Tick(CancellationToken token)
@@ -197,6 +238,7 @@ public partial class MainWindow : Window
             LCD2.IsChecked = false;
             LCD3.IsChecked = false;
             BaW.IsChecked = false;
+            CustomPalette.IsChecked = false;
             _emulator?.PPU.SetBitmapPalette(this, lcd1);
             Settings.Palette = lcd1;
         }
@@ -206,6 +248,7 @@ public partial class MainWindow : Window
             LCD2.IsChecked = true;
             LCD3.IsChecked = false;
             BaW.IsChecked = false;
+            CustomPalette.IsChecked = false;
             _emulator?.PPU.SetBitmapPalette(this, lcd2);
             Settings.Palette = lcd2;
         }
@@ -215,6 +258,7 @@ public partial class MainWindow : Window
             LCD2.IsChecked = false;
             LCD3.IsChecked = true;
             BaW.IsChecked = false;
+            CustomPalette.IsChecked = false;
             _emulator?.PPU.SetBitmapPalette(this, lcd3);
             Settings.Palette = lcd3;
         }
@@ -224,8 +268,19 @@ public partial class MainWindow : Window
             LCD2.IsChecked = false;
             LCD3.IsChecked = false;
             BaW.IsChecked = true;
+            CustomPalette.IsChecked = false;
             _emulator?.PPU.SetBitmapPalette(this, baw);
             Settings.Palette = baw;
+        }
+        else if (sender.Equals(CustomPalette))
+        {
+            LCD1.IsChecked = false;
+            LCD2.IsChecked = false;
+            LCD3.IsChecked = false;
+            BaW.IsChecked = false;
+            CustomPalette.IsChecked = true;
+            _emulator?.PPU.SetBitmapPalette(this, Settings.CustomPalette);
+            Settings.Palette = Settings.CustomPalette;
         }
     }
 

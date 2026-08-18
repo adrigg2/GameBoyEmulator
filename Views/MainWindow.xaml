@@ -19,6 +19,7 @@
                     <MenuItem x:Name="LCD2" Header="LCD 2" Click="ChangePalette"></MenuItem>
                     <MenuItem x:Name="LCD3" Header="LCD 3" Click="ChangePalette"></MenuItem>
                     <MenuItem x:Name="BaW" Header="Black and White" Click="ChangePalette"></MenuItem>
+                    <MenuItem x:Name="CustomPalette" Header="Custom Palette" Click="ChangePalette"></MenuItem>
                 </MenuItem>
             </MenuItem>
         </Menu>
