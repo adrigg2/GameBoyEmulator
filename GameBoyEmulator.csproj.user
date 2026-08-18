@@ -5,6 +5,9 @@
     <Compile Update="Views\MainWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\SettingsWindow\SettingsWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Views\VRAMInspector\VRAMViewer.xaml.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -21,6 +21,8 @@
                     <MenuItem x:Name="BaW" Header="Black and White" Click="ChangePalette"></MenuItem>
                     <MenuItem x:Name="CustomPalette" Header="Custom Palette" Click="ChangePalette"></MenuItem>
                 </MenuItem>
+                <MenuItem Header="_Settings" Click="OpenSettings">
+                </MenuItem>
             </MenuItem>
         </Menu>
         <Grid Background="Black" x:Name="ScreenContainer">

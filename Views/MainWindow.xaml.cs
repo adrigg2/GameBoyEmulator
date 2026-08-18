@@ -1,10 +1,11 @@
 ﻿using GameBoyEmulator.SaveState;
+using GameBoyEmulator.Views.SettingsWindow;
+using GameBoyEmulator.Views.VRAMInspector;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace GameBoyEmulator.Views;
 
@@ -192,7 +193,7 @@ public partial class MainWindow : Window
         if (e.Key == Settings.OpenVramViewer && _emulator != null)
         {
             _paused = true;
-            var window = new VRAMInspector.VRAMViewer
+            var window = new VRAMViewer
             {
                 Owner = this
             };
@@ -325,5 +326,16 @@ public partial class MainWindow : Window
             }
 
         }
+    }
+
+    private void OpenSettings(object sender, RoutedEventArgs e)
+    {
+        _paused = true;
+        var window = new SettingsWindow.SettingsWindow
+        {
+            Owner = this
+        };
+        window.ShowDialog();
+        _paused = false;
     }
 }
