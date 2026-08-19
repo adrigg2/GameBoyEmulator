@@ -335,7 +335,14 @@ public partial class MainWindow : Window
         {
             Owner = this
         };
+
         window.ShowDialog();
+        Settings.SaveSettings();
+        if (CustomPalette.IsChecked)
+        {
+            _emulator?.PPU.SetBitmapPalette(this, Settings.CustomPalette);
+        }
+
         _paused = false;
     }
 }

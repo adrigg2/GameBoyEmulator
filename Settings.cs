@@ -10,25 +10,25 @@ public static class Settings
 {
     private readonly static SettingsData _data = new();
 
-    public static float Volume { get => _data.Volume; set { _data.Volume = value; SaveSettings(); } }
+    public static float Volume { get => _data.Volume; set => _data.Volume = value; }
     public static Color[] Palette { get => _data.Palette; set { _data.Palette = value; SaveSettings(); } }
-    public static Color[] CustomPalette { get => _data.CustomPalette; set { _data.CustomPalette = value; SaveSettings(); } }
-    public static Key DPadUp { get => _data.DPadUp; set { _data.DPadUp = value; SaveSettings(); } }
-    public static Key DPadLeft { get => _data.DPadLeft; set { _data.DPadLeft = value; SaveSettings(); } }
-    public static Key DPadRight { get => _data.DPadRight; set { _data.DPadRight = value; SaveSettings(); } }
-    public static Key DPadDown { get => _data.DPadDown; set { _data.DPadDown = value; SaveSettings(); } }
-    public static Key ButtonA { get => _data.ButtonA; set { _data.ButtonA = value; SaveSettings(); } }
-    public static Key ButtonB { get => _data.ButtonB; set { _data.ButtonB = value; SaveSettings(); } }
-    public static Key ButtonStart { get => _data.ButtonStart; set { _data.ButtonStart = value; SaveSettings(); } }
-    public static Key ButtonSelect { get => _data.ButtonSelect; set { _data.ButtonSelect = value; SaveSettings(); } }
-    public static Key AllButtons { get => _data.AllButtons; set { _data.AllButtons = value; SaveSettings(); } }
-    public static Key ToggleChannel1 { get => _data.ToggleChannel1; set { _data.ToggleChannel1 = value; SaveSettings(); } }
-    public static Key ToggleChannel2 { get => _data.ToggleChannel2; set { _data.ToggleChannel2 = value; SaveSettings(); } }
-    public static Key ToggleChannel3 { get => _data.ToggleChannel3; set { _data.ToggleChannel3 = value; SaveSettings(); } }
-    public static Key ToggleChannel4 { get => _data.ToggleChannel4; set { _data.ToggleChannel4 = value; SaveSettings(); } }
-    public static Key TurboMode { get => _data.TurboMode; set { _data.TurboMode = value; SaveSettings(); } }
-    public static Key RewindButton { get => _data.RewindButton; set { _data.RewindButton = value; SaveSettings(); } }
-    public static Key OpenVramViewer { get => _data.OpenVramViewer; set { _data.OpenVramViewer = value; SaveSettings(); } }
+    public static Color[] CustomPalette { get => _data.CustomPalette; set => _data.CustomPalette = value; }
+    public static Key DPadUp { get => _data.DPadUp; set => _data.DPadUp = value; }
+    public static Key DPadLeft { get => _data.DPadLeft; set => _data.DPadLeft = value; }
+    public static Key DPadRight { get => _data.DPadRight; set => _data.DPadRight = value; }
+    public static Key DPadDown { get => _data.DPadDown; set => _data.DPadDown = value; }
+    public static Key ButtonA { get => _data.ButtonA; set => _data.ButtonA = value; }
+    public static Key ButtonB { get => _data.ButtonB; set => _data.ButtonB = value; }
+    public static Key ButtonStart { get => _data.ButtonStart; set => _data.ButtonStart = value; }
+    public static Key ButtonSelect { get => _data.ButtonSelect; set => _data.ButtonSelect = value; }
+    public static Key AllButtons { get => _data.AllButtons; set => _data.AllButtons = value; }
+    public static Key ToggleChannel1 { get => _data.ToggleChannel1; set => _data.ToggleChannel1 = value; }
+    public static Key ToggleChannel2 { get => _data.ToggleChannel2; set => _data.ToggleChannel2 = value; }
+    public static Key ToggleChannel3 { get => _data.ToggleChannel3; set => _data.ToggleChannel3 = value; }
+    public static Key ToggleChannel4 { get => _data.ToggleChannel4; set => _data.ToggleChannel4 = value; }
+    public static Key TurboMode { get => _data.TurboMode; set => _data.TurboMode = value; }
+    public static Key RewindButton { get => _data.RewindButton; set => _data.RewindButton = value; }
+    public static Key OpenVramViewer { get => _data.OpenVramViewer; set => _data.OpenVramViewer = value; }
 
 
     static Settings()
@@ -40,7 +40,7 @@ public static class Settings
         }
     }
 
-    private static void SaveSettings()
+    public static void SaveSettings()
     {
         string json = JsonSerializer.Serialize(_data);
 
