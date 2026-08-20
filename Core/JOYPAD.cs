@@ -45,11 +45,11 @@ public class JOYPAD
         {
             _pad = (byte)(_pad & ~0x2);
         }
-        else if (key == Settings.DPadRight)
+        else if (key == Settings.DPadDown)
         {
             _pad = (byte)(_pad & ~0x8);
         }
-        else if (key == Settings.DPadDown)
+        else if (key == Settings.DPadRight)
         {
             _pad = (byte)(_pad & ~0x1);
         }
@@ -85,11 +85,11 @@ public class JOYPAD
         {
             _pad |= 0x2;
         }
-        else if (key == Settings.DPadRight)
+        else if (key == Settings.DPadDown)
         {
             _pad |= 0x8;
         }
-        else if (key == Settings.DPadDown)
+        else if (key == Settings.DPadRight)
         {
             _pad |= 0x1;
         }
