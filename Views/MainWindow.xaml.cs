@@ -197,7 +197,7 @@ public partial class MainWindow : Window
             {
                 Owner = this
             };
-            window.RenderVRAM(_emulator.MMU.VRAM, Settings.Palette);
+            window.RenderVRAM((byte[])_emulator.MMU.VRAM.Clone(), _emulator.PPU.LCDC, _emulator.PPU.SCX, _emulator.PPU.SCY, Settings.Palette);
             window.ShowDialog();
             _paused = false;
         }

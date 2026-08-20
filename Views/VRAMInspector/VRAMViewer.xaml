@@ -6,8 +6,8 @@
         xmlns:local="clr-namespace:GameBoyEmulator"
         mc:Ignorable="d"
         Title="VRAMViewer" Height="450" Width="800">
-    <Grid Background="Black">
-        <Image x:Name="Screen" HorizontalAlignment="Center" Height="215" Margin="0,0,0,0" VerticalAlignment="Center" Width="143" RenderTransformOrigin="0.5,0.5" RenderOptions.BitmapScalingMode="NearestNeighbor" Stretch="Uniform">
+    <Grid x:Name="ScreenContainer" Background="Black">
+        <Image x:Name="Screen" HorizontalAlignment="Center" Height="256" Margin="0,0,0,0" VerticalAlignment="Center" Width="665" RenderTransformOrigin="0.5,0.5" RenderOptions.BitmapScalingMode="NearestNeighbor" Stretch="Uniform">
         </Image>
     </Grid>
 </Window>
