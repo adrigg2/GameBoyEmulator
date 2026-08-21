@@ -5,16 +5,10 @@ namespace GameBoyEmulator;
 public class Program
 {
     [STAThread]
-    public static void Main(string[] args)
-    {
-        if (args.Length < 1)
-        {
-            Console.WriteLine("A Boot ROM filepath must be given as a parameter");
-            return;
-        }
-        
+    public static void Main()
+    {   
         var app = new Application();
-        var window = new Views.MainWindow(args);
+        var window = new Views.MainWindow();
         app.Run(window);
     }
 }

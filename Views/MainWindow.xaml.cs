@@ -26,7 +26,6 @@ public partial class MainWindow : Window
     private bool _paused;
     private bool _rewinding;
 
-    private readonly string _bootRomFilePath;
     private string _romName = "";
     
     private Emulator? _emulator;
@@ -37,7 +36,7 @@ public partial class MainWindow : Window
 
     private readonly RewindStack _rewindStack;
 
-    public MainWindow(string[] args)
+    public MainWindow()
     {
         InitializeComponent();
 
@@ -59,8 +58,6 @@ public partial class MainWindow : Window
             _cts?.Dispose();
             _cts = null;
         };
-
-        _bootRomFilePath = args[0];
 
         _rewindStack = new(100);
 
@@ -313,6 +310,12 @@ public partial class MainWindow : Window
 
     private void OpenROM(object sender, RoutedEventArgs e)
     {
+        if (!File.Exists(Settings.BootRomFilePath))
+        {
+            MessageBox.Show("Boot ROM not found, provide a valid boot rom in the application settings", "Boot ROM not found", MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
+        }
+
         var dialog = new Microsoft.Win32.OpenFileDialog
         {
             FileName = "Game",
@@ -337,7 +340,7 @@ public partial class MainWindow : Window
 
                 _emulator?.MMU.Cartridge.SaveRam();
 
-                _emulator = new Emulator(romFilePath, _bootRomFilePath, Dispatcher);
+                _emulator = new Emulator(romFilePath, Settings.BootRomFilePath, Dispatcher);
                 _emulator?.PPU.SetWindowSource(this);
                 _emulator?.PPU.SetBitmapPalette(this, Settings.Palette);
 

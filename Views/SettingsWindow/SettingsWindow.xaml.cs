@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using GameBoyEmulator.SaveState;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -40,6 +41,10 @@ public partial class SettingsWindow : Window
         TurboMode.Content = Settings.TurboMode;
         RewindMode.Content = Settings.RewindButton;
         VRAMInspector.Content = Settings.OpenVramViewer;
+        QuickLoad.Content = Settings.QuickLoad;
+        QuickSave.Content = Settings.QuickSave;
+
+        BootRomFilePath.Content = Settings.BootRomFilePath;
 
         Closed += (_, _) =>
         {
@@ -270,6 +275,23 @@ public partial class SettingsWindow : Window
         {
             Settings.QuickLoad = Key.F3;
             QuickLoad.Content = Settings.QuickLoad;
+        }
+    }
+
+    private void SelectBootRomFile(object sender, RoutedEventArgs e)
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            FileName = "boot",
+            DefaultExt = ".bin",
+        };
+
+        bool? result = dialog.ShowDialog();
+
+        if (result == true)
+        {
+            Settings.BootRomFilePath = dialog.FileName;
+            BootRomFilePath.Content = Settings.BootRomFilePath;
         }
     }
 }

@@ -31,6 +31,7 @@ public static class Settings
     public static Key OpenVramViewer { get => _data.OpenVramViewer; set => _data.OpenVramViewer = value; }
     public static Key QuickSave { get => _data.QuickSave; set => _data.QuickSave = value; }
     public static Key QuickLoad { get => _data.QuickLoad; set => _data.QuickLoad = value; }
+    public static string BootRomFilePath { get => _data.BootRomPath; set => _data.BootRomPath = value; }
 
 
     static Settings()
@@ -73,5 +74,6 @@ public static class Settings
         public Key OpenVramViewer { get; set; } = Key.F1;
         public Key QuickSave { get; set; } = Key.F2;
         public Key QuickLoad { get; set; } = Key.F3;
+        public string BootRomPath { get; set; } = "";
     }
 }

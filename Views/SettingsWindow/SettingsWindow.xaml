@@ -41,6 +41,7 @@
                 <RowDefinition Height="26"></RowDefinition>
                 <RowDefinition Height="26"></RowDefinition>
                 <RowDefinition Height="26"></RowDefinition>
+                <RowDefinition Height="26"></RowDefinition>
             </Grid.RowDefinitions>
             <Label Grid.Row="0" Grid.Column="0">Volume:</Label>
             <Slider x:Name="VolumeControl" Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="1" ValueChanged="UpdateVolumeValue"></Slider>
@@ -56,79 +57,83 @@
             <Label Grid.Row="5" Grid.Column="0">Color 3:</Label>
             <xctk:ColorPicker x:Name="Color3" Grid.Row="5" Grid.Column="1"></xctk:ColorPicker>
 
-            <Label Grid.Row="6" Grid.Column="0">Key Bindings:</Label>
-            
-            <Label Grid.Row="7" Grid.Column="0">DPad Up:</Label>
-            <Button x:Name="DPadUp" Grid.Row="7" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
-            <Button x:Name="ResetDPadUp" Grid.Row="7" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
-            
-            <Label Grid.Row="8" Grid.Column="0">DPad Down:</Label>
-            <Button x:Name="DPadDown" Grid.Row="8" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
-            <Button x:Name="ResetDPadDown" Grid.Row="8" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
-            
-            <Label Grid.Row="9" Grid.Column="0">DPad Left:</Label>
-            <Button x:Name="DPadLeft" Grid.Row="9" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
-            <Button x:Name="ResetDPadLeft" Grid.Row="9" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
-            
-            <Label Grid.Row="10" Grid.Column="0">DPad Right:</Label>
-            <Button x:Name="DPadRight" Grid.Row="10" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
-            <Button x:Name="ResetDPadRight" Grid.Row="10" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
-            
-            <Label Grid.Row="11" Grid.Column="0">Button A:</Label>
-            <Button x:Name="ButtonA" Grid.Row="11" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
-            <Button x:Name="ResetButtonA" Grid.Row="11" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
-            
-            <Label Grid.Row="12" Grid.Column="0">Button B:</Label>
-            <Button x:Name="ButtonB" Grid.Row="12" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
-            <Button x:Name="ResetButtonB" Grid.Row="12" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
-            
-            <Label Grid.Row="13" Grid.Column="0">Button Start:</Label>
-            <Button x:Name="ButtonStart" Grid.Row="13" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
-            <Button x:Name="ResetButtonStart" Grid.Row="13" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
-            
-            <Label Grid.Row="14" Grid.Column="0">Button Select:</Label>
-            <Button x:Name="ButtonSelect" Grid.Row="14" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
-            <Button x:Name="ResetButtonSelect" Grid.Row="14" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
-            
-            <Label Grid.Row="15" Grid.Column="0">All Buttons:</Label>
-            <Button x:Name="AllButtons" Grid.Row="15" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
-            <Button x:Name="ResetAllButtons" Grid.Row="15" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
-            
-            <Label Grid.Row="16" Grid.Column="0">Turbo Mode:</Label>
-            <Button x:Name="TurboMode" Grid.Row="16" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
-            <Button x:Name="ResetTurboMode" Grid.Row="16" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
-            
-            <Label Grid.Row="17" Grid.Column="0">Rewind:</Label>
-            <Button x:Name="RewindMode" Grid.Row="17" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
-            <Button x:Name="ResetRewindMode" Grid.Row="17" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
-            
-            <Label Grid.Row="23" Grid.Column="0">Quick save:</Label>
-            <Button x:Name="QuickSave" Grid.Row="18" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
-            <Button x:Name="ResetQuickSave" Grid.Row="18" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
+            <Label Grid.Row="6" Grid.Column="0">Boot ROM file path:</Label>
+            <Label x:Name="BootRomFilePath" Grid.Row="6" Grid.Column="1"></Label>
+            <Button Grid.Row="6" Grid.Column="2" Width="70" Height="20" Click="SelectBootRomFile">Select file</Button>
 
-            <Label Grid.Row="24" Grid.Column="0">Quick load:</Label>
-            <Button x:Name="QuickLoad" Grid.Row="19" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
-            <Button x:Name="ResetQuickLoad" Grid.Row="19" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
+            <Label Grid.Row="7" Grid.Column="0">Key Bindings:</Label>
             
-            <Label Grid.Row="18" Grid.Column="0">Toggle Sound Channel 1 (Debug):</Label>
-            <Button x:Name="ToggleChannel1" Grid.Row="20" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
-            <Button x:Name="ResetToggleChannel1" Grid.Row="20" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
+            <Label Grid.Row="8" Grid.Column="0">DPad Up:</Label>
+            <Button x:Name="DPadUp" Grid.Row="8" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
+            <Button x:Name="ResetDPadUp" Grid.Row="8" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
             
-            <Label Grid.Row="19" Grid.Column="0">Toggle Sound Channel 2 (Debug):</Label>
-            <Button x:Name="ToggleChannel2" Grid.Row="21" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
-            <Button x:Name="ResetToggleChannel2" Grid.Row="21" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
+            <Label Grid.Row="9" Grid.Column="0">DPad Down:</Label>
+            <Button x:Name="DPadDown" Grid.Row="9" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
+            <Button x:Name="ResetDPadDown" Grid.Row="9" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
             
-            <Label Grid.Row="20" Grid.Column="0">Toggle Sound Channel 3 (Debug):</Label>
-            <Button x:Name="ToggleChannel3" Grid.Row="22" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
-            <Button x:Name="ResetToggleChannel3" Grid.Row="22" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
+            <Label Grid.Row="10" Grid.Column="0">DPad Left:</Label>
+            <Button x:Name="DPadLeft" Grid.Row="10" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
+            <Button x:Name="ResetDPadLeft" Grid.Row="10" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
             
-            <Label Grid.Row="21" Grid.Column="0">Toggle Sound Channel 4 (Debug):</Label>
-            <Button x:Name="ToggleChannel4" Grid.Row="23" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
-            <Button x:Name="ResetToggleChannel4" Grid.Row="23" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
+            <Label Grid.Row="11" Grid.Column="0">DPad Right:</Label>
+            <Button x:Name="DPadRight" Grid.Row="11" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
+            <Button x:Name="ResetDPadRight" Grid.Row="11" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
             
-            <Label Grid.Row="22" Grid.Column="0">Open VRAM Inspector (Debug):</Label>
-            <Button x:Name="VRAMInspector" Grid.Row="24" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
-            <Button x:Name="ResetVRAMInspector" Grid.Row="24" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
+            <Label Grid.Row="12" Grid.Column="0">Button A:</Label>
+            <Button x:Name="ButtonA" Grid.Row="12" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
+            <Button x:Name="ResetButtonA" Grid.Row="12" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
+            
+            <Label Grid.Row="13" Grid.Column="0">Button B:</Label>
+            <Button x:Name="ButtonB" Grid.Row="13" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
+            <Button x:Name="ResetButtonB" Grid.Row="13" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
+            
+            <Label Grid.Row="14" Grid.Column="0">Button Start:</Label>
+            <Button x:Name="ButtonStart" Grid.Row="14" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
+            <Button x:Name="ResetButtonStart" Grid.Row="14" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
+            
+            <Label Grid.Row="15" Grid.Column="0">Button Select:</Label>
+            <Button x:Name="ButtonSelect" Grid.Row="15" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
+            <Button x:Name="ResetButtonSelect" Grid.Row="15" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
+            
+            <Label Grid.Row="16" Grid.Column="0">All Buttons:</Label>
+            <Button x:Name="AllButtons" Grid.Row="16" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
+            <Button x:Name="ResetAllButtons" Grid.Row="16" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
+            
+            <Label Grid.Row="17" Grid.Column="0">Turbo Mode:</Label>
+            <Button x:Name="TurboMode" Grid.Row="17" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
+            <Button x:Name="ResetTurboMode" Grid.Row="17" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
+            
+            <Label Grid.Row="18" Grid.Column="0">Rewind:</Label>
+            <Button x:Name="RewindMode" Grid.Row="18" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
+            <Button x:Name="ResetRewindMode" Grid.Row="18" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
+            
+            <Label Grid.Row="19" Grid.Column="0">Quick save:</Label>
+            <Button x:Name="QuickSave" Grid.Row="19" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
+            <Button x:Name="ResetQuickSave" Grid.Row="19" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
+
+            <Label Grid.Row="20" Grid.Column="0">Quick load:</Label>
+            <Button x:Name="QuickLoad" Grid.Row="20" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
+            <Button x:Name="ResetQuickLoad" Grid.Row="20" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
+            
+            <Label Grid.Row="21" Grid.Column="0">Toggle Sound Channel 1 (Debug):</Label>
+            <Button x:Name="ToggleChannel1" Grid.Row="21" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
+            <Button x:Name="ResetToggleChannel1" Grid.Row="21" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
+            
+            <Label Grid.Row="22" Grid.Column="0">Toggle Sound Channel 2 (Debug):</Label>
+            <Button x:Name="ToggleChannel2" Grid.Row="22" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
+            <Button x:Name="ResetToggleChannel2" Grid.Row="22" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
+            
+            <Label Grid.Row="23" Grid.Column="0">Toggle Sound Channel 3 (Debug):</Label>
+            <Button x:Name="ToggleChannel3" Grid.Row="23" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
+            <Button x:Name="ResetToggleChannel3" Grid.Row="23" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
+            
+            <Label Grid.Row="24" Grid.Column="0">Toggle Sound Channel 4 (Debug):</Label>
+            <Button x:Name="ToggleChannel4" Grid.Row="24" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
+            <Button x:Name="ResetToggleChannel4" Grid.Row="24" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
+            
+            <Label Grid.Row="25" Grid.Column="0">Open VRAM Inspector (Debug):</Label>
+            <Button x:Name="VRAMInspector" Grid.Row="25" Grid.Column="1" Height="20" Width="50" Click="BeginChangeKeyBinding"></Button>
+            <Button x:Name="ResetVRAMInspector" Grid.Row="25" Grid.Column="2" Height="20" Width="50" Click="ResetKeyBinding">Reset</Button>
 
         </Grid>
     </ScrollViewer>
