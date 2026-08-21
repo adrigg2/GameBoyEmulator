@@ -26,19 +26,20 @@ public partial class MainWindow : Window
     private bool _paused;
     private bool _rewinding;
 
-    private string _bootRomFilePath;
+    private readonly string _bootRomFilePath;
+    private string _romName = "";
     
     private Emulator? _emulator;
 
     private Thread? _emulatorThread;
     private CancellationTokenSource? _cts;
+    private SaveState.SaveState? _loadState;
 
-    private RewindStack _rewindStack;
+    private readonly RewindStack _rewindStack;
 
     public MainWindow(string[] args)
     {
         InitializeComponent();
-        Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/GEGB/states/");
 
         SizeChanged += (_, _) => UpdateScale();
 
@@ -61,7 +62,7 @@ public partial class MainWindow : Window
 
         _bootRomFilePath = args[0];
 
-        _rewindStack = new(50);
+        _rewindStack = new(100);
 
         MinWidth = GbWidth + 100;
         MinHeight = GbHeight + 100;
@@ -113,9 +114,7 @@ public partial class MainWindow : Window
         int frames = 0;
 
         const int throttleTarget = 44100 / 50;
-        const int framesPerSave = 6; // 5 seconds of rewind
-
-        Stopwatch stopwatch = Stopwatch.StartNew();
+        const int framesPerSave = 6; // ~10 seconds of rewind
 
         if (_emulator == null)
         {
@@ -149,11 +148,10 @@ public partial class MainWindow : Window
                 _emulator.APU.ClearAudioBuffer();
             }
 
-            if (stopwatch.ElapsedMilliseconds >= 60 * 1000)
+            if (_loadState != null)
             {
-                Console.WriteLine(frames / (stopwatch.ElapsedMilliseconds / 1000.0f));
-                frames = 0;
-                stopwatch.Restart();
+                _emulator.LoadState(_loadState);
+                _loadState = null;
             }
         }
 
@@ -167,15 +165,18 @@ public partial class MainWindow : Window
         {
             _emulator?.APU.ToggleChannel(1);
         }
-        else if (e.Key == Settings.ToggleChannel2)
+        
+        if (e.Key == Settings.ToggleChannel2)
         {
             _emulator?.APU.ToggleChannel(2);
         }
-        else if (e.Key == Settings.ToggleChannel3)
+        
+        if (e.Key == Settings.ToggleChannel3)
         {
             _emulator?.APU.ToggleChannel(3);
         }
-        else if (e.Key == Settings.ToggleChannel4)
+        
+        if (e.Key == Settings.ToggleChannel4)
         {
             _emulator?.APU.ToggleChannel(4);
         }
@@ -188,6 +189,31 @@ public partial class MainWindow : Window
         if (e.Key == Settings.RewindButton)
         {
             _rewinding = true;
+        }
+
+        if (e.Key == Settings.QuickSave && _emulator != null)
+        {
+            Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"/GEGB/states/{_romName}");
+            var saveState = _rewindStack.Peek();
+            SaveStateSerializer.SerializeSaveState(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"/GEGB/states/{_romName}/quick_save.state", saveState);
+        }
+        else if (e.Key == Settings.QuickLoad && _emulator != null)
+        {
+            if (File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"/GEGB/states/{_romName}/quick_save.state")) 
+            {
+                try
+                {
+                    _loadState = SaveStateSerializer.DeserializeSaveState(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"/GEGB/states/{_romName}/quick_save.state", _emulator.MMU.Cartridge.HeaderCheck);
+                }
+                catch (FileFormatException ex)
+                {
+                    MessageBox.Show(ex.Message, "Load error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            else
+            {
+                MessageBox.Show("No quick load file found", "Load error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         if (e.Key == Settings.OpenVramViewer && _emulator != null)
@@ -315,8 +341,8 @@ public partial class MainWindow : Window
                 _emulator?.PPU.SetWindowSource(this);
                 _emulator?.PPU.SetBitmapPalette(this, Settings.Palette);
 
-                string romName = Path.GetFileNameWithoutExtension(romFilePath);
-                Title = romName;
+                _romName = Path.GetFileNameWithoutExtension(romFilePath);
+                Title = _romName;
 
                 _rewindStack?.Clear();
 
@@ -324,7 +350,6 @@ public partial class MainWindow : Window
                 _emulatorThread = new Thread(() => Tick(_cts.Token));
                 _emulatorThread.Start();
             }
-
         }
     }
 
@@ -344,5 +369,104 @@ public partial class MainWindow : Window
         }
 
         _paused = false;
+    }
+
+    private void SaveState(object sender, RoutedEventArgs e)
+    {
+        string dir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"/GEGB/states/{_romName}/";
+        Directory.CreateDirectory(dir);
+        string fileName = Path.Combine(dir, "save.state");
+        int count = 1;
+        while (File.Exists(fileName))
+        {
+            fileName = Path.Combine(dir, $"save{count}.state");
+            count++;
+        }
+
+        var saveState = _rewindStack.Peek();
+        SaveStateSerializer.SerializeSaveState(fileName, saveState);
+    }
+
+    private void LoadState(object sender, RoutedEventArgs e)
+    {
+        if (_emulator == null)
+        {
+            return;
+        }
+
+        string dir = "";
+        if (Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"/GEGB/states/{_romName}"))
+        {
+            dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "GEGB", "states", _romName);
+        }
+
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            FileName = "save",
+            DefaultExt = ".state",
+            Filter = "GEGB Save state file (.state)|*.state",
+            InitialDirectory = dir,
+        };
+
+        bool? result = dialog.ShowDialog();
+
+        if (result == true)
+        {
+            string saveStateFile = dialog.FileName;
+            string fileExtension = Path.GetExtension(saveStateFile);
+            if (fileExtension.ToLower().Equals(".state"))
+            {
+                try
+                {
+                    _loadState = SaveStateSerializer.DeserializeSaveState(saveStateFile, _emulator.MMU.Cartridge.HeaderCheck);
+                }
+                catch (FileFormatException ex)
+                {
+                    MessageBox.Show(ex.Message, "Load error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            else
+            {
+                MessageBox.Show("The file selected is not valid", "Load error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+    }
+
+    private void RemoveState(object sender, RoutedEventArgs e)
+    {
+        if (_emulator == null)
+        {
+            return;
+        }
+
+        string dir = "";
+        if (Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"/GEGB/states/{_romName}"))
+        {
+            dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "GEGB", "states", _romName);
+        }
+
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            FileName = "save",
+            DefaultExt = ".state",
+            Filter = "GEGB Save state file (.state)|*.state",
+            InitialDirectory = dir,
+        };
+
+        bool? result = dialog.ShowDialog();
+
+        if (result == true)
+        {
+            string saveStateFile = dialog.FileName;
+            string fileExtension = Path.GetExtension(saveStateFile);
+            if (fileExtension.ToLower().Equals(".state"))
+            {
+                File.Delete(saveStateFile);
+            }
+            else
+            {
+                MessageBox.Show("The file selected is not valid", "Load error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
     }
 }

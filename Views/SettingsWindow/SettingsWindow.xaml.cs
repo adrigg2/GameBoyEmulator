@@ -75,7 +75,7 @@ public partial class SettingsWindow : Window
 
     public void ChangeKeyBinding(object sender, KeyEventArgs e)
     {
-        if (_keybind == null)
+        if (_keybind == null || e.Key == Key.Escape)
         {
             return;
         }
@@ -165,6 +165,16 @@ public partial class SettingsWindow : Window
             Settings.OpenVramViewer = e.Key;
             VRAMInspector.Content = Settings.OpenVramViewer;
         }
+        else if (_keybind.Equals(QuickSave))
+        {
+            Settings.QuickSave = e.Key;
+            QuickSave.Content = Settings.QuickSave;
+        }
+        else if (_keybind.Equals(QuickLoad))
+        {
+            Settings.QuickLoad = e.Key;
+            QuickLoad.Content = Settings.QuickLoad;
+        }
 
         _keybind = null;
     }
@@ -250,6 +260,16 @@ public partial class SettingsWindow : Window
         {
             Settings.OpenVramViewer = Key.F1;
             VRAMInspector.Content = Settings.OpenVramViewer;
+        }
+        else if (sender.Equals(ResetQuickSave))
+        {
+            Settings.QuickSave = Key.F2;
+            QuickSave.Content = Settings.QuickSave;
+        }
+        else if (sender.Equals(ResetQuickLoad))
+        {
+            Settings.QuickLoad = Key.F3;
+            QuickLoad.Content = Settings.QuickLoad;
         }
     }
 }

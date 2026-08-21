@@ -31,8 +31,7 @@ public class Emulator
         byte[] romBytes = File.ReadAllBytes(rom);
         byte[] bootRomBytes = File.ReadAllBytes(bootRom);
 
-        string romName = rom.Split('\\').Last();
-        romName = romName.Substring(0, romName.Length - 3);
+        string romName = Path.GetFileNameWithoutExtension(rom);
 
         _ppu = new(windowDispatcher);
         _joypad = new();
@@ -46,7 +45,7 @@ public class Emulator
         _frames = 0;
     }
 
-    public void ProcessFrame(StreamWriter? logFile = null)
+    public void ProcessFrame()
     {
         int frameCycles = 0;
 
@@ -65,41 +64,6 @@ public class Emulator
             {
                 _halted = false;
             }
-
-            //if (!_mmu._bootRomMapped && !_halted)
-            //{
-            //    logFile?.WriteLine($"{_cpu._lastInstructionPC:X2}: {OpcodeParser.ParseOpcode(_cpu._lastInstruction)}");
-            //    if (_cpu._lastInstruction == 0x76)
-            //    {
-            //        _halted = true;
-            //    }
-            //}
-
-            ////if (_cpu._lastInstructionPC == 0xFE)
-            ////{
-            ////    logFile?.WriteLine(_cpu);
-            ////}
-
-            //if (_cpu.interrupt)
-            //{
-            //    logFile?.WriteLine(_cpu.interruptSource);
-            //}
-
-            //if (_cpu.interruptService)
-            //{
-            //    logFile?.WriteLine($"{_cpu._lastInstructionPC:X2}: {OpcodeParser.ParseOpcode(_cpu._lastInstruction)}");
-            //}
-
-            //Console.WriteLine(_cpu);
-            //Console.WriteLine($"LY = {_mmu.LY}");
-            //Console.WriteLine($"LY(CPU) = {_mmu.ReadByte(0xFF44)}");
-            //Console.WriteLine($"Calls = {_calls}");
-            //if (mmu.LY == 144 || (cpu._lastInstruction != 0x20 && cpu._lastInstruction != 0xFE && cpu._lastInstruction != 0xF0) )
-            //Console.ReadKey();
-            //using (StreamWriter log = new StreamWriter(".\\logs\\log.txt", true))
-            //{
-            //    log.WriteLine($"{_cpu._lastInstruction:X2}");
-            //}
         }
 
         _frames++;

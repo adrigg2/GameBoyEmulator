@@ -29,6 +29,8 @@ public static class Settings
     public static Key TurboMode { get => _data.TurboMode; set => _data.TurboMode = value; }
     public static Key RewindButton { get => _data.RewindButton; set => _data.RewindButton = value; }
     public static Key OpenVramViewer { get => _data.OpenVramViewer; set => _data.OpenVramViewer = value; }
+    public static Key QuickSave { get => _data.QuickSave; set => _data.QuickSave = value; }
+    public static Key QuickLoad { get => _data.QuickLoad; set => _data.QuickLoad = value; }
 
 
     static Settings()
@@ -69,5 +71,7 @@ public static class Settings
         public Key TurboMode { get; set; } = Key.Space;
         public Key RewindButton { get; set; } = Key.LeftCtrl;
         public Key OpenVramViewer { get; set; } = Key.F1;
+        public Key QuickSave { get; set; } = Key.F2;
+        public Key QuickLoad { get; set; } = Key.F3;
     }
 }

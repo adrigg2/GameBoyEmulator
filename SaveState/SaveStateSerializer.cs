@@ -11,6 +11,11 @@ public static class SaveStateSerializer
 
     public static void SerializeSaveState(string path, SaveState saveState)
     {
+        if (saveState == null)
+        {
+            return;
+        }
+
         using FileStream stream = File.OpenWrite(path);
         using BinaryWriter writer = new(stream);
 
@@ -36,7 +41,7 @@ public static class SaveStateSerializer
         byte version = reader.ReadByte();
         if (!Enumerable.SequenceEqual(magic, Magic) || version != Version)
         {
-            throw new FileFormatException("The file given is not a save state file for this emulator");
+            throw new FileFormatException("The file given is corrupted or not a valid save state file for this emulator");
         }
 
         byte[] fileHeaderCheck = reader.ReadBytes(headerCheck.Length);

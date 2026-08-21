@@ -12,6 +12,9 @@
         <Menu DockPanel.Dock="Top" x:Name="MenuContainer">
             <MenuItem Header="_File">
                 <MenuItem Header="_Open ROM" Click="OpenROM"></MenuItem>
+                <MenuItem Header="_Save State" Click="SaveState"></MenuItem>
+                <MenuItem Header="_Load State" Click="LoadState"></MenuItem>
+                <MenuItem Header="_Remove Save State" Click="RemoveState"></MenuItem>
             </MenuItem>
             <MenuItem Header="_Options">
                 <MenuItem Header="_Palettes">
