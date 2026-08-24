@@ -1,10 +1,10 @@
 ﻿using GameBoyEmulator.Core;
 using GameBoyEmulator.Core.Audio;
-using GameBoyEmulator.SaveState;
 using System.IO;
 using System.Windows.Threading;
 
 namespace GameBoyEmulator;
+
 public class Emulator
 {
     private readonly MMU _mmu;

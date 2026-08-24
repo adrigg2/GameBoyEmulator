@@ -12,8 +12,8 @@ public class TIMER
     private int _timaResetCounter = -1;
     private int _timaIgnoreWritesCounter = 0;
     private int _divApu = 0;
-    
-    public byte DIV 
+
+    public byte DIV
     {
         get => (byte)(_counter >> 8);
         set

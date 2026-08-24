@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace GameBoyEmulator.Core.Audio;
+﻿namespace GameBoyEmulator.Core.Audio;
 
 public class RingBuffer(int capacity)
 {
@@ -11,7 +9,7 @@ public class RingBuffer(int capacity)
     private int _count;
     private readonly object _lock = new();
 
-    public int Count { get { lock(_lock) return  _count; } }
+    public int Count { get { lock (_lock) return _count; } }
 
     public void Write(float f)
     {

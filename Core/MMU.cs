@@ -3,6 +3,7 @@ using GameBoyEmulator.Core.Cartridge;
 using GameBoyEmulator.SaveState.Components;
 
 namespace GameBoyEmulator.Core;
+
 public class MMU(DMA dma, JOYPAD joypad, PPU ppu, TIMER timer, APU apu)
 {
     private DMA _dma = dma;
@@ -315,7 +316,7 @@ public class MMU(DMA dma, JOYPAD joypad, PPU ppu, TIMER timer, APU apu)
         }
         Console.WriteLine(s);
 
-        switch(rom[0x147])
+        switch (rom[0x147])
         {
             case 0x00:
                 _cartridge = new NoMBC(rom);

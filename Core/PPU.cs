@@ -98,7 +98,7 @@ public class PPU
             _windowY = 0;
             _stat = (byte)(_stat & ~0x3);
             _cycleCount = 0;
-            
+
             if (!_screenOff)
             {
                 _screenOff = true;
@@ -432,7 +432,7 @@ public class PPU
             }
         }
     }
-    
+
     private void SetPixel(int x, int y, int color)
     {
         _screenBuffer[(y * ScreenWidth + x) / 4] |= (byte)(color << ((~x & 3) * 2));

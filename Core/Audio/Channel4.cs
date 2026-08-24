@@ -68,7 +68,7 @@ public class Channel4
                 }
 
                 ResetFrequency();
-                
+
                 _volume = (_nr42 & 0xF0) >> 4;
                 _envSweepPace = _nr42 & 0x7;
                 _envDir = (_nr42 & 0x8) > 0;

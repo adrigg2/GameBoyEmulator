@@ -26,7 +26,7 @@ public record PPUState(int CycleCount, int WindowY, byte LCDC, byte STAT, byte S
         writer.Write(ScreenBuffer);
         writer.Write(BgColorIds);
         writer.Write(ObjectPool.Count);
-        
+
         foreach (ushort obj in ObjectPool)
         {
             writer.Write(obj);

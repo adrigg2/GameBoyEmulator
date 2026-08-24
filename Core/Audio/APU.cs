@@ -1,6 +1,6 @@
-﻿using NAudio.Wave;
+﻿using GameBoyEmulator.SaveState.Components.APU;
 using NAudio.CoreAudioApi;
-using GameBoyEmulator.SaveState.Components.APU;
+using NAudio.Wave;
 
 namespace GameBoyEmulator.Core.Audio;
 
@@ -29,10 +29,10 @@ public class APU
 
     private readonly APUSampleProvider _sampleProvider;
     private readonly WasapiOut _out;
-    
+
     public byte NR50 { get => _nr50; set => _nr50 = value; }
     public byte NR51 { get => _nr51; set => _nr51 = value; }
-    public byte NR52 
+    public byte NR52
     {
         get
         {
@@ -59,7 +59,7 @@ public class APU
 
             return nr52;
         }
-        set 
+        set
         {
             _nr52 = (byte)(value & 0x80);
             _active = true;

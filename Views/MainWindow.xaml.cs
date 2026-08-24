@@ -1,7 +1,5 @@
 ﻿using GameBoyEmulator.SaveState;
-using GameBoyEmulator.Views.SettingsWindow;
 using GameBoyEmulator.Views.VRAMInspector;
-using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
@@ -27,7 +25,7 @@ public partial class MainWindow : Window
     private bool _rewinding;
 
     private string _romName = "";
-    
+
     private Emulator? _emulator;
 
     private Thread? _emulatorThread;
@@ -162,17 +160,17 @@ public partial class MainWindow : Window
         {
             _emulator?.APU.ToggleChannel(1);
         }
-        
+
         if (e.Key == Settings.ToggleChannel2)
         {
             _emulator?.APU.ToggleChannel(2);
         }
-        
+
         if (e.Key == Settings.ToggleChannel3)
         {
             _emulator?.APU.ToggleChannel(3);
         }
-        
+
         if (e.Key == Settings.ToggleChannel4)
         {
             _emulator?.APU.ToggleChannel(4);
@@ -196,7 +194,7 @@ public partial class MainWindow : Window
         }
         else if (e.Key == Settings.QuickLoad && _emulator != null)
         {
-            if (File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"/GEGB/states/{_romName}/quick_save.state")) 
+            if (File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"/GEGB/states/{_romName}/quick_save.state"))
             {
                 try
                 {

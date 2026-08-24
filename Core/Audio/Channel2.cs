@@ -30,7 +30,7 @@ public class Channel2
     private bool _envDir;
     private bool _envFinished;
 
-    public byte NR21 
+    public byte NR21
     {
         get => (byte)(_nr21 & 0xC0);
         set

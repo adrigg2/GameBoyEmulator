@@ -1,9 +1,4 @@
 ﻿using GameBoyEmulator.SaveState.Components;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GameBoyEmulator.Core;
 
@@ -11,7 +6,7 @@ public class DMA
 {
     private const int MaxCycles = 640;
     private const int CyclesPerTransfer = 4;
-    
+
     private ushort _address = 0;
 
     private int _cycles = 0;
@@ -49,7 +44,7 @@ public class DMA
             mmu.WriteByte((ushort)(0xFE00 + _transfers), transferedByte);
             _transfers++;
         }
-        
+
         if (_cycles >= MaxCycles)
         {
             _active = false;

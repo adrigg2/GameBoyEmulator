@@ -1,7 +1,8 @@
 ﻿namespace GameBoyEmulator.Core;
+
 public static class CPUCycles
 {
-    public static int[] Cycles { get; set; } = 
+    public static int[] Cycles { get; set; } =
     [
     //  0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
         4,  12, 8,  8,  4,  4,  8,  4,  20, 8,  8,  8,  4,  4,  8,  4,  // 0
@@ -43,12 +44,12 @@ public static class CPUCycles
         8,  8,  8,  8,  8,  8,  16, 8,  8,  8,  8,  8,  8,  8,  16, 8,  // F
     ];
 
-    public const int JRT   = 12;
-    public const int JRF   =  8;
-    public const int RETT  = 20;
-    public const int RETF  =  8;
-    public const int JPT   = 16;
-    public const int JPF   = 12;
+    public const int JRT = 12;
+    public const int JRF = 8;
+    public const int RETT = 20;
+    public const int RETF = 8;
+    public const int JPT = 16;
+    public const int JPF = 12;
     public const int CALLT = 24;
     public const int CALLF = 12;
 }

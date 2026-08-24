@@ -139,7 +139,7 @@ public partial class VRAMViewer : Window
                         }
                         else
                         {
-                            if (xWithoutOffset > scx && xWithoutOffset <  rightX && (y == scy || y == bottomY))
+                            if (xWithoutOffset > scx && xWithoutOffset < rightX && (y == scy || y == bottomY))
                             {
                                 pixels[y * (int)Screen.Width + x] = 6;
                             }

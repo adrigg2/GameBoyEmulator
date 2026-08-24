@@ -2,7 +2,6 @@
 using System.Text.Json;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace GameBoyEmulator;
 

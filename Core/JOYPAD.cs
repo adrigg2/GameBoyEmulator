@@ -8,7 +8,7 @@ public class JOYPAD
     private byte _pad = 0x0F;
     private byte _buttons = 0x0F;
     private byte _joyp = 0x3F;
-    
+
     public byte JOYP { get => _joyp; set => _joyp = (byte)((value & 0xF0) | (_joyp & 0x0F)); }
 
     public void Update(MMU mmu)

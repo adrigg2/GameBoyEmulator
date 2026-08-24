@@ -20,17 +20,17 @@ public class NoMBC(byte[] rom) : ICartridge
 
     public void SaveRam()
     {
-        
+
     }
 
     public void WriteRam(ushort address, byte value)
     {
-        
+
     }
 
     public void WriteRegister(ushort address, byte value)
     {
-        
+
     }
 
     public MBCState SaveState()
@@ -40,6 +40,6 @@ public class NoMBC(byte[] rom) : ICartridge
 
     public void LoadState(MBCState state)
     {
-        
+
     }
 }

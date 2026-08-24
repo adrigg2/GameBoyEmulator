@@ -1,5 +1,4 @@
 ﻿using NAudio.Wave;
-using System.Collections.Concurrent;
 
 namespace GameBoyEmulator.Core.Audio;
 

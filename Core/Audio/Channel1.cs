@@ -36,7 +36,7 @@ public class Channel1
     private bool _envFinished;
 
     public byte NR10 { get => _nr10; set => _nr10 = value; }
-    public byte NR11 
+    public byte NR11
     {
         get => (byte)(_nr11 & 0xC0);
         set
@@ -64,7 +64,8 @@ public class Channel1
         }
     }
     public byte NR13 { set => _nr13 = value; }
-    public byte NR14 {
+    public byte NR14
+    {
         get => (byte)(_nr14 & 0x40);
         set
         {

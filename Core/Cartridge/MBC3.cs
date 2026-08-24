@@ -182,7 +182,8 @@ public class MBC3 : ICartridge
                     int newRtcDHday = (_rtcDH & 0x01) << 8;
                     _rtcTime += newRtcDHday * 24 * 3600 - oldRtcDHday * 24 * 3600;
                     break;
-            };
+            }
+            ;
         }
     }
 
