@@ -18,8 +18,6 @@ public class Emulator
     private const int CPUFrequency = 4194304; // 4.194304 MHz
     private const int CyclesPerFrame = 70224; // ~60 FPS
     public const float FrameTime = (float)CyclesPerFrame / CPUFrequency;
-    private int _frames;
-    private bool _halted;
 
     public PPU PPU { get => _ppu; }
     public JOYPAD JOYPAD { get => _joypad; }
@@ -42,7 +40,6 @@ public class Emulator
         _mmu.LoadGame(romBytes, romName);
         _mmu.LoadBootRom(bootRomBytes);
         _cpu = new(_mmu);
-        _frames = 0;
     }
 
     public void ProcessFrame()
@@ -59,14 +56,7 @@ public class Emulator
             int divApuCounter = _timer.Tick(cycles, _mmu);
             _apu.Tick(cycles, divApuCounter);
             frameCycles += cycles;
-
-            if (_cpu._lastInstruction != 0x76)
-            {
-                _halted = false;
-            }
         }
-
-        _frames++;
     }
 
     public SaveState.SaveState SaveState()
