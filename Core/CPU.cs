@@ -11,7 +11,6 @@ public class CPU
     private ushort _pc, _sp;
 
     private bool _ime, _halted, _haltBug;
-    // private bool _stopped;   // TODO: Stop
 
     private int _eiCounter;
 
@@ -34,12 +33,6 @@ public class CPU
     public bool HalfCarryFlag { get => (_f & 0x20) != 0; set => _f = (byte)(_f & 0xDF | (value ? 0x20 : 0)); }
     public bool CarryFlag { get => (_f & 0x10) != 0; set => _f = (byte)(_f & 0xEF | (value ? 0x10 : 0)); }
 
-    public byte _lastInstruction;  // DEBUG: Debug only
-    public ushort _lastInstructionPC; // DEBUG: Debug only
-    public bool interrupt;  // DEBUG: Debug only
-    public string interruptSource;  // DEBUG: Debug only
-    public bool interruptService;
-
     public CPU(MMU mmu)
     {
         _a = _b = _c = _d = _e = _h = _l = _f = 0;
@@ -47,17 +40,11 @@ public class CPU
         _ime = _halted = _haltBug = false;
         _mmu = mmu;
         _eiCounter = 0;
-        interrupt = interruptService = false;
-        interruptSource = "";
     }
 
     public int Execute()
     {
-        // if (_stopped) return;    // TODO: STOP
-        _lastInstructionPC = _pc;
-
         int cycles = 0;
-        interrupt = false;
         if (_ime || _halted)
         {
             if ((_mmu.IE & _mmu.IF) != 0)
@@ -78,11 +65,6 @@ public class CPU
         {
             _pc--;
             _haltBug = false;
-        }
-
-        if (instruction == 0xD9)
-        {
-            interruptService = false;
         }
 
         switch (instruction)
@@ -420,7 +402,6 @@ public class CPU
             default: break;
         }
 
-        _lastInstruction = instruction; // DEBUG: debug only
         return cycles;
     }
 
@@ -461,40 +442,30 @@ public class CPU
             _ime = false;
             interruptHandler = 0x40;
             _mmu.IF &= 0xFE;
-            interrupt = true;
-            interruptSource = "VBLANK";
         }
         else if ((_mmu.IE & _mmu.IF & 0x2) != 0)
         {
             _ime = false;
             interruptHandler = 0x48;
             _mmu.IF &= 0xFD;
-            interrupt = true;
-            interruptSource = "STAT";
         }
         else if ((_mmu.IE & _mmu.IF & 0x4) != 0)
         {
             _ime = false;
             interruptHandler = 0x50;
             _mmu.IF &= 0xFB;
-            interrupt = true;
-            interruptSource = "Timer";
         }
         else if ((_mmu.IE & _mmu.IF & 0x8) != 0)
         {
             _ime = false;
             interruptHandler = 0x58;
             _mmu.IF &= 0xF7;
-            interrupt = true;
-            interruptSource = "Serial";
         }
         else if ((_mmu.IE & _mmu.IF & 0x10) != 0)
         {
             _ime = false;
             interruptHandler = 0x60;
             _mmu.IF &= 0xEF;
-            interrupt = true;
-            interruptSource = "JOYPAD";
         }
 
         if (interruptHandler != 0)
@@ -503,7 +474,6 @@ public class CPU
             _mmu.WriteWord(_sp, _pc);
 
             _pc = interruptHandler;
-            interruptService = true;
             return 20;
         }
 
@@ -1103,8 +1073,6 @@ public class CPU
 
             PC = {_pc:X2}
             SP = {_sp:X2}
-
-            LastInstruction = {_lastInstruction:X2}
 
             InBIOS = {_mmu._bootRomMapped}
             """;
