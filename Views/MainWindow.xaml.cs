@@ -108,7 +108,9 @@ public partial class MainWindow : Window
     {
         int frames = 0;
 
-        const int throttleTarget = 44100 / 50;
+        const double frameRate = 4194304.0 / 70224.0;
+
+        const int throttleTarget = (int)(44100 / 5);
         const int framesPerSave = 6; // ~10 seconds of rewind
 
         if (_emulator == null)
